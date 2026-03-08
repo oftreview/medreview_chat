@@ -4,7 +4,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, request, jsonify, render_template
 from agents.sales.agent import SalesAgent
-from core.config import DEBUG, PORT, HOST
+from core.config import DEBUG, PORT
+
+HOST = os.getenv("HOST", "0.0.0.0")
 
 app = Flask(__name__)
 agent = SalesAgent()
