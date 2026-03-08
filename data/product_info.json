@@ -1,0 +1,87 @@
+{
+  "intro": "Use as informações abaixo para responder perguntas detalhadas sobre produtos. Não invente nada que não esteja aqui.",
+  "products": {
+    "extensive-2026": {
+      "description": "Curso completo de preparação para a prova de residência médica do ciclo 2026. Inclui todo o conteúdo teórico, questões comentadas, simulados e acompanhamento até a data da prova.",
+      "features": [
+        "Videoaulas cobrindo todo o edital",
+        "Banco de questões comentadas",
+        "Simulados no formato da banca",
+        "Acesso até 01/03/2027",
+        "Suporte e dúvidas via plataforma"
+      ],
+      "faq": [
+        { "q": "O que está incluso?", "a": "Acesso completo à plataforma: videoaulas, questões, simulados e ferramentas de acompanhamento até 01/03/2027." },
+        { "q": "Posso parcelar?", "a": "Consulte as condições de parcelamento com o consultor; há opções disponíveis." }
+      ]
+    },
+    "extensive-2026-2027": {
+      "description": "Preparação para dois ciclos de prova (2026 e 2027). Ideal para quem quer começar cedo ou fazer duas tentativas com conteúdo atualizado.",
+      "features": [
+        "Todo o conteúdo do Extensive 2026",
+        "Acesso estendido até 01/03/2028",
+        "Atualizações de edital para as duas provas",
+        "Melhor custo por ano de acesso"
+      ],
+      "faq": []
+    },
+    "extensive-flex": {
+      "description": "Mesmo conteúdo do Extensive com pagamento mensal. Sem compromisso anual; pode cancelar quando quiser.",
+      "features": [
+        "Acesso mensal à plataforma completa",
+        "R$ 497/mês",
+        "Cancele quando quiser",
+        "Ideal para testar ou estudar por período menor"
+      ],
+      "faq": [
+        { "q": "Posso cancelar a qualquer momento?", "a": "Sim. O plano Flex é mensal e sem fidelidade." }
+      ]
+    },
+    "intensive-enamed": {
+      "description": "Intensivo focado na prova Enamed, com duração de 3 meses. Conteúdo enxuto e direto ao ponto.",
+      "features": [
+        "Foco na Enamed",
+        "Duração: 3 meses",
+        "Preço único R$ 97"
+      ],
+      "faq": []
+    },
+    "cronicas-clinica-medica": {
+      "description": "Crônicas da MED Review - 1ª edição - Clínica Médica. Material específico de Clínica Médica em formato de crônicas.",
+      "features": [
+        "Conteúdo de Clínica Médica",
+        "Formato crônicas - 1ª edição",
+        "Acesso conforme produto"
+      ],
+      "faq": []
+    },
+    "lux-anual": {
+      "description": "Sistema LUX: banco de questões e flashcards para estudo ativo. Plano de 1 ano com acesso completo às questões e flashcards.",
+      "features": [
+        "Banco completo de questões",
+        "Flashcards integrados",
+        "Acesso por 1 ano",
+        "Atualizações durante o período"
+      ],
+      "faq": [
+        { "q": "A diferença entre LUX e Extensive?", "a": "O Extensive é o curso completo (videoaulas + questões + simulados). O LUX é focado em questões e flashcards — ideal para quem já tem base ou quer complementar." }
+      ]
+    },
+    "lux-semestral": {
+      "description": "Sistema LUX por 6 meses. Mesmo conteúdo de questões e flashcards do plano anual, com acesso de meio ano.",
+      "features": [
+        "Questões e flashcards",
+        "Acesso por 6 meses"
+      ],
+      "faq": []
+    },
+    "lux-trimestral": {
+      "description": "Sistema LUX por 3 meses. Para quem quer um período mais curto de questões e flashcards.",
+      "features": [
+        "Questões e flashcards",
+        "Acesso por 3 meses"
+      ],
+      "faq": []
+    }
+  }
+}

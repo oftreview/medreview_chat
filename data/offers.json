@@ -1,0 +1,94 @@
+{
+  "vertical": "R1 - Residência Médica",
+  "company": "MedReview",
+  "offers": [
+    {
+      "id": "extensive-2026",
+      "name": "Extensive 2026",
+      "price": 4764,
+      "price_display": "R$ 4.764",
+      "price_base": "R$ 5.964",
+      "access_until": "01/03/2027",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato focado na prova de 2026"
+    },
+    {
+      "id": "extensive-2026-2027",
+      "name": "Extensive 2026/2027",
+      "price": 7622,
+      "price_display": "R$ 7.622",
+      "price_base": "R$ 11.928",
+      "access_until": "01/03/2028",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato que quer 2 anos de preparação completa"
+    },
+    {
+      "id": "extensive-flex",
+      "name": "Extensive Flex",
+      "price": 497,
+      "price_display": "R$ 497/mês",
+      "price_base": "R$ 497/mês",
+      "access_until": "Mensal",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato que prefere pagamento mensal sem compromisso anual"
+    },
+    {
+      "id": "intensive-enamed",
+      "name": "Intensive Enamed",
+      "price": 97,
+      "price_display": "R$ 97",
+      "price_base": "R$ 97",
+      "access_until": "3 meses",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato focado em intensivo de curta duração"
+    },
+    {
+      "id": "cronicas-clinica-medica",
+      "name": "Crônicas da MED Review - 1ª edição - Clínica Médica",
+      "price": 147,
+      "price_display": "R$ 147",
+      "price_base": "R$ 147",
+      "access_until": "Não informado",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato focado em Clínica Médica"
+    },
+    {
+      "id": "lux-anual",
+      "name": "Sistema LUX questões e flashcards - 1 ano",
+      "price": 1997,
+      "price_display": "R$ 1.997",
+      "price_base": "R$ 1.997",
+      "access_until": "1 ano",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato que quer banco completo de questões e flashcards por 1 ano"
+    },
+    {
+      "id": "lux-semestral",
+      "name": "Sistema LUX questões e flashcards - 6 meses",
+      "price": 1697,
+      "price_display": "R$ 1.697",
+      "price_base": "R$ 1.997",
+      "access_until": "6 meses",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato que quer banco de questões e flashcards por 6 meses"
+    },
+    {
+      "id": "lux-trimestral",
+      "name": "Sistema LUX questões e flashcards - 3 meses",
+      "price": 1097,
+      "price_display": "R$ 1.097",
+      "price_base": "R$ 1.997",
+      "access_until": "3 meses",
+      "type": "Novo aluno",
+      "channel": "Website",
+      "best_for": "Candidato que quer banco de questões e flashcards por 3 meses"
+    }
+  ]
+}
