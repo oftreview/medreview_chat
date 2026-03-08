@@ -29,18 +29,18 @@ class SalesAgent:
     def __init__(self):
         self.memory = ConversationMemory()
         self.system_prompt = load_context()
-        self.status = "active"
 
-    def reply(self, user_message: str) -> dict:
-        self.memory.add("user", user_message)
-        response_text = call_claude(self.system_prompt, self.memory.get())
-        self.memory.add("assistant", response_text)
+    def reply(self, user_message: str, session_id: str = "default") -> dict:
+        self.memory.add(session_id, "user", user_message)
+        response_text = call_claude(self.system_prompt, self.memory.get(session_id))
+        self.memory.add(session_id, "assistant", response_text)
+
         escalate = any(t in response_text.lower() for t in ["vou conectar você com", "consultor humano"])
         if escalate:
-            self.status = "escalated"
-        return {"message": response_text, "status": self.status, "escalate": escalate}
+            self.memory.set_status(session_id, "escalated")
 
-    def reset(self):
-        self.memory.reset()
-        self.status = "active"
-        
+        status = self.memory.get_status(session_id)
+        return {"message": response_text, "status": status, "escalate": escalate}
+
+    def reset(self, session_id: str = None):
+        self.memory.reset(session_id)

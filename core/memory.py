@@ -1,28 +1,42 @@
 """
-Memória de conversa em memória RAM (sandbox).
+Memória de conversa multi-sessão (por número de telefone ou session_id).
 No futuro: substituir por Supabase com tenant_id.
 """
 
 class ConversationMemory:
     def __init__(self):
-        self.history = []
+        # sessions: dict { session_id -> list of messages }
+        self.sessions = {}
+        self.statuses = {}
 
-    def add(self, role: str, content: str):
-        """Adiciona uma mensagem ao histórico. role = 'user' ou 'assistant'"""
-        self.history.append({"role": role, "content": content})
+    def add(self, session_id: str, role: str, content: str):
+        if session_id not in self.sessions:
+            self.sessions[session_id] = []
+        self.sessions[session_id].append({"role": role, "content": content})
 
-    def get(self) -> list:
-        """Retorna o histórico completo para enviar à Claude API."""
-        return self.history
+    def get(self, session_id: str) -> list:
+        return self.sessions.get(session_id, [])
 
-    def reset(self):
-        """Limpa o histórico — simula início de nova conversa."""
-        self.history = []
+    def reset(self, session_id: str = None):
+        if session_id:
+            self.sessions.pop(session_id, None)
+            self.statuses.pop(session_id, None)
+        else:
+            self.sessions = {}
+            self.statuses = {}
 
-    def summary(self) -> str:
-        """Resumo simples da conversa para debug."""
+    def set_status(self, session_id: str, status: str):
+        self.statuses[session_id] = status
+
+    def get_status(self, session_id: str) -> str:
+        return self.statuses.get(session_id, "active")
+
+    def list_sessions(self) -> list:
+        return list(self.sessions.keys())
+
+    def summary(self, session_id: str) -> str:
         lines = []
-        for msg in self.history:
+        for msg in self.get(session_id):
             prefix = "Lead" if msg["role"] == "user" else "Criatons"
             lines.append(f"{prefix}: {msg['content'][:80]}...")
         return "\n".join(lines)
