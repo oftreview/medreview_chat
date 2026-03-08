@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, render_template
 from agents.sales.agent import SalesAgent
 from core.config import DEBUG, PORT
 from core.whatsapp import send_message, parse_incoming
+from core import database
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
@@ -98,6 +99,9 @@ def webhook_form():
 
     if not phone:
         return jsonify({"error": "Campo 'phone' não encontrado no payload"}), 400
+
+    # Persiste o lead no Supabase
+    database.upsert_lead(phone=phone, name=name, source="form")
 
     # Mensagem de abertura: usar dados do lead como contexto para o agente
     trigger = f"[NOVO LEAD VIA FORMULÁRIO] Nome: {name}. Inicie a conversa de qualificação."
