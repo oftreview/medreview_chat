@@ -7,6 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE $PORT
+EXPOSE 8080
 
-CMD ["sh", "-c", "gunicorn sandbox.app:app --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120"]
+RUN chmod +x start.sh
+
+CMD ["sh", "start.sh"]
