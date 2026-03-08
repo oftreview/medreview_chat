@@ -51,15 +51,23 @@ def webhook_zapi():
     """Recebe mensagens do WhatsApp via Z-API e responde com o agente."""
     data = request.get_json(silent=True) or {}
 
+    # LOG COMPLETO para debug — aparece nos logs do Railway
+    print(f"[ZAPI WEBHOOK] Payload recebido: {data}", flush=True)
+
     incoming = parse_incoming(data)
     if not incoming:
+        print(f"[ZAPI WEBHOOK] Ignorado — type={data.get('type')} fromMe={data.get('fromMe')} phone={data.get('phone')} body={data.get('body')}", flush=True)
         return jsonify({"status": "ignored"}), 200
 
     phone = incoming["phone"]
     message = incoming["message"]
 
+    print(f"[ZAPI WEBHOOK] Processando — phone={phone} msg={message[:80]}", flush=True)
+
     result = agent.reply(message, session_id=phone)
-    send_message(phone, result["message"])
+    ok = send_message(phone, result["message"])
+
+    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} — {result['message'][:80]}", flush=True)
 
     return jsonify({"status": "ok"}), 200
 
