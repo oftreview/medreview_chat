@@ -1,94 +1,103 @@
 {
   "vertical": "R1 - Residência Médica",
   "company": "MedReview",
+  "payment_conditions": "12x com juros ou 5% de desconto à vista",
   "offers": [
     {
       "id": "extensive-2026",
       "name": "Extensive 2026",
-      "price": 4764,
-      "price_display": "R$ 4.764",
-      "price_base": "R$ 5.964",
-      "access_until": "01/03/2027",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato focado na prova de 2026"
+      "price": 5397,
+      "price_display": "R$ 5.397",
+      "price_avista_display": "R$ 5.127 (5% off à vista)",
+      "access": "1 ano",
+      "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
+      "best_for": "Candidato focado na prova de 2026",
+      "link": "https://pay.hotmart.com/R91654048X?off=wi3tpwxq",
+      "link_avista": "https://pay.hotmart.com/R91654048X?off=ly65zo8a"
     },
     {
       "id": "extensive-2026-2027",
       "name": "Extensive 2026/2027",
-      "price": 7622,
-      "price_display": "R$ 7.622",
-      "price_base": "R$ 11.928",
-      "access_until": "01/03/2028",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato que quer 2 anos de preparação completa"
+      "price": 8222,
+      "price_display": "R$ 8.222",
+      "price_avista_display": "R$ 7.811 (5% off à vista)",
+      "access": "2 anos",
+      "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
+      "best_for": "Candidato que quer 2 anos de preparação completa, prova de 2026 e 2027",
+      "link": "https://pay.hotmart.com/R91654048X?off=rql0d4se",
+      "link_avista": "https://pay.hotmart.com/R91654048X?off=05s0xc31"
+    },
+    {
+      "id": "extensive-2026-recorrente",
+      "name": "Extensive 2026 — Mensal Recorrente",
+      "price": 5397,
+      "price_display": "R$ 5.397 (cobrado mensalmente)",
+      "price_avista_display": null,
+      "access": "1 ano",
+      "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
+      "best_for": "Candidato que prefere pagar mensalmente o plano anual completo",
+      "link": "https://pay.hotmart.com/R91654048X?off=8h0jsbyi",
+      "link_avista": null
     },
     {
       "id": "extensive-flex",
       "name": "Extensive Flex",
       "price": 497,
       "price_display": "R$ 497/mês",
-      "price_base": "R$ 497/mês",
-      "access_until": "Mensal",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato que prefere pagamento mensal sem compromisso anual"
+      "price_avista_display": null,
+      "access": "Mensal — cancela quando quiser",
+      "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
+      "best_for": "Candidato que prefere flexibilidade sem compromisso anual",
+      "link": "https://pay.hotmart.com/T101014755S?sck=HOTMART_PRODUCT_PAGE&off=1pulw8b7",
+      "link_avista": null
     },
     {
-      "id": "intensive-enamed",
-      "name": "Intensive Enamed",
+      "id": "enamed",
+      "name": "Enamed",
       "price": 97,
       "price_display": "R$ 97",
-      "price_base": "R$ 97",
-      "access_until": "3 meses",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato focado em intensivo de curta duração"
-    },
-    {
-      "id": "cronicas-clinica-medica",
-      "name": "Crônicas da MED Review - 1ª edição - Clínica Médica",
-      "price": 147,
-      "price_display": "R$ 147",
-      "price_base": "R$ 147",
-      "access_until": "Não informado",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato focado em Clínica Médica"
+      "price_avista_display": null,
+      "access": "3 meses",
+      "entregavel": "Curso Enamed",
+      "best_for": "Candidato focado em intensivo de curta duração para o Enamed",
+      "link": "https://pay.hotmart.com/E100233236Q?off=ovc2s6qa",
+      "link_avista": null
     },
     {
       "id": "lux-anual",
-      "name": "Sistema LUX questões e flashcards - 1 ano",
+      "name": "Sistema LUX — 1 ano",
       "price": 1997,
       "price_display": "R$ 1.997",
-      "price_base": "R$ 1.997",
-      "access_until": "1 ano",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato que quer banco completo de questões e flashcards por 1 ano"
+      "price_avista_display": null,
+      "access": "1 ano",
+      "entregavel": "Banco completo de questões e flashcards",
+      "best_for": "Candidato que quer banco de questões e flashcards por 1 ano",
+      "link": null,
+      "link_avista": null
     },
     {
       "id": "lux-semestral",
-      "name": "Sistema LUX questões e flashcards - 6 meses",
+      "name": "Sistema LUX — 6 meses",
       "price": 1697,
       "price_display": "R$ 1.697",
-      "price_base": "R$ 1.997",
-      "access_until": "6 meses",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato que quer banco de questões e flashcards por 6 meses"
+      "price_avista_display": null,
+      "access": "6 meses",
+      "entregavel": "Banco completo de questões e flashcards",
+      "best_for": "Candidato que quer banco de questões e flashcards por 6 meses",
+      "link": null,
+      "link_avista": null
     },
     {
       "id": "lux-trimestral",
-      "name": "Sistema LUX questões e flashcards - 3 meses",
+      "name": "Sistema LUX — 3 meses",
       "price": 1097,
       "price_display": "R$ 1.097",
-      "price_base": "R$ 1.997",
-      "access_until": "3 meses",
-      "type": "Novo aluno",
-      "channel": "Website",
-      "best_for": "Candidato que quer banco de questões e flashcards por 3 meses"
+      "price_avista_display": null,
+      "access": "3 meses",
+      "entregavel": "Banco completo de questões e flashcards",
+      "best_for": "Candidato que quer banco de questões e flashcards por 3 meses",
+      "link": null,
+      "link_avista": null
     }
   ]
 }

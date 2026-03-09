@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "last_updated": "2026-03",
   "discount_policy": {
     "max_discount_percent": 15,
@@ -12,17 +12,19 @@
   "allowed_conditions": [
     "Parcelamento em até 12x (conforme oferta)",
     "Acesso imediato após pagamento aprovado",
-    "Bônus: e-book de resumos ao fechar anual"
+    "5% de desconto para pagamento à vista — use o link_avista da oferta"
   ],
+  "payment_instructions": {
+    "when_to_send_link": "Somente quando o lead confirmar que quer comprar. Não envie link antes do lead sinalizar intenção clara.",
+    "how_to_send": "Pergunte se o lead prefere parcelar ou pagar à vista. Se à vista: envie o link_avista (tem 5% desconto embutido). Se parcelado ou não especificado: envie o link padrão.",
+    "if_no_link": "Se o campo 'link' da oferta for null, informe que enviará o link por outro canal e acione escalation.",
+    "format": "Envie o link limpo, sem texto ao redor: apenas a URL. Exemplo: https://pay.hotmart.com/..."
+  },
   "escalation_triggers": [
     "Lead pede desconto acima de 15%",
     "Lead quer falar com humano",
     "Lead tem situação especial (bolsa, convênio, grupo, empresa)",
-    "Lead não responde por 2 mensagens seguidas após proposta"
-  ],
-  "payment_links": {
-    "r1-anual": "https://medreview.com.br/pagamento/r1-anual",
-    "r1-semestral": "https://medreview.com.br/pagamento/r1-semestral",
-    "r1-intensivo": "https://medreview.com.br/pagamento/r1-intensivo"
-  }
+    "Lead não responde por 2 mensagens seguidas após proposta",
+    "Oferta solicitada não tem link disponível"
+  ]
 }
