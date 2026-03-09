@@ -1,5 +1,6 @@
 import sys
 import os
+import random
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, request, jsonify, render_template
@@ -103,8 +104,18 @@ def webhook_form():
     # Persiste o lead no Supabase
     database.upsert_lead(phone=phone, name=name, source="form")
 
-    # Mensagem de abertura: usar dados do lead como contexto para o agente
-    trigger = f"[NOVO LEAD VIA FORMULÁRIO] Nome: {name}. Inicie a conversa de qualificação."
+    # Escolhe nome do agente aleatoriamente
+    agent_name = random.choice(["Pedro", "Sofia"])
+
+    # Trigger com copy exata de abertura e nome do agente
+    first_name = name.split()[0] if name and name != "Lead" else "tudo bem"
+    trigger = (
+        f"[NOVO LEAD VIA FORMULÁRIO] [AGENT_NAME: {agent_name}] Nome do lead: {name}.\n"
+        f"Use EXATAMENTE esta mensagem de abertura (sem alterar nada):\n"
+        f"Olá, {first_name}, tudo bem? Aqui é {agent_name}, do time comercial da Med-Review! "
+        f"Vi que preencheu nosso formulário para saber mais sobre os preparatórios, certo?\n\n"
+        f"Posso te enviar as informações por aqui? ☺️"
+    )
     result = agent.reply(trigger, session_id=phone)
     send_message(phone, result["message"])
 
