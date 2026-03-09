@@ -106,18 +106,22 @@ def webhook_form():
 
     # Escolhe nome do agente aleatoriamente
     agent_name = random.choice(["Pedro", "Sofia"])
+    first_name = name.split()[0] if name and name != "Lead" else ""
 
-    # Trigger com copy exata de abertura e nome do agente
-    first_name = name.split()[0] if name and name != "Lead" else "tudo bem"
-    trigger = (
-        f"[NOVO LEAD VIA FORMULÁRIO] [AGENT_NAME: {agent_name}] Nome do lead: {name}.\n"
-        f"Use EXATAMENTE esta mensagem de abertura (sem alterar nada):\n"
-        f"Olá, {first_name}, tudo bem? Aqui é {agent_name}, do time comercial da Med-Review! "
+    # Mensagem de abertura fixa — não passa pelo LLM para garantir copy exata
+    opening = (
+        f"Olá, {first_name}, tudo bem? "
+        f"Aqui é {agent_name}, do time comercial da Med-Review! "
         f"Vi que preencheu nosso formulário para saber mais sobre os preparatórios, certo?\n\n"
         f"Posso te enviar as informações por aqui? ☺️"
     )
-    result = agent.reply(trigger, session_id=phone)
-    send_message(phone, result["message"])
+
+    # Salva contexto na memória para que o agente saiba o histórico nas próximas mensagens
+    agent.memory.add(phone, "user", f"[NOVO LEAD] Nome: {name}. Agente: {agent_name}.")
+    agent.memory.add(phone, "assistant", opening)
+
+    # Envia direto, sem LLM
+    send_message(phone, opening)
 
     return jsonify({"status": "ok", "phone": phone}), 200
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Criatons · Sandbox</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0a14;--surface:#17112a;--surface2:#1f1636;--purple:#8b3fbb;--purple-light:#b06fe0;--purple-glow:rgba(139,63,187,0.25);--orange:#e07b39;--orange-glow:rgba(224,123,57,0.2);--text:#f0eaf8;--text-dim:#8b80a8;--border:rgba(139,63,187,0.2);--bubble-agent:#1f1636;--bubble-user:#2d1f52;--green:#4caf80}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -64,10 +64,11 @@ textarea:focus{border-color:var(--purple)}
 .send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 .send-btn svg{width:18px;height:18px;fill:white}
 .welcome{text-align:center;padding:60px 20px}
-.welcome-blob{width:72px;height:72px;margin:0 auto 20px;filter:drop-shadow(0 0 20px var(--purple))}
-.welcome h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
-.welcome h2 span{color:var(--purple-light)}
-.welcome p{color:var(--text-dim);font-size:14px;max-width:360px;margin:0 auto 24px;line-height:1.6}
+.welcome-blob{width:80px;height:80px;margin:0 auto 28px;filter:drop-shadow(0 0 24px rgba(139,63,187,0.7))}
+.welcome-title{margin-bottom:14px;line-height:1.1}
+.welcome-title .line1{display:block;font-family:'Playfair Display',serif;font-weight:400;font-size:28px;letter-spacing:0.5px;color:var(--text-dim)}
+.welcome-title .line2{display:block;font-family:'Playfair Display',serif;font-weight:900;font-size:36px;letter-spacing:-0.5px;background:linear-gradient(135deg,#c084f5 0%,#8b3fbb 50%,#e07b39 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome p{color:var(--text-dim);font-size:13px;white-space:nowrap;margin:0 auto 28px;letter-spacing:0.2px}
 .quick-messages{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .quick-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:8px 14px;border-radius:20px;font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all 0.2s}
 .quick-btn:hover{border-color:var(--purple);color:var(--purple-light);background:var(--purple-glow)}
@@ -82,7 +83,6 @@ textarea:focus{border-color:var(--purple)}
     </div>
     <div class="logo-text">Cria<span>tons</span></div>
   </div>
-  <span class="sandbox-badge">Sandbox</span>
   <div class="header-actions">
     <div class="status-dot"><div class="dot" id="statusDot"></div><span id="statusText">Agente ativo</span></div>
     <button class="reset-btn" onclick="resetChat()">↺ Nova conversa</button>
@@ -101,7 +101,10 @@ textarea:focus{border-color:var(--purple)}
       <circle cx="55.5" cy="30.5" r="1" fill="white" opacity="0.7"/>
       <path d="M30 48 Q40 56 50 48" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
     </svg>
-    <h2>Agente de Vendas da <span>Med-Review</span></h2>
+    <h2 class="welcome-title">
+      <span class="line1">Agente de Vendas</span>
+      <span class="line2">da MED-Review</span>
+    </h2>
     <p>Simule uma conversa como se você fosse um lead da MedReview.</p>
     <div class="quick-messages">
       <button class="quick-btn" onclick="sendQuick('Oi, vi um anúncio do R1 e quero saber mais')">Oi, vi um anúncio do R1</button>
