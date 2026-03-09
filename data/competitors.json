@@ -1,0 +1,87 @@
+{
+  "instrucao": "Use esses dados para responder quando o lead mencionar que usa um concorrente. Tom: curioso e consultivo, nunca atacar. Não mencione o concorrente pelo nome na resposta — reframe para os diferenciais da MedReview.",
+  "postura_geral": "Nunca desmereça o concorrente. Reconheça que é uma boa plataforma. Depois pergunte o que está faltando ou mostre o que a MedReview entrega de diferente. O objetivo é complementar ou substituir com lógica, não confronto.",
+  "concorrentes": [
+    {
+      "nome": "Medcel",
+      "perfil_de_usuario": "Candidato que usa banco de questões e gabarito comentado. Geralmente usa como principal plataforma.",
+      "o_que_eles_fazem_bem": "Grande banco de questões, interface familiar, brand reconhecida.",
+      "o_que_costuma_faltar": "Profundidade clínica nas explicações; videoaulas menos aprofundadas; sem trilha adaptativa clara.",
+      "argumento_principal": "O Medcel tem muito conteúdo, mas muita gente que usa chega a um ponto onde só acerta questão sem entender de verdade o mecanismo — e aí na hora da prova trava. A MedReview é construída pra você entender o raciocínio clínico por trás, não só a resposta certa.",
+      "diferencial_medreview": "Profundidade clínica real + videoaulas com raciocínio clínico + banco LUX integrado com explicações mais ricas.",
+      "frases_de_transicao": [
+        "Você está satisfeito com os resultados nos simulados ou sente que tem alguma lacuna?",
+        "O que você mais usa lá — questões, videoaulas ou os dois?",
+        "Tem algo específico que sente falta ou que queria que fosse melhor na plataforma que usa hoje?"
+      ],
+      "o_que_evitar": "Não diga 'o Medcel é inferior' ou 'a MedReview é melhor'. Diga 'depende do que você precisa'.",
+      "quando_escalar": "Se lead diz que está muito satisfeito e não vê motivo para mudar — respeite. Pergunte se tem algo que quer complementar; se não, desqualifique com respeito."
+    },
+    {
+      "nome": "Sanarflix / Sanar",
+      "perfil_de_usuario": "Estudante de medicina que usa como recurso de estudo geral, não necessariamente focado em R1.",
+      "o_que_eles_fazem_bem": "Interface moderna, conteúdo amplo de medicina geral, preço acessível.",
+      "o_que_costuma_faltar": "Foco específico em residência médica R1; conteúdo menos direcionado às bancas das grandes provas.",
+      "argumento_principal": "A Sanar é ótima pra formação geral na medicina, mas quando o foco é especificamente a residência — com as bancas certas, questões no formato das provas maiores e raciocínio de prova — a MedReview tem a especialização que faz diferença.",
+      "diferencial_medreview": "Especialização profunda em R1, alinhamento com as principais bancas (USP, Unifesp, SUS, etc.), comunidade de 15k médicos que já passaram.",
+      "frases_de_transicao": [
+        "Você usa mais para faculdade ou já está focando na residência?",
+        "Quando é sua prova? Você tem uma banca alvo já definida?",
+        "Você sente que o conteúdo que estuda está alinhado com o que cai nas provas?"
+      ],
+      "o_que_evitar": "Não minimize o uso da Sanar — ela tem um papel real na formação. Reposicione a MedReview como o próximo passo natural para R1.",
+      "quando_escalar": "Se lead está na faculdade e prova é em mais de 18 meses — pode ser cedo; avalie com cuidado antes de forçar."
+    },
+    {
+      "nome": "Anamnese",
+      "perfil_de_usuario": "Candidato mais avançado, geralmente já tem base e busca material mais aprofundado.",
+      "o_que_eles_fazem_bem": "Conteúdo bem estruturado, foco em R1, didática reconhecida.",
+      "o_que_costuma_faltar": "Banco de questões menos robusto; comunidade menor; menos integração entre conteúdo e prática.",
+      "argumento_principal": "A Anamnese tem boa didática, mas a MedReview tem a combinação de conteúdo + banco de questões integrado + comunidade ativa de quem já passou — o que cria um contexto de aprendizado mais completo.",
+      "diferencial_medreview": "Sistema LUX integrado, maior comunidade ativa, suporte mais próximo, trilha que conecta teoria e questões.",
+      "frases_de_transicao": [
+        "O que você usa mais lá — as videoaulas ou mais as questões?",
+        "Como você se sente nos simulados — acha que seu rendimento tá bom ou sente lacunas?"
+      ],
+      "o_que_evitar": "Não compare preço diretamente — reframe para valor.",
+      "quando_escalar": "Se lead está muito satisfeito — pergunte se quer complementar o LUX sem abandonar o que usa."
+    },
+    {
+      "nome": "Residência Médica (RM)",
+      "perfil_de_usuario": "Candidato que usa banco de questões focado em provas específicas.",
+      "o_que_eles_fazem_bem": "Banco de questões grande, atualizado por banca.",
+      "o_que_costuma_faltar": "Conteúdo teórico integrado; explicações mais rasas; sem trilha de aprendizado estruturada.",
+      "argumento_principal": "RM é bom pra fazer questões, mas sem o conteúdo teórico forte junto, você acaba acertando por eliminação em vez de entendimento. A MedReview integra os dois no mesmo lugar — você aprende e pratica no mesmo fluxo.",
+      "diferencial_medreview": "Integração de conteúdo teórico + questões no mesmo sistema; explicações clínicas mais ricas; trilha estruturada.",
+      "frases_de_transicao": [
+        "Você usa só para questões ou tem algum conteúdo teórico junto?",
+        "Quando você erra uma questão, consegue entender bem pelo gabarito ou sente que falta aprofundamento?"
+      ],
+      "o_que_evitar": "Não diga que só questões não é suficiente de forma genérica — personalize para o caso do lead.",
+      "quando_escalar": "Raramente. Lead do RM geralmente está aberto a complementar."
+    },
+    {
+      "nome": "Aristo",
+      "perfil_de_usuario": "Candidato mais avançado, foco em especialidades cirúrgicas e Revalida.",
+      "o_que_eles_fazem_bem": "Bom em cirurgia e especialidades específicas, formato de questões comentadas.",
+      "o_que_costuma_faltar": "Menor variedade de especialidades clínicas; conteúdo mais segmentado.",
+      "argumento_principal": "A Aristo é forte em cirurgia, mas se você precisa de cobertura completa de todas as especialidades da prova — clínica, pediatria, GO, saúde pública — a MedReview tem a amplitude que você precisa sem precisar dividir o estudo em várias plataformas.",
+      "diferencial_medreview": "Cobertura completa de todas as especialidades + integração com banco de questões do LUX.",
+      "frases_de_transicao": [
+        "Quais especialidades você sente que está mais forte e mais fraco hoje?",
+        "Você usa somente a Aristo ou complementa com alguma outra coisa?"
+      ],
+      "o_que_evitar": "Não subestime Aristo em cirurgia — eles são realmente fortes nisso.",
+      "quando_escalar": "Se lead está focado em cirurgia e não quer mudar — ofereça LUX como complemento."
+    }
+  ],
+  "resposta_generica_concorrente": {
+    "quando_usar": "Quando o lead menciona uma plataforma que não está mapeada acima.",
+    "abordagem": "Valide que é uma boa ferramenta, pergunte o que usa e o que está buscando de diferente. Então apresente a MedReview pelo ângulo do que está faltando.",
+    "frases": [
+      "Entendo! O que você usa mais lá — conteúdo ou questões?",
+      "Tem algo que sente falta ou gostaria que fosse diferente?",
+      "O que te trouxe a buscar outras opções agora?"
+    ]
+  }
+}

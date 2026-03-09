@@ -4,24 +4,44 @@ from core.llm import call_claude
 from core.memory import ConversationMemory
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-PROMPT_PATH = os.path.join(BASE_DIR, "agents/sales/prompts/system_prompt.md")
-OFFERS_PATH = os.path.join(BASE_DIR, "data/offers.json")
-RULES_PATH = os.path.join(BASE_DIR, "data/commercial_rules.json")
-PRODUCT_INFO_PATH = os.path.join(BASE_DIR, "data/product_info.json")
+PROMPT_PATH         = os.path.join(BASE_DIR, "agents/sales/prompts/system_prompt.md")
+STAGE_SCRIPTS_PATH  = os.path.join(BASE_DIR, "agents/sales/prompts/stage_scripts.md")
+OFFERS_PATH         = os.path.join(BASE_DIR, "data/offers.json")
+RULES_PATH          = os.path.join(BASE_DIR, "data/commercial_rules.json")
+PRODUCT_INFO_PATH   = os.path.join(BASE_DIR, "data/product_info.json")
+COMPETITORS_PATH    = os.path.join(BASE_DIR, "data/competitors.json")
+OBJECTIONS_PATH     = os.path.join(BASE_DIR, "data/objections.json")
+SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
+
+
+def _load_json(path: str) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _load_text(path: str) -> str:
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
 
 def load_context() -> str:
-    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
-        prompt = f.read()
-    with open(OFFERS_PATH, "r", encoding="utf-8") as f:
-        offers = json.load(f)
-    with open(RULES_PATH, "r", encoding="utf-8") as f:
-        rules = json.load(f)
-    with open(PRODUCT_INFO_PATH, "r", encoding="utf-8") as f:
-        product_info = json.load(f)
+    prompt        = _load_text(PROMPT_PATH)
+    stage_scripts = _load_text(STAGE_SCRIPTS_PATH)
+    sales_tech    = _load_text(SALES_TECH_PATH)
+    offers        = _load_json(OFFERS_PATH)
+    rules         = _load_json(RULES_PATH)
+    product_info  = _load_json(PRODUCT_INFO_PATH)
+    competitors   = _load_json(COMPETITORS_PATH)
+    objections    = _load_json(OBJECTIONS_PATH)
+
     return (
         f"{prompt}\n\n"
-        f"# OFERTAS (preços e planos)\n{json.dumps(offers, ensure_ascii=False, indent=2)}\n\n"
-        f"# INFORMAÇÕES DE PRODUTO (descrições e FAQ para perguntas do lead)\n{json.dumps(product_info, ensure_ascii=False, indent=2)}\n\n"
+        f"# SCRIPTS POR ETAPA (tom, exemplos, transições)\n{stage_scripts}\n\n"
+        f"# TÉCNICAS DE VENDAS\n{sales_tech}\n\n"
+        f"# OFERTAS (preços, planos e links de pagamento)\n{json.dumps(offers, ensure_ascii=False, indent=2)}\n\n"
+        f"# INFORMAÇÕES DE PRODUTO (descrições detalhadas e FAQ)\n{json.dumps(product_info, ensure_ascii=False, indent=2)}\n\n"
+        f"# CONCORRENTES (argumentos e abordagem por plataforma)\n{json.dumps(competitors, ensure_ascii=False, indent=2)}\n\n"
+        f"# OBJEÇÕES (framework de contorno por tipo de objeção)\n{json.dumps(objections, ensure_ascii=False, indent=2)}\n\n"
         f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}"
     )
 

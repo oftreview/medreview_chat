@@ -1,0 +1,83 @@
+{
+  "instrucao": "Use este framework quando o lead apresentar uma objeção. Siga a estrutura: Validar → Aprofundar → Reframe → Checar. Máximo 2 tentativas de contorno por objeção. Se não funcionar: mude de abordagem ou escale.",
+  "estrutura_de_contorno": {
+    "passo_1_validar": "Mostre que entendeu e que a objeção é legítima. Nunca rebata direto.",
+    "passo_2_aprofundar": "Faça uma pergunta para entender a objeção REAL por trás da aparente.",
+    "passo_3_reframe": "Apresente uma perspectiva diferente baseada no que o lead disse.",
+    "passo_4_checar": "Confirme se o contorno fez sentido para o lead antes de avançar."
+  },
+  "objecoes": [
+    {
+      "id": "ja-uso-outra-plataforma",
+      "trigger": ["já uso", "uso a", "estudo pelo", "tenho plataforma", "já tenho", "Medcel", "Sanar", "Anamnese"],
+      "categoria": "concorrente",
+      "tom": "curioso, não defensivo",
+      "resposta_padrao": "Faz sentido — quem já estuda tem uma base pra comparar. Me conta: o que você usa mais lá, o conteúdo ou as questões? Estou perguntando pra entender se tem algo que complementaria bem o que você já faz.",
+      "resposta_alternativa": "Legal que você já tem uma rotina. Muita gente que chega até a gente usa as duas coisas — uma como base e a MedReview pra aprofundar onde sente mais fraco. Tem alguma área que você sente que poderia estar mais sólido?",
+      "quando_escalar": "Se lead está muito satisfeito e não vê motivo para nenhuma mudança ou complemento — desqualifique com respeito. 'Se você está indo bem e satisfeito, pode ser que não seja a hora certa. Quando quiser explorar mais opções, pode me chamar!'",
+      "observacao": "Consulte também o KB de CONCORRENTES para argumentos específicos por plataforma."
+    },
+    {
+      "id": "esta-caro",
+      "trigger": ["caro", "preço alto", "muito dinheiro", "não tenho esse valor", "salgado", "pesado no bolso"],
+      "categoria": "preco",
+      "tom": "empático, sem defender o preço — falar de valor",
+      "resposta_padrao": "Entendo. Investimento em preparatório é sério. Me pergunto — quando você pensa em quanto custa mais um ano sem passar na residência, como você vê esse valor? Porque a maioria dos nossos alunos coloca na balança assim.",
+      "resposta_alternativa": "Faz sentido querer ter certeza de que vale. Tem algo específico do que eu te apresentei que não ficou claro em termos de o que você vai ter? Às vezes o valor fica mais claro quando a gente vê o que está incluso de verdade.",
+      "desconto_proativo": "Não ofereça desconto proativamente. Se o lead insistir em preço: 'Olha, o máximo que consigo aqui é até 10% — mas isso depende de checar a condição exata. Você quer que eu veja o que consigo?' Se pedir acima de 10%: escale para humano.",
+      "quando_escalar": "Se lead pede desconto explícito acima de 10% ou tem situação especial (bolsa, grupo, convênio).",
+      "observacao": "Nunca inicie desconto. Só ofereça se o lead pedir explicitamente e dentro das regras comerciais."
+    },
+    {
+      "id": "preciso-pensar",
+      "trigger": ["preciso pensar", "vou pensar", "deixa eu avaliar", "preciso de tempo", "vou ver", "não sei ainda"],
+      "categoria": "indecisao",
+      "tom": "respeitoso, sem pressão — mas criando clareza",
+      "resposta_padrao": "Claro, decisão de investimento merece reflexão. Me ajuda a entender: o que você ainda precisa clarear pra se sentir seguro? Às vezes é uma dúvida específica que eu consigo resolver aqui agora.",
+      "resposta_alternativa": "Faz todo sentido. Só quero garantir que você tem tudo que precisa pra decidir com calma. Tem alguma parte do produto que ficou com dúvida ou é mais uma questão de timing mesmo?",
+      "urgencia_real": "Use uma urgência baseada em realidade: 'Só te lembro que a prova é em [mês] — cada semana de atraso no início é menos conteúdo consolidado. Não é pra te pressionar, é só um dado real da preparação.'",
+      "quando_escalar": "Raramente. Normalmente o lead volta sozinho. Se não voltou em 2 mensagens: escale para humano ou follow-up gentil."
+    },
+    {
+      "id": "nao-tenho-tempo",
+      "trigger": ["não tenho tempo", "muito ocupado", "plantão", "residência", "não consigo estudar", "trabalho demais", "sem tempo"],
+      "categoria": "tempo",
+      "tom": "empático com a realidade da medicina — você entende esse mundo",
+      "resposta_padrao": "Cara, sei exatamente do que está falando. A rotina de médico é pesada. Mas me conta: quantas horas por semana você acha que consegue proteger mesmo, mesmo que seja pouco?",
+      "resposta_alternativa": "Faz sentido — é por isso que o Extensive tem módulos curtos que dá pra encaixar entre plantões. Mas me diz: a prova vai continuar sendo uma meta ou você está pensando em adiar o plano de residência?",
+      "reframe": "Com 1-2 horas por dia de estudo estruturado, dá pra cobrir o edital em 8 meses. O problema geralmente não é tempo total — é não saber por onde começar e perder tempo com material errado.",
+      "quando_escalar": "Se lead claramente não tem nenhuma disponibilidade real nos próximos meses — desqualifique com respeito e deixe a porta aberta."
+    },
+    {
+      "id": "quero-ver-antes",
+      "trigger": ["quero testar", "ver o conteúdo", "assistir uma aula", "trial", "demonstração", "período de teste", "antes de comprar"],
+      "categoria": "prova-de-valor",
+      "tom": "aberto, confiante no produto",
+      "resposta_padrao": "Totalmente válido querer ver antes de comprar. Me conta — o que especificamente você gostaria de avaliar? Posso te mostrar como funciona a plataforma e se tiver acesso demo disponível te encaminhar.",
+      "resposta_alternativa": "Faz sentido. O que você mais quer avaliar — a qualidade do conteúdo, a interface, como funciona o banco de questões? Dependendo, consigo te dar uma visão mais direcionada.",
+      "observacao": "Se houver trial disponível: oriente sobre como acessar. Se não houver: ofereça uma demonstração guiada via conversa ou vídeo institucional. Nunca invente acesso que não existe.",
+      "quando_escalar": "Raramente. Se o lead insistir muito em trial e não houver opção — escale para humano que pode ter alternativas."
+    },
+    {
+      "id": "amigo-recomendou-outra",
+      "trigger": ["meu amigo usa", "meu colega disse", "todo mundo usa", "me indicaram", "ouvi falar que"],
+      "categoria": "prova-social",
+      "tom": "respeitoso com a recomendação — mas abra espaço para perspectiva",
+      "resposta_padrao": "Recomendação de colega tem muito peso, é real. Mas me conta — ele usou essa plataforma pra passar ou ainda está estudando? Às vezes quem passou fica fiel ao que usou sem comparar com o que há de novo.",
+      "resposta_alternativa": "Entendo. O que ele gosta especificamente? É o conteúdo, a interface, o preço? Pergunto porque dependendo do que ele valoriza, pode ser que a escolha certa pra você seja diferente, dependendo do seu perfil.",
+      "reframe": "Mais de 15.000 médicos usam a MedReview — entre eles tem muita gente que também foi recomendada por colega e ficou surpreso com o diferencial. Mas cada pessoa estuda de um jeito diferente.",
+      "quando_escalar": "Raramente. Essa objeção normalmente cede com curiosidade genuína sobre o perfil do lead."
+    },
+    {
+      "id": "vou-esperar-prova-chegar",
+      "trigger": ["vou esperar", "prova é longe", "ainda tenho tempo", "só ano que vem", "não é urgente", "2027", "2028"],
+      "categoria": "urgencia",
+      "tom": "não pressione — apresente a lógica de quem passou",
+      "resposta_padrao": "Entendo essa lógica. A maioria que passa nos grandes centros começa entre 8 e 12 meses antes — não porque é obrigado, mas porque o conteúdo precisa de maturação. Me conta: você tem uma banca alvo ou ainda está avaliando pra qual programa vai concorrer?",
+      "resposta_alternativa": "Faz sentido não querer se precipitar. Mas deixa eu te fazer uma pergunta: se você soubesse que começar agora aumenta a chance em X%, o que mudaria na sua decisão?",
+      "reframe": "Quem começa cedo normalmente faz o conteúdo uma vez com calma, revisita duas vezes e chega na prova descansado. Quem começa tarde entra em modo de corrida e retém menos. Não é regra, mas é o padrão de quem passou.",
+      "qualificacao": "Se prova é em mais de 18 meses e o lead não quer começar agora: respeite. 'Faz sentido. Quando chegar a hora, me chama — estarei por aqui!'",
+      "quando_escalar": "Se a prova está em menos de 6 meses e o lead quer esperar mais — crie urgência real baseada em fatos. Se em mais de 18 meses e não quer começar — desqualifique com respeito."
+    }
+  ]
+}

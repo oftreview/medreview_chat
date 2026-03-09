@@ -1,86 +1,141 @@
 {
-  "intro": "Use as informações abaixo para responder perguntas detalhadas sobre produtos. Não invente nada que não esteja aqui.",
+  "intro": "Use as informações abaixo para responder perguntas detalhadas sobre produtos. Não invente nada que não esteja aqui. Se a informação não estiver disponível, diga 'deixa eu verificar isso pra você'.",
+  "diferenciais_gerais_medreview": {
+    "tagline": "Profundidade clínica real — você aprende pra carreira, não só pra prova",
+    "numeros": "Mais de 15.000 médicos ativos na plataforma",
+    "metodo": "Integração entre conteúdo teórico e prática de questões no mesmo ambiente — sem precisar pular entre plataformas",
+    "comunidade": "Comunidade ativa de médicos residentes e aprovados disponível para troca de experiência"
+  },
   "products": {
     "extensive-2026": {
-      "description": "Curso completo de preparação para a prova de residência médica do ciclo 2026. Inclui todo o conteúdo teórico, questões comentadas, simulados e acompanhamento até a data da prova.",
-      "features": [
-        "Videoaulas cobrindo todo o edital",
-        "Banco de questões comentadas",
-        "Simulados no formato da banca",
-        "Acesso até 01/03/2027",
-        "Suporte e dúvidas via plataforma"
+      "nome_completo": "Extensive 2026",
+      "descricao_curta": "Preparação completa para o ciclo 2026 — do zero até a prova, com tudo integrado.",
+      "descricao_venda": "O Extensive é o curso principal da MedReview. Você não precisa montar roteiro nem buscar material em outros lugares — o curso já tem a trilha estruturada do primeiro dia até a prova. Inclui videoaulas com raciocínio clínico real, banco de questões comentadas (LUX) e simulados no formato das bancas.",
+      "para_quem_e": "Candidato focado na prova de 2026 que quer uma preparação completa e estruturada, seja começando do zero ou retomando estudos.",
+      "features_detalhadas": [
+        "Videoaulas com raciocínio clínico aprofundado — não decoreba, entendimento real",
+        "Banco de questões LUX integrado com filtros por especialidade, banca e dificuldade",
+        "Flashcards para revisão espaçada",
+        "Simulados no formato das principais bancas (USP, Unifesp, SUS e outras)",
+        "Trilha de estudos estruturada — você sabe exatamente por onde começar e como evoluir",
+        "Suporte e dúvidas via plataforma",
+        "Acesso até 01/03/2027"
+      ],
+      "especialidades_cobertas": "Clínica Médica, Cirurgia Geral, Pediatria, Ginecologia e Obstetrícia, Saúde Pública, Psiquiatria e outras especialidades do edital padrão R1",
+      "diferencial_vs_lux": "O Extensive inclui o LUX (questões + flashcards) mais o conteúdo teórico completo em videoaulas. O LUX sozinho é só questões e flashcards — ideal para quem já tem base teórica sólida.",
+      "casos_de_uso": [
+        "Recém-formado focando em residência pela primeira vez",
+        "Candidato que tentou antes e quer preparação mais estruturada",
+        "Quem quer um só lugar para tudo — teoria, questões, simulados"
       ],
       "faq": [
-        { "q": "O que está incluso?", "a": "Acesso completo à plataforma: videoaulas, questões, simulados e ferramentas de acompanhamento até 01/03/2027." },
-        { "q": "Posso parcelar?", "a": "Consulte as condições de parcelamento com o consultor; há opções disponíveis." }
+        { "q": "O que está incluso?", "a": "Videoaulas de todas as especialidades do edital, banco de questões LUX com comentários, flashcards, simulados e trilha de estudos. Acesso até 01/03/2027." },
+        { "q": "Posso parcelar?", "a": "Sim, em até 12x. À vista tem 5% de desconto." },
+        { "q": "Qual a diferença do Extensive para o LUX?", "a": "O Extensive é o pacote completo — tem as videoaulas aprofundadas + questões + flashcards. O LUX sozinho é só questões e flashcards, sem as videoaulas." },
+        { "q": "O acesso expira?", "a": "O acesso vai até 01/03/2027, cobrindo todo o ciclo de provas de 2026." },
+        { "q": "Serve para qualquer especialidade?", "a": "Sim, cobre as principais especialidades do edital R1." }
       ]
     },
     "extensive-2026-2027": {
-      "description": "Preparação para dois ciclos de prova (2026 e 2027). Ideal para quem quer começar cedo ou fazer duas tentativas com conteúdo atualizado.",
-      "features": [
+      "nome_completo": "Extensive 2026/2027",
+      "descricao_curta": "Preparação completa para dois ciclos de prova — 2026 e 2027.",
+      "descricao_venda": "Mesmo conteúdo do Extensive 2026, mas com acesso estendido até 2028 e conteúdo atualizado para os dois ciclos. É o plano pra quem quer se preparar com calma, ter duas tentativas garantidas ou começar cedo sem pressa.",
+      "para_quem_e": "Candidato que quer cobrir dois ciclos de prova (2026 e 2027), quem está começando mais cedo ou quem quer segurança de ter o backup do segundo ciclo.",
+      "features_detalhadas": [
         "Todo o conteúdo do Extensive 2026",
         "Acesso estendido até 01/03/2028",
-        "Atualizações de edital para as duas provas",
-        "Melhor custo por ano de acesso"
+        "Atualizações de edital para as provas de 2026 e 2027",
+        "Banco LUX + flashcards + simulados",
+        "Melhor custo por ano de preparação vs. comprar dois anos separados"
       ],
-      "faq": []
-    },
-    "extensive-flex": {
-      "description": "Mesmo conteúdo do Extensive com pagamento mensal. Sem compromisso anual; pode cancelar quando quiser.",
-      "features": [
-        "Acesso mensal à plataforma completa",
-        "R$ 497/mês",
-        "Cancele quando quiser",
-        "Ideal para testar ou estudar por período menor"
+      "diferencial_financeiro": "Comprar 2026 e 2027 separados sairia mais caro. O 2026/2027 é o plano mais econômico para quem sabe que vai tentar nos dois ciclos.",
+      "casos_de_uso": [
+        "Candidato que quer ter duas tentativas garantidas",
+        "Quem começa cedo e quer acesso sem pressa",
+        "Quem não quer se preocupar em renovar depois"
       ],
       "faq": [
-        { "q": "Posso cancelar a qualquer momento?", "a": "Sim. O plano Flex é mensal e sem fidelidade." }
+        { "q": "Se eu passar em 2026, o acesso some?", "a": "Não — o acesso continua até 2028. Mas na prática, quem passa não precisa mais estudar para R1." },
+        { "q": "O conteúdo é atualizado para 2027?", "a": "Sim, as atualizações de edital estão incluídas." },
+        { "q": "Posso parcelar?", "a": "Sim, em até 12x. À vista tem 5% de desconto." }
       ]
     },
-    "intensive-enamed": {
-      "description": "Intensivo focado na prova Enamed, com duração de 3 meses. Conteúdo enxuto e direto ao ponto.",
-      "features": [
-        "Foco na Enamed",
-        "Duração: 3 meses",
-        "Preço único R$ 97"
-      ],
-      "faq": []
+    "extensive-2026-recorrente": {
+      "nome_completo": "Extensive 2026 — Mensal Recorrente",
+      "descricao_curta": "Plano anual pago de forma mensal automática.",
+      "descricao_venda": "Mesmo conteúdo do Extensive 2026, mas com a cobrança distribuída mensalmente de forma recorrente. Para quem prefere não desembolsar o valor todo de uma vez.",
+      "para_quem_e": "Candidato que quer o plano completo mas prefere gestão de caixa mensal.",
+      "faq": [
+        { "q": "Qual a diferença para o parcelado comum?", "a": "O recorrente cobra mensalmente de forma automática. O parcelado é uma compra única dividida. No recorrente, o acesso depende da cobrança estar ativa." }
+      ]
     },
-    "cronicas-clinica-medica": {
-      "description": "Crônicas da MED Review - 1ª edição - Clínica Médica. Material específico de Clínica Médica em formato de crônicas.",
-      "features": [
-        "Conteúdo de Clínica Médica",
-        "Formato crônicas - 1ª edição",
-        "Acesso conforme produto"
+    "extensive-flex": {
+      "nome_completo": "Extensive Flex",
+      "descricao_curta": "Plano mensal sem compromisso anual. Cancela quando quiser.",
+      "descricao_venda": "Mesmo conteúdo do Extensive, mas com flexibilidade total: você paga mensalmente e pode cancelar quando quiser, sem multa. Ideal pra quem quer testar a plataforma ou estudar por um período mais curto.",
+      "para_quem_e": "Candidato que quer flexibilidade, quer testar a plataforma antes de se comprometer, ou tem certeza de que vai estudar por poucos meses.",
+      "features_detalhadas": [
+        "Acesso mensal à plataforma completa (mesmo conteúdo do Extensive)",
+        "R$ 497/mês",
+        "Cancela quando quiser, sem fidelidade",
+        "Inclui banco LUX + flashcards"
       ],
-      "faq": []
+      "quando_recomendar": "Lead indeciso, lead que quer testar, lead com menos de 6 meses até a prova, ou lead preço-sensível.",
+      "comparativo_custo": "8 meses de Flex = R$ 3.976. Extensive 2026 = R$ 5.397 com acesso até março/2027. Para estudar por longo período, o Extensive sai mais em conta.",
+      "faq": [
+        { "q": "Posso cancelar a qualquer momento?", "a": "Sim. É um plano mensal sem fidelidade." },
+        { "q": "Tem desconto pra pagar mais meses de uma vez?", "a": "Para compromisso mais longo, o Extensive 2026 (anual) costuma sair mais vantajoso." }
+      ]
+    },
+    "enamed": {
+      "nome_completo": "Intensivo Enamed",
+      "descricao_curta": "Preparação intensiva e focada para a prova Enamed em 3 meses.",
+      "descricao_venda": "Curso objetivo, sem enrolação, feito especificamente para quem vai fazer o Enamed. Conteúdo enxuto, direto ao ponto, com foco nas especialidades e formato da prova.",
+      "para_quem_e": "Candidato focado exclusivamente no Enamed com prazo curto para preparação.",
+      "features_detalhadas": [
+        "Conteúdo específico para o formato Enamed",
+        "Duração de 3 meses de acesso",
+        "Preço acessível: R$ 97",
+        "Objetivo: cobrir o essencial da prova sem dispersão"
+      ],
+      "observacao": "Não é o curso completo de R1 geral — é um intensivo focado no Enamed.",
+      "faq": [
+        { "q": "Serve para R1 geral?", "a": "O foco é no Enamed especificamente. Para R1 em geral, o Extensive é mais completo." },
+        { "q": "Qual a duração do acesso?", "a": "3 meses de acesso." }
+      ]
     },
     "lux-anual": {
-      "description": "Sistema LUX: banco de questões e flashcards para estudo ativo. Plano de 1 ano com acesso completo às questões e flashcards.",
-      "features": [
-        "Banco completo de questões",
-        "Flashcards integrados",
-        "Acesso por 1 ano",
+      "nome_completo": "Sistema LUX — 1 ano",
+      "descricao_curta": "Banco de questões + flashcards por 1 ano, sem as videoaulas.",
+      "descricao_venda": "O LUX é o sistema de prática da MedReview — banco robusto de questões comentadas e flashcards para estudo ativo. Ideal para quem já tem base teórica sólida e quer aprofundar com questões de alta qualidade.",
+      "para_quem_e": "Candidato que já tem conteúdo teórico de outra fonte e quer complementar com banco de questões e flashcards, ou candidato do Extensive que quer acesso adicional ao LUX.",
+      "features_detalhadas": [
+        "Banco completo de questões comentadas",
+        "Flashcards para revisão espaçada",
+        "Filtros por especialidade, banca, ano e dificuldade",
+        "1 ano de acesso",
         "Atualizações durante o período"
       ],
+      "diferencial_vs_extensive": "O Extensive já inclui o LUX. O LUX sozinho é ideal para quem já tem fonte de conteúdo teórico e quer só a parte de prática.",
+      "quando_recomendar": "Lead que usa outra plataforma para teoria e quer complementar; lead que estudou antes e precisa de prática.",
+      "observacao_link": "LUX anual, semestral e trimestral não têm link de pagamento direto disponível — escale para humano ao fechar.",
       "faq": [
-        { "q": "A diferença entre LUX e Extensive?", "a": "O Extensive é o curso completo (videoaulas + questões + simulados). O LUX é focado em questões e flashcards — ideal para quem já tem base ou quer complementar." }
+        { "q": "O LUX tem videoaulas?", "a": "Não. O LUX é focado em questões e flashcards. Para ter videoaulas, o produto certo é o Extensive." },
+        { "q": "Qual a diferença entre LUX e Extensive?", "a": "O Extensive é o pacote completo: videoaulas + banco de questões LUX + flashcards. O LUX sozinho é só questões e flashcards." }
       ]
     },
     "lux-semestral": {
-      "description": "Sistema LUX por 6 meses. Mesmo conteúdo de questões e flashcards do plano anual, com acesso de meio ano.",
-      "features": [
-        "Questões e flashcards",
-        "Acesso por 6 meses"
-      ],
+      "nome_completo": "Sistema LUX — 6 meses",
+      "descricao_curta": "Banco de questões + flashcards por 6 meses.",
+      "para_quem_e": "Candidato com prova nos próximos 6 meses que quer foco em prática de questões.",
+      "observacao_link": "Sem link disponível — escale para humano ao fechar.",
       "faq": []
     },
     "lux-trimestral": {
-      "description": "Sistema LUX por 3 meses. Para quem quer um período mais curto de questões e flashcards.",
-      "features": [
-        "Questões e flashcards",
-        "Acesso por 3 meses"
-      ],
+      "nome_completo": "Sistema LUX — 3 meses",
+      "descricao_curta": "Banco de questões + flashcards por 3 meses.",
+      "para_quem_e": "Candidato com prova iminente que precisa de prática intensiva de questões.",
+      "observacao_link": "Sem link disponível — escale para humano ao fechar.",
       "faq": []
     }
   }
