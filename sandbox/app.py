@@ -117,6 +117,20 @@ def webhook_form():
 def health():
     return jsonify({"status": "ok"})
 
+@app.route("/health/db", methods=["GET"])
+def health_db():
+    """Testa conexão com o Supabase."""
+    if not database.is_enabled():
+        return jsonify({"status": "disabled", "message": "SUPABASE_URL/KEY não configurados"}), 200
+    try:
+        from supabase import create_client
+        import os
+        db = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        result = db.table("leads").select("id").limit(1).execute()
+        return jsonify({"status": "ok", "message": "Supabase conectado ✅", "leads_count": len(result.data)}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == "__main__":
     print(f"\n🟣 Criatons rodando em http://{HOST}:{PORT}\n")
     app.run(host=HOST, debug=DEBUG, port=PORT)
