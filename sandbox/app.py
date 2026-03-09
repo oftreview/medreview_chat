@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify, render_template
 from agents.sales.agent import SalesAgent
 from core.config import DEBUG, PORT
 from core.whatsapp import send_message, parse_incoming
-from core import database
+from core import database, escalation
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
@@ -66,10 +66,20 @@ def webhook_zapi():
 
     print(f"[ZAPI WEBHOOK] Processando — phone={phone} msg={message[:80]}", flush=True)
 
-    result = agent.reply(message, session_id=phone)
-    ok = send_message(phone, result["message"])
+    # Se sessão já foi escalada para humano: IA não responde
+    if escalation.is_escalated(phone, agent.memory):
+        print(f"[ZAPI WEBHOOK] Sessão {phone} em atendimento humano — IA pausada.", flush=True)
+        return jsonify({"status": "escalated_session"}), 200
 
-    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} — {result['message'][:80]}", flush=True)
+    result = agent.reply(message, session_id=phone)
+
+    # Verifica se a resposta aciona escalação
+    if result.get("escalate"):
+        lead_name = agent.memory.get(phone)[0].get("content", "Lead") if agent.memory.get(phone) else "Lead"
+        escalation.handle_escalation(phone, agent.memory, lead_name)
+
+    ok = send_message(phone, result["message"])
+    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} — {result['message'][:80]}", flush=True)
 
     return jsonify({"status": "ok"}), 200
 
@@ -124,6 +134,33 @@ def webhook_form():
     send_message(phone, opening)
 
     return jsonify({"status": "ok", "phone": phone}), 200
+
+
+# ── Escalação humana ──────────────────────────────────────────────────────────
+
+@app.route("/escalation/resolve", methods=["POST"])
+def escalation_resolve():
+    """
+    Devolve o controle da conversa para a IA após atendimento humano.
+    Payload: { "phone": "5531999990000" }
+    """
+    data = request.get_json(silent=True) or {}
+    phone = data.get("phone", "").strip()
+    if not phone:
+        return jsonify({"error": "Campo 'phone' obrigatório"}), 400
+
+    escalation.resolve_escalation(phone, agent.memory)
+    return jsonify({"status": "ok", "message": f"Sessão {phone} retornada para IA."}), 200
+
+
+@app.route("/leads/escalated", methods=["GET"])
+def leads_escalated():
+    """Lista sessões atualmente em atendimento humano (escalated)."""
+    escalated = [
+        s for s in agent.memory.list_sessions()
+        if agent.memory.get_status(s) == "escalated"
+    ]
+    return jsonify({"escalated": escalated, "count": len(escalated)}), 200
 
 
 # ── Utilitários ───────────────────────────────────────────────────────────────
