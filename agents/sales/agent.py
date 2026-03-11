@@ -12,6 +12,7 @@ PRODUCT_INFO_PATH   = os.path.join(BASE_DIR, "data/product_info.json")
 COMPETITORS_PATH    = os.path.join(BASE_DIR, "data/competitors.json")
 OBJECTIONS_PATH     = os.path.join(BASE_DIR, "data/objections.json")
 SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
+FINALIZATION_PATH   = os.path.join(BASE_DIR, "data/finalization.json")
 
 
 def _load_json(path: str) -> dict:
@@ -33,6 +34,7 @@ def load_context() -> str:
     product_info  = _load_json(PRODUCT_INFO_PATH)
     competitors   = _load_json(COMPETITORS_PATH)
     objections    = _load_json(OBJECTIONS_PATH)
+    finalization  = _load_json(FINALIZATION_PATH)
 
     return (
         f"{prompt}\n\n"
@@ -42,7 +44,8 @@ def load_context() -> str:
         f"# INFORMAÇÕES DE PRODUTO (descrições detalhadas e FAQ)\n{json.dumps(product_info, ensure_ascii=False, indent=2)}\n\n"
         f"# CONCORRENTES (argumentos e abordagem por plataforma)\n{json.dumps(competitors, ensure_ascii=False, indent=2)}\n\n"
         f"# OBJEÇÕES (framework de contorno por tipo de objeção)\n{json.dumps(objections, ensure_ascii=False, indent=2)}\n\n"
-        f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}"
+        f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}\n\n"
+        f"# FINALIZAÇÃO, RE-ENGAJAMENTO E CSAT (scripts de despedida, follow-up e pesquisa)\n{json.dumps(finalization, ensure_ascii=False, indent=2)}"
     )
 
 class SalesAgent:
