@@ -1,28 +1,176 @@
 {
   "instrucao": "Use esses dados para responder quando o lead mencionar que usa um concorrente. Tom: curioso e consultivo, nunca atacar. Não mencione o concorrente pelo nome na resposta — reframe para os diferenciais da MedReview.",
-  "postura_geral": "Nunca desmereça o concorrente. Reconheça que é uma boa plataforma. Depois pergunte o que está faltando ou mostre o que a MedReview entrega de diferente. O objetivo é complementar ou substituir com lógica, não confronto.",
+
+  "regras_gerais": {
+    "objetivo": "Contornar objeções sem atacar diretamente concorrentes",
+    "postura": "Nunca desmereça o concorrente. Reconheça que é uma boa plataforma. Depois pergunte o que está faltando ou mostre o que a MedReview entrega de diferente. O objetivo é complementar ou substituir com lógica, não confronto.",
+    "sequencia_resposta": [
+      "1. Reconhecer ponto forte real do concorrente",
+      "2. Mostrar limite daquele modelo para certos perfis",
+      "3. Reposicionar a decisão para aderência ao aluno",
+      "4. Conectar com o diferencial da MedReview"
+    ],
+    "frase_base": "Não existe cursinho perfeito para todo mundo. Existe o cursinho que melhor encaixa no seu jeito de aprender e no tipo de prova que você quer passar."
+  },
+
+  "medreview_posicionamento": {
+    "perfil_de_usuario": "Aluno que prefere aulas objetivas, didática visual e estudo integrado com menos fricção operacional.",
+    "forca_central": [
+      "Didática muito direta e visual",
+      "Aulas mais curtas e direcionadas",
+      "Integração entre aula, questão, flashcard e revisão",
+      "Experiência de estudo mais leve e executável no dia a dia"
+    ],
+    "objecoes_recorrentes": [
+      "Marca mais nova comparada a players muito tradicionais",
+      "Alguns alunos inicialmente comparam volume de conteúdo com cursos muito massivos",
+      "Parte do mercado ainda associa a marca a especialidades antes da expansão para residência"
+    ],
+    "posicionamento_de_mercado": "Alguns cursos apostam em tradição, banco gigante de questões ou tecnologia. A MedReview aposta em clareza, didática e retenção do conteúdo.",
+    "quando_medreview_costuma_ganhar": [
+      "Quando o aluno reclama de aulas muito longas",
+      "Quando o aluno quer estudar com mais fluidez no dia a dia",
+      "Quando o aluno prefere didática visual e objetiva",
+      "Quando o aluno sente dificuldade em reter conteúdo de aulas muito densas"
+    ]
+  },
+
+  "mapa_posicionamento_mercado": {
+    "tradicao": "MEDGRUPO / MEDCURSO",
+    "tecnologia": "Medway",
+    "performance": "MedCof",
+    "banco_de_questoes": "Estratégia MED",
+    "didatica_e_retencao": "MedReview"
+  },
+
   "concorrentes": [
     {
+      "nome": "MEDGRUPO / MEDCURSO",
+      "categoria": "principal",
+      "perfil_de_usuario": "Candidato que valoriza tradição, marca consolidada e volume de conteúdo.",
+      "o_que_eles_fazem_bem": "Tradição e autoridade histórica no mercado, grande reconhecimento de marca.",
+      "o_que_costuma_faltar": "Preço alto e modelo mais pesado para alguns perfis; aulas mais longas e densas.",
+      "argumento_principal": "Tradição é muito importante, mas o que muda o resultado é o quanto você consegue absorver e executar no dia a dia. Para muitos alunos, uma didática mais objetiva e uma experiência de estudo mais leve entregam mais resultado do que o volume.",
+      "como_posicionar_medreview": "Didática mais objetiva e experiência mais leve de estudo",
+      "diferencial_medreview": "Aulas mais diretas, integração de aula + questão + revisão no mesmo fluxo, estudo mais executável no dia a dia.",
+      "frases_de_transicao": [
+        "Você consegue acompanhar o ritmo e a densidade das aulas sem se perder?",
+        "Como está seu aproveitamento — você sente que retém bem o que estuda?",
+        "O volume de conteúdo está sendo um aliado ou está pesando?"
+      ],
+      "o_que_evitar": "Não ataque a tradição deles — é real e valorizada. Reframe para execução e retenção.",
+      "quando_escalar": "Se lead está muito satisfeito ou tem prova em menos de 3 meses e não quer trocar — respeite."
+    },
+    {
+      "nome": "Medway",
+      "categoria": "principal",
+      "perfil_de_usuario": "Candidato que valoriza tecnologia, organização e plataforma moderna.",
+      "o_que_eles_fazem_bem": "Tecnologia, plataforma bem organizada e uso de IA para personalização.",
+      "o_que_costuma_faltar": "Alguns alunos buscam maior diferenciação pedagógica nas aulas; didática das aulas em si pode ser menos marcante.",
+      "argumento_principal": "Tecnologia boa organiza o estudo, mas o que faz você aprender de verdade é a clareza das aulas. Se você sente que a plataforma é boa mas as aulas não estão gravando, pode ser um sinal de que você precisa de uma didática mais direta.",
+      "como_posicionar_medreview": "Didática mais direta e experiência de aula mais clara",
+      "diferencial_medreview": "Aulas com foco em retenção e clareza pedagógica, integração de conteúdo + prática mais orgânica.",
+      "frases_de_transicao": [
+        "Você acha que a plataforma facilita bem o estudo ou às vezes sente que navegar consome tempo?",
+        "Como você avalia a clareza das aulas — você sai entendendo ou precisa rever muito?",
+        "O que está buscando de diferente agora?"
+      ],
+      "o_que_evitar": "Não minimize a tecnologia deles — é um diferencial real. Foque na profundidade pedagógica.",
+      "quando_escalar": "Se lead está satisfeito com a plataforma e só quer complementar questões."
+    },
+    {
+      "nome": "MedCof",
+      "categoria": "principal",
+      "perfil_de_usuario": "Candidato focado em performance e aprovação, geralmente mais avançado.",
+      "o_que_eles_fazem_bem": "Estratégia de aprovação, personalização por banca, foco em performance.",
+      "o_que_costuma_faltar": "Método mais intenso e pesado para alguns perfis; pode ser difícil de sustentar.",
+      "argumento_principal": "Foco em performance é exatamente o que você precisa. A diferença é que o caminho para a performance tem que ser sustentável. Um método muito intenso pode funcionar para alguns, mas para outros gera fadiga e queda de rendimento antes da prova.",
+      "como_posicionar_medreview": "Mais clareza pedagógica e estudo mais sustentável",
+      "diferencial_medreview": "Estudo mais executável no dia a dia, didática que gera retenção sem sobrecarga, curva de rendimento mais estável.",
+      "frases_de_transicao": [
+        "Você está conseguindo manter o ritmo sem se sentir sobrecarregado?",
+        "Como está seu rendimento — você sente que está evoluindo bem?",
+        "O método está encaixando bem no seu perfil ou tem gerado alguma fricção?"
+      ],
+      "o_que_evitar": "Não questione a eficiência do método deles — é reconhecida. Foque em sustentabilidade e fit com o perfil do lead.",
+      "quando_escalar": "Se lead está no meio do ciclo com bom rendimento — não force a troca."
+    },
+    {
+      "nome": "Estratégia MED",
+      "categoria": "principal",
+      "perfil_de_usuario": "Candidato que quer muito volume de questões e foco em prática.",
+      "o_que_eles_fazem_bem": "Banco de questões muito grande, variedade por banca.",
+      "o_que_costuma_faltar": "Alguns alunos sentem necessidade de didática mais integrada entre teoria e prática.",
+      "argumento_principal": "Ter muitas questões é ótimo, mas questão sem conteúdo sólido por trás vira decoreba de gabarito. A diferença é quando você erra uma questão e consegue entender o mecanismo, não só a resposta certa — e isso vem da integração entre aula e prática.",
+      "como_posicionar_medreview": "Integração entre aula, prática e revisão no mesmo fluxo",
+      "diferencial_medreview": "Questões integradas com o conteúdo teórico, explicações clínicas mais ricas, trilha que conecta teoria e prática.",
+      "frases_de_transicao": [
+        "Quando você erra uma questão, consegue entender bem pelo gabarito ou sente que falta aprofundamento?",
+        "Você usa só questões ou tem algum conteúdo teórico junto?",
+        "Sua taxa de acerto está evoluindo ou está estabilizando em algum patamar?"
+      ],
+      "o_que_evitar": "Não diga que só questões não basta de forma genérica — personalize para o caso do lead.",
+      "quando_escalar": "Raramente. Lead da Estratégia geralmente está aberto a complementar."
+    },
+    {
       "nome": "Medcel",
-      "perfil_de_usuario": "Candidato que usa banco de questões e gabarito comentado. Geralmente usa como principal plataforma.",
-      "o_que_eles_fazem_bem": "Grande banco de questões, interface familiar, brand reconhecida.",
-      "o_que_costuma_faltar": "Profundidade clínica nas explicações; videoaulas menos aprofundadas; sem trilha adaptativa clara.",
+      "categoria": "secundario",
+      "perfil_de_usuario": "Candidato que usa banco de questões e gabarito comentado como principal plataforma.",
+      "o_que_eles_fazem_bem": "Marca conhecida no mercado, grande banco de questões, interface familiar.",
+      "o_que_costuma_faltar": "Profundidade clínica nas explicações; videoaulas menos aprofundadas; sem trilha adaptativa clara. Reputação pública inferior aos principais players.",
       "argumento_principal": "O Medcel tem muito conteúdo, mas muita gente que usa chega a um ponto onde só acerta questão sem entender de verdade o mecanismo — e aí na hora da prova trava. A MedReview é construída pra você entender o raciocínio clínico por trás, não só a resposta certa.",
-      "diferencial_medreview": "Profundidade clínica real + videoaulas com raciocínio clínico + banco LUX integrado com explicações mais ricas.",
+      "como_posicionar_medreview": "Mais profundidade didática e experiência mais completa",
+      "diferencial_medreview": "Profundidade clínica real, videoaulas com raciocínio clínico, banco integrado com explicações mais ricas.",
       "frases_de_transicao": [
         "Você está satisfeito com os resultados nos simulados ou sente que tem alguma lacuna?",
         "O que você mais usa lá — questões, videoaulas ou os dois?",
         "Tem algo específico que sente falta ou que queria que fosse melhor na plataforma que usa hoje?"
       ],
-      "o_que_evitar": "Não diga 'o Medcel é inferior' ou 'a MedReview é melhor'. Diga 'depende do que você precisa'.",
-      "quando_escalar": "Se lead diz que está muito satisfeito e não vê motivo para mudar — respeite. Pergunte se tem algo que quer complementar; se não, desqualifique com respeito."
+      "o_que_evitar": "Não diga 'o Medcel é inferior'. Diga 'depende do que você precisa'.",
+      "quando_escalar": "Se lead diz que está muito satisfeito — respeite. Pergunte se quer complementar; se não, desqualifique com respeito."
+    },
+    {
+      "nome": "Hardwork Medicina",
+      "categoria": "secundario",
+      "perfil_de_usuario": "Candidato focado em estudo por questões e revisão personalizada.",
+      "o_que_eles_fazem_bem": "Estudo por questões e revisão personalizada, metodologia ativa.",
+      "o_que_costuma_faltar": "Menor consolidação nacional da marca; ecossistema de conteúdo menos completo.",
+      "argumento_principal": "Estudo ativo por questões é muito eficiente. A questão é ter o conteúdo teórico sólido integrado para quando você travar numa questão não precisar sair da plataforma para entender.",
+      "como_posicionar_medreview": "Ecossistema mais completo e didática mais forte",
+      "diferencial_medreview": "Marca mais consolidada, ecossistema completo de aula + questão + revisão, didática mais aprofundada.",
+      "frases_de_transicao": [
+        "Você usa mais como complemento ou como plataforma principal?",
+        "Quando trava numa questão, onde você vai buscar o conteúdo teórico?",
+        "Tem algo que sente falta no método?"
+      ],
+      "o_que_evitar": "Não minimize a metodologia ativa — é válida. Foque na completude do ecossistema.",
+      "quando_escalar": "Se lead usa como complemento — ofereça substituição ou integração com MedReview."
+    },
+    {
+      "nome": "Eu Médico Residente",
+      "categoria": "secundario",
+      "perfil_de_usuario": "Candidato com interesse em preparação objetiva, frequentemente com contexto regional.",
+      "o_que_eles_fazem_bem": "Preparação objetiva e presença regional relevante.",
+      "o_que_costuma_faltar": "Feedbacks públicos mais dispersos sobre organização e plataforma; menor consolidação nacional.",
+      "argumento_principal": "Objetividade é exatamente o que você precisa. A MedReview tem essa mesma proposta de ser direto ao ponto, mas com uma estrutura de plataforma mais consolidada e uma comunidade maior de quem já passou.",
+      "como_posicionar_medreview": "Marca mais consolidada e experiência de estudo mais integrada",
+      "diferencial_medreview": "Plataforma mais estável e integrada, comunidade maior, didática objetiva com suporte mais estruturado.",
+      "frases_de_transicao": [
+        "Como você avalia a plataforma no dia a dia — tem funcionado bem?",
+        "Você está usando como principal ou complementando com outra coisa?",
+        "O que te fez considerar outras opções?"
+      ],
+      "o_que_evitar": "Não ataque a proposta de objetividade — é um valor real. Foque em consolidação e suporte.",
+      "quando_escalar": "Se lead está satisfeito — pergunte se quer complementar antes de tentar substituir."
     },
     {
       "nome": "Sanarflix / Sanar",
+      "categoria": "secundario",
       "perfil_de_usuario": "Estudante de medicina que usa como recurso de estudo geral, não necessariamente focado em R1.",
       "o_que_eles_fazem_bem": "Interface moderna, conteúdo amplo de medicina geral, preço acessível.",
       "o_que_costuma_faltar": "Foco específico em residência médica R1; conteúdo menos direcionado às bancas das grandes provas.",
       "argumento_principal": "A Sanar é ótima pra formação geral na medicina, mas quando o foco é especificamente a residência — com as bancas certas, questões no formato das provas maiores e raciocínio de prova — a MedReview tem a especialização que faz diferença.",
+      "como_posicionar_medreview": "Especialização em R1 vs. formação geral",
       "diferencial_medreview": "Especialização profunda em R1, alinhamento com as principais bancas (USP, Unifesp, SUS, etc.), comunidade de 15k médicos que já passaram.",
       "frases_de_transicao": [
         "Você usa mais para faculdade ou já está focando na residência?",
@@ -34,11 +182,13 @@
     },
     {
       "nome": "Anamnese",
+      "categoria": "secundario",
       "perfil_de_usuario": "Candidato mais avançado, geralmente já tem base e busca material mais aprofundado.",
       "o_que_eles_fazem_bem": "Conteúdo bem estruturado, foco em R1, didática reconhecida.",
       "o_que_costuma_faltar": "Banco de questões menos robusto; comunidade menor; menos integração entre conteúdo e prática.",
       "argumento_principal": "A Anamnese tem boa didática, mas a MedReview tem a combinação de conteúdo + banco de questões integrado + comunidade ativa de quem já passou — o que cria um contexto de aprendizado mais completo.",
-      "diferencial_medreview": "Sistema LUX integrado, maior comunidade ativa, suporte mais próximo, trilha que conecta teoria e questões.",
+      "como_posicionar_medreview": "Ecossistema mais completo: conteúdo + prática + comunidade",
+      "diferencial_medreview": "Sistema integrado, maior comunidade ativa, suporte mais próximo, trilha que conecta teoria e questões.",
       "frases_de_transicao": [
         "O que você usa mais lá — as videoaulas ou mais as questões?",
         "Como você se sente nos simulados — acha que seu rendimento tá bom ou sente lacunas?"
@@ -48,10 +198,12 @@
     },
     {
       "nome": "Residência Médica (RM)",
+      "categoria": "secundario",
       "perfil_de_usuario": "Candidato que usa banco de questões focado em provas específicas.",
       "o_que_eles_fazem_bem": "Banco de questões grande, atualizado por banca.",
       "o_que_costuma_faltar": "Conteúdo teórico integrado; explicações mais rasas; sem trilha de aprendizado estruturada.",
       "argumento_principal": "RM é bom pra fazer questões, mas sem o conteúdo teórico forte junto, você acaba acertando por eliminação em vez de entendimento. A MedReview integra os dois no mesmo lugar — você aprende e pratica no mesmo fluxo.",
+      "como_posicionar_medreview": "Integração de conteúdo teórico + questões no mesmo sistema",
       "diferencial_medreview": "Integração de conteúdo teórico + questões no mesmo sistema; explicações clínicas mais ricas; trilha estruturada.",
       "frases_de_transicao": [
         "Você usa só para questões ou tem algum conteúdo teórico junto?",
@@ -62,10 +214,12 @@
     },
     {
       "nome": "Aristo",
+      "categoria": "secundario",
       "perfil_de_usuario": "Candidato mais avançado, foco em especialidades cirúrgicas e Revalida.",
       "o_que_eles_fazem_bem": "Bom em cirurgia e especialidades específicas, formato de questões comentadas.",
       "o_que_costuma_faltar": "Menor variedade de especialidades clínicas; conteúdo mais segmentado.",
       "argumento_principal": "A Aristo é forte em cirurgia, mas se você precisa de cobertura completa de todas as especialidades da prova — clínica, pediatria, GO, saúde pública — a MedReview tem a amplitude que você precisa sem precisar dividir o estudo em várias plataformas.",
+      "como_posicionar_medreview": "Cobertura completa de todas as especialidades",
       "diferencial_medreview": "Cobertura completa de todas as especialidades + integração com banco de questões do LUX.",
       "frases_de_transicao": [
         "Quais especialidades você sente que está mais forte e mais fraco hoje?",
@@ -75,6 +229,7 @@
       "quando_escalar": "Se lead está focado em cirurgia e não quer mudar — ofereça LUX como complemento."
     }
   ],
+
   "resposta_generica_concorrente": {
     "quando_usar": "Quando o lead menciona uma plataforma que não está mapeada acima.",
     "abordagem": "Valide que é uma boa ferramenta, pergunte o que usa e o que está buscando de diferente. Então apresente a MedReview pelo ângulo do que está faltando.",
