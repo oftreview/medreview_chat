@@ -16,6 +16,8 @@ from agents.sales.agent import SalesAgent
 from core.config import DEBUG, PORT
 from core.whatsapp import send_message, parse_incoming
 from core import database, escalation
+from core.security import sanitize_input, check_injection_patterns, rate_limiter, filter_output, hash_user_id
+from core.logger import log_security_event, log_conversation
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
@@ -79,6 +81,12 @@ def _flush_and_respond(user_id: str):
     try:
         result = agent.reply(combined, session_id=user_id)
         response_text = result["message"]
+
+        # Filtrar output antes de enviar ao canal externo
+        response_text, redactions = filter_output(response_text)
+        if redactions:
+            log_security_event("OUTPUT_FILTERED", hash_user_id(user_id), {"redactions": redactions})
+
         status = "success"
     except Exception as e:
         print(f"[CHAT API] Erro ao processar {user_id}: {e}", flush=True)
@@ -136,6 +144,24 @@ def chat():
         if not message:
             return jsonify({"error": "message é obrigatório", "status": "error"}), 400
 
+        # ── Segurança: rate limit ──────────────────────────────────────────────
+        allowed, count = rate_limiter(user_id)
+        if not allowed:
+            log_security_event("RATE_LIMIT_EXCEEDED", hash_user_id(user_id), {"count": count})
+            return jsonify({"error": "Muitas mensagens. Aguarde um momento.", "status": "error"}), 429
+
+        # ── Segurança: sanitização e detecção de injection ─────────────────────
+        message, warnings = sanitize_input(message)
+        if warnings:
+            log_security_event("INPUT_SANITIZED", hash_user_id(user_id), {"warnings": warnings})
+
+        is_suspicious, patterns = check_injection_patterns(message)
+        if is_suspicious:
+            log_security_event("INJECTION_DETECTED", hash_user_id(user_id), {"patterns": patterns})
+            # Não bloqueia — deixa Claude recusar via system prompt (defesa em profundidade)
+            # Mas registra para auditoria
+            print(f"[SECURITY] Injection pattern detectado de {hash_user_id(user_id)}", flush=True)
+
         with _chat_lock:
             if user_id not in _chat_state:
                 _chat_state[user_id] = {
@@ -185,7 +211,23 @@ def chat():
     session_id = data.get("session_id", "sandbox")
     if not user_message:
         return jsonify({"error": "Mensagem vazia"}), 400
+
+    # Sanitização e injection detection mesmo no sandbox
+    user_message, warnings = sanitize_input(user_message)
+    if warnings:
+        log_security_event("INPUT_SANITIZED", session_id, {"warnings": warnings, "source": "sandbox"})
+
+    is_suspicious, patterns = check_injection_patterns(user_message)
+    if is_suspicious:
+        log_security_event("INJECTION_DETECTED", session_id, {"patterns": patterns, "source": "sandbox"})
+
     result = agent.reply(user_message, session_id=session_id)
+
+    # Filtrar output
+    result["message"], redactions = filter_output(result["message"])
+    if redactions:
+        log_security_event("OUTPUT_FILTERED", session_id, {"redactions": redactions})
+
     return jsonify(result)
 
 
@@ -227,18 +269,39 @@ def webhook_zapi():
 
     print(f"[ZAPI WEBHOOK] Processando — phone={phone} msg={message[:80]}", flush=True)
 
+    # ── Segurança: rate limit ──────────────────────────────────────────────────
+    allowed, _ = rate_limiter(phone)
+    if not allowed:
+        log_security_event("RATE_LIMIT_EXCEEDED", hash_user_id(phone), {"source": "zapi"})
+        return jsonify({"status": "rate_limited"}), 200   # 200 para não gerar retry no Z-API
+
+    # ── Segurança: sanitização e injection detection ───────────────────────────
+    message, warnings = sanitize_input(message)
+    if warnings:
+        log_security_event("INPUT_SANITIZED", hash_user_id(phone), {"warnings": warnings})
+
+    is_suspicious, patterns = check_injection_patterns(message)
+    if is_suspicious:
+        log_security_event("INJECTION_DETECTED", hash_user_id(phone), {"patterns": patterns, "source": "zapi"})
+        print(f"[SECURITY] Injection detectado no WhatsApp de {hash_user_id(phone)}", flush=True)
+
     if escalation.is_escalated(phone, agent.memory):
         print(f"[ZAPI WEBHOOK] Sessão {phone} em atendimento humano — IA pausada.", flush=True)
         return jsonify({"status": "escalated_session"}), 200
 
     result = agent.reply(message, session_id=phone)
 
+    # Filtrar output antes de enviar ao lead
+    reply_text, redactions = filter_output(result["message"])
+    if redactions:
+        log_security_event("OUTPUT_FILTERED", hash_user_id(phone), {"redactions": redactions})
+
     if result.get("escalate"):
         lead_name = agent.memory.get(phone)[0].get("content", "Lead") if agent.memory.get(phone) else "Lead"
         escalation.handle_escalation(phone, agent.memory, lead_name)
 
-    ok = send_message(phone, result["message"])
-    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} — {result['message'][:80]}", flush=True)
+    ok = send_message(phone, reply_text)
+    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} — {reply_text[:80]}", flush=True)
 
     return jsonify({"status": "ok"}), 200
 
@@ -310,6 +373,14 @@ def leads_escalated():
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok", "version": "1.0"})
+
+
+@app.route("/health/security", methods=["GET"])
+def health_security():
+    """Retorna últimos 20 eventos de segurança. Use para monitoramento."""
+    from core.logger import get_recent_events
+    events = get_recent_events(20)
+    return jsonify({"status": "ok", "recent_events": events, "count": len(events)}), 200
 
 
 @app.route("/health/db", methods=["GET"])
