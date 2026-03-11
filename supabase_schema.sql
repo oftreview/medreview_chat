@@ -40,3 +40,22 @@ CREATE TRIGGER leads_updated_at
     BEFORE UPDATE ON leads
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================
+-- Tabela conversations (unificada para todos os canais)
+-- Usada pelo endpoint POST /chat (Botmaker, webchat, etc.)
+-- user_id pode ser: número de telefone, UUID do webchat, etc.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS conversations (
+    id          UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id     TEXT        NOT NULL,
+    role        TEXT        NOT NULL CHECK (role IN ('user', 'assistant')),
+    content     TEXT        NOT NULL,
+    channel     TEXT,                              -- botmaker | webchat | whatsapp | api
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Índices para buscas rápidas por user_id
+CREATE INDEX IF NOT EXISTS idx_conversations_user_id         ON conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_user_id_created ON conversations(user_id, created_at);

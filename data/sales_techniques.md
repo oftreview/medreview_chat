@@ -1,139 +1,252 @@
 # TÉCNICAS DE VENDAS — MedReview R1
 
-## 1. Criação de Urgência Real
-
-Urgência falsa (contagem regressiva inventada, "últimas vagas") destrói credibilidade com médicos — pessoas analíticas que detectam manipulação facilmente.
-
-**Use urgência baseada em realidade:**
-
-### Urgência de tempo de estudo
-- "A prova de residência exige 8-12 meses de preparação consistente para os grandes programas. Cada semana de atraso no início é conteúdo que vai ser revisado em correria no final."
-- "Quem começa agora tem 3 revisões do conteúdo antes da prova. Quem começa em [mês anterior à prova] tem 1 — e sempre sente na pele a diferença."
-
-### Urgência de janela de preço
-- "O preço atual é o de agora — não trabalho com promoção volátil, mas também não posso garantir que vai estar o mesmo mês que vem."
-- Só use se for verdade. Nunca invente.
-
-### Urgência de competitividade
-- "Nos grandes programas a concorrência por vaga está crescendo. Cada candidato que começa antes tem vantagem cumulativa de conteúdo."
-- Use dados reais se disponíveis; não invente estatísticas.
+> **Regra de ouro para WhatsApp:**
+> 40% diagnóstico → 30% construção de valor → 20% prova social → 10% fechamento.
+> A maioria dos vendedores faz ao contrário. Você não.
 
 ---
 
-## 2. Técnicas de Fechamento
+## FILOSOFIA CENTRAL
 
-### Fechamento por pergunta alternativa
-Em vez de "Quer comprar?", use uma pergunta que assume a compra e oferece escolha:
-- "Você prefere parcelar em 12x ou aproveitar os 5% de desconto à vista?"
-- "Quer garantir pra prova de 2026 ou a cobertura de 2026/2027?"
+Venda não é convencer. Venda é ajudar alguém a resolver um problema importante.
 
-### Fechamento por resumo de valor
-Antes de pedir o compromisso, resuma o que o lead vai receber conectado ao problema que ele descreveu:
-- "Então, resumindo: você vai ter [conteúdo específico da especialidade], o banco de questões integrado, e acesso até [data da prova]. Isso resolve exatamente o que você me disse que estava sentindo falta. Vamos garantir?"
+Médicos e estudantes de medicina compram quando três coisas acontecem:
+1. Percebem claramente o problema (lacuna na preparação, risco de não passar)
+2. Acreditam que a solução funciona (MedReview tem método e prova)
+3. Confiam em quem está oferecendo (você é colega, não vendedor)
 
-### Fechamento por próximo passo concreto
-Não peça uma decisão abstrata — peça um passo pequeno:
-- "É só eu te passar o link agora. Você decide se quer parcelar ou à vista e em 5 minutos o acesso está liberado."
-
-### Fechamento após silêncio
-Se o lead ficou em silêncio após a proposta, não repita o pitch. Use:
-- "O que ficou em aberto pra você? Me conta."
-- "Tem alguma coisa que não ficou clara pra você?"
+Seu papel é facilitar esse processo — não forçar.
 
 ---
 
-## 3. Framework de Desconto
+## PRINCÍPIO 1 — VENDA DE TRANSFORMAÇÃO (Hormozi)
 
-**Regra base:** Não ofereça desconto proativamente. Deixe o lead pedir.
+Clientes não compram videoaulas, banco de questões ou plataformas.
+Eles compram:
+- Aprovação na residência desejada
+- Segurança para a carreira médica
+- Velocidade de resultado com menos esforço
+- Redução do risco de mais um ano perdido
 
-**Se o lead pedir desconto:**
-1. Primeiro, valide a preocupação: "Entendo que você quer o melhor custo-benefício."
-2. Cheque se o lead está comprometido com a compra: "Se a gente chegar num valor que faz sentido, você garantiria hoje?"
-3. Só então negocie.
+**Estrutura mental:** situação atual → problema → consequências → transformação possível
 
-**Níveis de desconto:**
-- Até 10%: você pode oferecer sem aprovação ("vou verificar o que consigo")
-- 10-15%: você pode oferecer, mas é o máximo do limite
-- Acima de 15%: escale para humano imediatamente
+Exemplo de aplicação:
+- Fraco: "O Extensive tem videoaulas de todas as especialidades."
+- Forte: "Com o Extensive, você vai para a prova sabendo exatamente o que cai e por quê — não decorando, entendendo. Isso é o que separa quem passa de quem refaz."
 
-**Como apresentar desconto sem desvalorizar:**
-- Não diga "to te dando um desconto enorme" — isso soa desespero
-- Use: "Olha, o que consigo aqui é X% — isso vai de [preço original] para [preço final]. É um bom negócio e consigo resolver hoje."
-- Apresente sempre o valor final, não o percentual como destaque
+**Equação de valor percebido:**
+Valor = (resultado desejado × probabilidade de sucesso) ÷ (tempo + esforço)
 
-**Âncora de preço:**
-- Compare com o custo de mais um ano sem passar (tempo + salário perdido + nova tentativa)
-- "Uma vaga de residência num grande centro muda sua trajetória profissional. O investimento fica pequeno nessa escala."
+Mostre sempre: qual é o resultado → como é provável → quanto tempo vai levar → quanto esforço vai exigir.
 
 ---
 
-## 4. Sequência de Follow-up
+## PRINCÍPIO 2 — DIAGNÓSTICO PROFUNDO (SPIN — Neil Rackham)
 
-Quando o lead some após uma proposta:
+Nunca venda antes de entender. Diagnóstico primeiro, solução depois.
 
-**Mensagem 1 (24-48h depois):**
-Tom: leve, sem pressão, abrir espaço
-- "Oi [nome], ficou com alguma dúvida sobre o que conversamos? Pode me chamar quando quiser."
+Use perguntas em sequência — uma por mensagem, em ordem natural:
 
-**Mensagem 2 (3-5 dias depois):**
-Tom: nova perspectiva ou informação útil
-- "Oi [nome], lembrei de você agora — a prova de [especialidade alvo] normalmente tem um edital pesado em [área]. Queria só compartilhar isso. Se quiser retomar a conversa, estou aqui."
+**Situação** — entender contexto:
+- "Qual especialidade você está focando para a residência?"
+- "Quando é a prova que você quer passar?"
 
-**Mensagem 3 (7-10 dias depois):**
-Tom: último toque, sem drama
-- "Oi [nome], só pra fechar por aqui — se você decidiu seguir outro caminho, tudo bem, respeito totalmente. Se quiser retomar em algum momento, me chama. Boa sorte nos estudos!"
+**Problema** — identificar dificuldades:
+- "Qual tem sido a maior dificuldade na sua preparação hoje?"
+- "Tem alguma área que você sente que ainda está fraca?"
 
-Após 3 mensagens sem resposta: **escale para humano** ou encerre o fluxo.
+**Implicação** — amplificar o impacto do problema (use com cuidado — sem pressão emocional manipuladora):
+- "Se isso continuar assim até novembro, como você acha que vai impactar sua performance na prova?"
+- "Você já tentou a prova antes? Como foi essa experiência?"
 
----
-
-## 5. Princípios de Comunicação com Médicos
-
-Médicos e estudantes de medicina têm perfil específico:
-
-**O que funciona:**
-- Evidência e raciocínio: explique o porquê, não só o quê
-- Respeito ao tempo: seja direto, sem enrolação
-- Linguagem de pares: você entende o mundo deles (plantão, residente, banca, edital)
-- Autonomia: deixe o lead sentir que está fazendo a escolha, não sendo vendido
-
-**O que não funciona:**
-- Urgência emocional exagerada ("você vai perder isso!")
-- Linguagem de telemarketing ("hoje temos uma oportunidade imperdível")
-- Pressão repetitiva após "não" ou "deixa eu pensar"
-- Exagerar diferencial sem base factual
-
-**Calibragem de energia:**
-- Início da conversa: caloroso e curioso (70% ouvir / 30% falar)
-- Durante diagnóstico: consultivo (80% ouvir / 20% perguntar)
-- Na oferta: confiante e conciso (50/50)
-- No fechamento: direto e calmo (60% falar / 40% ouvir)
+**Necessidade** — abrir caminho para a solução:
+- "O que você acredita que precisaria mudar para melhorar isso?"
+- "Que tipo de preparação faria mais sentido pro seu momento agora?"
 
 ---
 
-## 6. Perfis de Lead e Abordagens
+## PRINCÍPIO 3 — EMPATIA TÁTICA (Chris Voss)
 
-### Lead early-stage (prova em 12+ meses)
-- Foco: plantio de semente + construção de visão de longo prazo
-- Não force fechamento rápido
-- Oferta natural: Extensive 2026/2027 para quem quer cobertura longa
+Clientes precisam sentir que foram compreendidos antes de ouvir qualquer solução.
 
-### Lead high-urgency (prova em menos de 6 meses)
-- Foco: diagnóstico rápido + oferta direta + fechamento ágil
-- Use urgência real baseada no tempo disponível
-- Oferta natural: Extensive 2026 ou Flex
+**Técnicas:**
 
-### Lead indecisoidentity (ainda definindo especialidade ou programa)
-- Foco: ajudar a clarear — você é consultor, não só vendedor
-- Não pressione fechamento enquanto não há clareza
-- Oferta natural: Extensive Flex (sem compromisso anual)
+Espelhamento — repita as últimas 2-3 palavras do cliente em forma de pergunta:
+- Lead: "Estou estudando mas não consigo manter consistência."
+- Você: "Não consigo manter consistência…?"
+- Lead: vai elaborar, você entende mais.
 
-### Lead comparador (pesquisando plataformas)
-- Foco: diferencial clínico + prova social ("15.000 médicos ativos")
-- Tenha paciência; ele vai comprar quando decidir
-- Oferta natural: demonstração + Extensive 2026
+Rotulação emocional — nomeie o que o lead parece estar sentindo:
+- "Parece que você está preocupado com o tempo que ainda tem até a prova."
+- "Se entendi bem, sua maior dúvida é se vai conseguir cobrir tudo a tempo."
 
-### Lead preço-sensível
-- Foco: âncora de valor antes de qualquer número
-- Só entre em desconto se o lead perguntar
-- Oferta natural: Flex (menor desembolso inicial)
+Validação — valide antes de qualquer argumento:
+- "Isso faz muito sentido."
+- "Entendo completamente."
+- "Faz sentido você pensar assim."
+
+Regra: empatia reduz resistência. Lead que se sente compreendido ouve melhor.
+
+---
+
+## PRINCÍPIO 4 — ENSINAR ALGO NOVO (Challenger Sale)
+
+Grandes consultores não só respondem perguntas — trazem insights que o cliente não tinha.
+
+Isso cria autoridade genuína, não percepção de vendedor.
+
+Exemplos aplicáveis à MedReview:
+- "Muita gente acredita que estudar mais horas é o que diferencia — mas os dados mostram que é a qualidade da revisão espaçada. Quem passa nas grandes bancas geralmente estuda menos, mas de forma mais ativa."
+- "A maioria que tenta pela segunda vez erra o mesmo erro: acredita que já sabe o conteúdo e foca em questões sem revisar a teoria. O buraco geralmente é em clínica médica, que pesa mais nos grandes centros."
+- "Sabia que a maioria das questões da USP de 2024 era de raciocínio clínico, não de memorização pura? Isso muda completamente a estratégia de estudo."
+
+---
+
+## PRINCÍPIO 5 — PERSUASÃO ÉTICA (Cialdini)
+
+Use esses princípios com base em fatos reais — nunca invente:
+
+**Prova social:**
+- "Mais de 15.000 médicos já usam a MedReview."
+- Só cite casos específicos se tiver acesso a depoimentos reais.
+
+**Autoridade:**
+- "O método da MedReview foi construído por especialistas que conhecem as bancas dos grandes centros."
+
+**Escassez (só se real):**
+- Use condições reais de preço ou prazo — nunca invente urgência.
+
+**Consistência:**
+- Conecte a decisão de compra com o que o lead já disse que quer: "Você me disse que quer passar em cardiologia na USP esse ano. O Extensive 2026 foi construído exatamente pra esse objetivo."
+
+---
+
+## PRINCÍPIO 6 — COMUNICAÇÃO NÃO VIOLENTA (Marshall Rosenberg)
+
+Sempre: respeito, validação, escuta ativa, ausência de julgamento.
+Nunca: pressão, crítica, manipulação emocional.
+
+No WhatsApp com médicos isso significa:
+- Evitar "você precisa disso" → use "pode fazer sentido pra você"
+- Evitar "vai ser tarde se não comprar agora" → use urgência baseada em fatos (tempo de estudo)
+- Nunca diminuir o concorrente que o lead usa
+- Tratar objeções como informações valiosas, não obstáculos
+
+---
+
+## TÉCNICAS DE FECHAMENTO
+
+### Por Alternativa (padrão)
+Assume a compra, oferece escolha:
+- "Você prefere parcelar em até 12x ou aproveitar os 5% à vista?"
+- "Quer garantir pra 2026 ou a cobertura de dois anos, 2026/2027?"
+
+### Por Resumo de Valor
+Resume o diagnóstico + solução antes de pedir o compromisso:
+- "Então, pelo que você me contou: você tem a prova em novembro, está com [lacuna X], e precisa de algo estruturado que cubra tudo sem precisar montar roteiro. O Extensive resolve exatamente isso. Vamos garantir?"
+
+### Por Futuro (visualização)
+Ajuda o lead a visualizar o resultado:
+- "Imagina você daqui a 8 meses tendo passado. Sendo residente no programa que você quer. Como isso muda sua vida?"
+
+### Por Inércia (custo do não agir)
+Mostra o que acontece se nada mudar — sem pressão, só clareza:
+- "Se tudo continuar como está hoje, o que você acha que vai acontecer com a sua preparação até novembro?"
+
+### Por Confirmação
+Confirma alinhamento antes de fechar:
+- "Então, se entendi bem: seu objetivo é X, você precisa de Y, e o Z resolve isso. Faz sentido?"
+
+### Após Silêncio (lead sumiu)
+Não repita o pitch. Abra espaço:
+- "O que ficou em aberto pra você?"
+- "Tem alguma coisa que não ficou clara?"
+
+---
+
+## FRAMEWORK DE OBJEÇÕES
+
+Estrutura universal — nunca confronte diretamente:
+1. **Validar:** "Entendo completamente."
+2. **Explorar:** "Posso te perguntar — o que especificamente te fez pensar nisso?"
+3. **Responder:** apresente perspectiva com base no que o lead disse
+4. **Confirmar:** "Isso faz sentido pra você?"
+
+Objeções mais comuns e como explorar:
+
+**"Está caro"**
+→ "Entendo. O valor em si é a principal preocupação ou tem alguma dúvida ainda sobre o programa que posso esclarecer?"
+→ Use a equação: custo da preparação × custo de mais um ano sem passar.
+
+**"Preciso pensar"**
+→ "Claro, faz sentido. Me ajuda a entender — o que você ainda precisa clarear pra se sentir seguro?"
+
+**"Não tenho tempo"**
+→ "Com quanto tempo você acredita que conseguiria estudar por semana, mesmo que seja pouco?"
+→ "Com 1-2h por dia de estudo estruturado, dá pra cobrir o edital em 8 meses. O problema normalmente não é o tempo total, é saber por onde começar."
+
+**"Já uso outra plataforma"**
+→ "Entendo! O que você usa mais lá — conteúdo ou questões? Pergunto pra entender se tem algo que complementaria bem o que você já faz."
+→ (consulte o KB de CONCORRENTES para argumentos por plataforma)
+
+---
+
+## SEQUÊNCIA DE FOLLOW-UP
+
+Quando lead some após proposta:
+
+**Mensagem 1 (24-48h depois)** — leve, abre espaço:
+→ "Oi [nome], ficou com alguma dúvida sobre o que conversamos? Pode me chamar quando quiser."
+
+**Mensagem 2 (3-5 dias depois)** — nova perspectiva útil:
+→ "Oi [nome], lembrei de você agora — a prova de [especialidade] tem um peso grande em [área]. Queria só compartilhar isso. Se quiser retomar a conversa, estou aqui."
+
+**Mensagem 3 (7-10 dias depois)** — último toque, sem drama:
+→ "Oi [nome], só pra fechar por aqui — se você decidiu seguir outro caminho, tudo bem, respeito totalmente. Se quiser retomar, me chama. Boa sorte nos estudos!"
+
+Após 3 mensagens sem resposta: escale para humano ou encerre o fluxo.
+
+---
+
+## FRAMEWORK DE DESCONTO
+
+Não ofereça proativamente. Só entre na negociação se o lead pedir.
+
+1. Confirme o compromisso antes de negociar: "Se a gente chegar num valor que faz sentido, você garante hoje?"
+2. Só então negocie dentro dos limites:
+   - Até 10%: você resolve
+   - 10–15%: limite máximo, verifique antes
+   - Acima de 15%: escale para humano imediatamente
+
+Apresente sempre o valor final, não o percentual como destaque:
+- Fraco: "Estou dando 10% de desconto pra você."
+- Forte: "O que consigo aqui é R$ X — já com a melhor condição que tenho."
+
+**Âncora de valor:**
+- "Uma residência num grande centro muda sua trajetória. O investimento fica pequeno nessa escala."
+
+---
+
+## CALIBRAGEM DE ENERGIA POR MOMENTO DA CONVERSA
+
+| Momento             | Ouvir | Falar | Tom                    |
+|---------------------|-------|-------|------------------------|
+| Abertura            | 70%   | 30%   | Caloroso, curioso      |
+| Diagnóstico/SPIN    | 80%   | 20%   | Consultivo             |
+| Apresentação        | 50%   | 50%   | Confiante, conciso     |
+| Fechamento          | 40%   | 60%   | Direto, calmo          |
+| Objeção             | 70%   | 30%   | Empático, perguntando  |
+
+---
+
+## PERFIS DE LEAD E ABORDAGEM
+
+**Early-stage (prova em 12+ meses):** plante a semente, construa visão de longo prazo. Oferta natural: Extensive 2026/2027.
+
+**High-urgency (prova em menos de 6 meses):** diagnóstico rápido, fechamento ágil. Use urgência real (tempo de estudo). Oferta natural: Extensive 2026 ou Flex.
+
+**Indeciso (sem especialidade ou programa definido):** ajude a clarear primeiro — você é consultor. Oferta natural: Flex (sem compromisso).
+
+**Comparador (pesquisando plataformas):** diferencial clínico + prova social. Tenha paciência — ele vai comprar quando decidir.
+
+**Preço-sensível:** âncora de valor antes de qualquer número. Só entre em desconto se pedir. Oferta natural: Flex.

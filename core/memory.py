@@ -1,23 +1,26 @@
 """
-Memória de conversa multi-sessão (por número de telefone ou session_id).
-Usa cache in-memory para velocidade + Supabase para persistência.
+Memória de conversa multi-sessão (por user_id / número de telefone).
+Usa cache in-memory para velocidade + Supabase (tabela conversations) para persistência.
 Se o Supabase não estiver configurado, opera apenas em memória.
+
+Tabela usada: conversations (user_id, role, content, channel, created_at)
 """
 from core import database
 
 
 class ConversationMemory:
     def __init__(self):
-        # Cache in-memory: { session_id -> list of messages }
-        self.sessions = {}
-        self.statuses = {}
+        # Cache in-memory: { session_id -> list of {"role": ..., "content": ...} }
+        self.sessions: dict = {}
+        self.statuses: dict = {}
         # Controla quais sessões já foram carregadas do Supabase
-        self._loaded_from_db = set()
+        self._loaded_from_db: set = set()
 
     def _ensure_loaded(self, session_id: str):
         """
-        Carrega histórico do Supabase na primeira vez que a sessão é acessada.
-        Garante que conversas anteriores sejam restauradas após reiniciar o servidor.
+        Carrega as últimas 20 mensagens do Supabase na primeira vez que a sessão
+        é acessada. Garante que conversas anteriores sejam restauradas após
+        reiniciar o servidor.
         """
         if session_id in self._loaded_from_db:
             return
@@ -25,19 +28,23 @@ class ConversationMemory:
         self._loaded_from_db.add(session_id)
 
         if session_id not in self.sessions:
-            history = database.load_messages(session_id)
+            # Tenta carregar da tabela conversations (endpoint /chat e webhooks)
+            history = database.load_conversation_history(session_id, limit=20)
+            # Fallback: tenta a tabela messages legada (webhooks WhatsApp antigos)
+            if not history:
+                history = database.load_messages(session_id)
             if history:
                 self.sessions[session_id] = history
                 print(f"[MEMORY] Restauradas {len(history)} mensagens de {session_id}", flush=True)
 
-    def add(self, session_id: str, role: str, content: str):
-        """Adiciona mensagem ao cache e persiste no Supabase."""
+    def add(self, session_id: str, role: str, content: str, channel: str = None):
+        """Adiciona mensagem ao cache e persiste no Supabase (tabela conversations)."""
         if session_id not in self.sessions:
             self.sessions[session_id] = []
         self.sessions[session_id].append({"role": role, "content": content})
 
-        # Persiste no banco (falha silenciosamente se Supabase não configurado)
-        database.save_message(session_id, role, content)
+        # Persiste na tabela conversations (unificada, suporta todos os canais)
+        database.save_conversation_message(session_id, role, content, channel)
 
     def get(self, session_id: str) -> list:
         """Retorna histórico da sessão, carregando do Supabase se necessário."""
@@ -69,6 +76,6 @@ class ConversationMemory:
     def summary(self, session_id: str) -> str:
         lines = []
         for msg in self.get(session_id):
-            prefix = "Lead" if msg["role"] == "user" else "Criatons"
+            prefix = "Lead" if msg["role"] == "user" else "Agente"
             lines.append(f"{prefix}: {msg['content'][:80]}...")
         return "\n".join(lines)

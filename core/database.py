@@ -102,6 +102,45 @@ def load_messages(phone: str) -> list:
         return []
 
 
+# ── Conversations (tabela unificada por user_id para o endpoint /chat) ─────────
+
+def save_conversation_message(user_id: str, role: str, content: str, channel: str = None):
+    """Salva uma mensagem na tabela conversations (usada pelo endpoint /chat)."""
+    db = _get_client()
+    if db is None:
+        return
+    try:
+        db.table("conversations").insert(
+            {"user_id": user_id, "role": role, "content": content, "channel": channel}
+        ).execute()
+    except Exception as e:
+        print(f"[DB] Erro ao salvar conversation de {user_id}: {e}", flush=True)
+
+
+def load_conversation_history(user_id: str, limit: int = 20) -> list:
+    """
+    Carrega as últimas `limit` mensagens de um user_id da tabela conversations.
+    Retorna lista cronológica: [{"role": "user"/"assistant", "content": "..."}].
+    """
+    db = _get_client()
+    if db is None:
+        return []
+    try:
+        result = (
+            db.table("conversations")
+            .select("role, content")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+        # Retorna em ordem cronológica (buscamos as mais recentes, revertemos)
+        return list(reversed(result.data or []))
+    except Exception as e:
+        print(f"[DB] Erro ao carregar conversations de {user_id}: {e}", flush=True)
+        return []
+
+
 def is_enabled() -> bool:
     """Retorna True se o Supabase está configurado."""
     return bool(SUPABASE_URL and SUPABASE_KEY)
