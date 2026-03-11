@@ -4,3 +4,4 @@ python-dotenv>=1.0.0
 gunicorn>=21.0.0
 httpx>=0.24.0
 supabase>=2.3.0
+gevent>=23.9.0

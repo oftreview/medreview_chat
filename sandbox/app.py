@@ -1,3 +1,10 @@
+# gevent monkey-patch deve ser a PRIMEIRA coisa executada — antes de qualquer import.
+# Converte I/O blocking (sockets, sleep, threading) em greenlets não-bloqueantes.
+# Isso permite que uma única instância gunicorn atenda 500+ conexões simultâneas
+# sem criar uma thread OS por conexão (que seria insustentável em escala).
+from gevent import monkey
+monkey.patch_all()
+
 import sys
 import os
 import random
