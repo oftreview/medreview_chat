@@ -24,7 +24,7 @@ HOST = os.getenv("HOST", "0.0.0.0")
 # ── Configurações do endpoint /chat ───────────────────────────────────────────
 
 # Tempo de espera (em segundos) antes de processar mensagens acumuladas.
-# Se chegar nova mensagem do mesmo user_id dentro desse tempo, o timer reinicia.
+# Se chegar nova mensagem do mesmo session_id dentro desse tempo, o timer reinicia.
 RESPONSE_DELAY_SECONDS = int(os.getenv("RESPONSE_DELAY_SECONDS", "10"))
 
 # Token de autenticação para o endpoint /chat (Bearer token).
@@ -38,8 +38,10 @@ FALLBACK_MESSAGE = os.getenv(
     "Estou com uma instabilidade agora, em breve um consultor vai te atender."
 )
 
-# ── Estado de debounce por user_id ────────────────────────────────────────────
-# Estrutura: { user_id -> { messages, timer, event, result, channel } }
+# ── Estado de debounce por session_id ─────────────────────────────────────────
+# Estrutura: { session_id -> { messages, timer, event, result, channel, user_id } }
+# O timer é indexado por session_id (identificador da Botmaker) para agrupar
+# mensagens por sessão ativa. O user_id é mantido separado para histórico Supabase.
 # IMPORTANTE: funciona em processo único. No Railway, configure:
 #   WEB_CONCURRENCY=1  (ou use gunicorn --workers=1 --threads=8)
 _chat_state: dict = {}
@@ -61,24 +63,30 @@ def _check_auth(req) -> bool:
     return auth == f"Bearer {API_SECRET_TOKEN}"
 
 
-def _flush_and_respond(user_id: str):
+def _flush_and_respond(session_id: str):
     """
     Callback do timer de debounce.
-    Processa todas as mensagens acumuladas para user_id e sinaliza a thread
+    Processa todas as mensagens acumuladas para session_id e sinaliza a thread
     da requisição HTTP com o resultado.
+
+    O timer é indexado por session_id (Botmaker), mas o histórico no Supabase
+    usa user_id (telefone do lead) para manter continuidade entre sessões.
     """
     with _chat_lock:
-        state = _chat_state.get(user_id)
+        state = _chat_state.get(session_id)
         if not state:
             return
         messages = list(state["messages"])
         channel = state.get("channel", "api")
+        user_id = state.get("user_id", session_id)
 
     # Combina mensagens acumuladas em uma única string
     combined = "\n".join(messages)
-    print(f"[CHAT API] Processando {user_id} ({len(messages)} msg) canal={channel}", flush=True)
+    print(f"[CHAT API] Processando session={session_id} user={user_id} ({len(messages)} msg) canal={channel}", flush=True)
 
     try:
+        # Usa user_id como session_id do agente para que o histórico Supabase
+        # fique indexado pelo identificador real do cliente
         result = agent.reply(combined, session_id=user_id)
         response_text = result["message"]
 
@@ -89,15 +97,16 @@ def _flush_and_respond(user_id: str):
 
         status = "success"
     except Exception as e:
-        print(f"[CHAT API] Erro ao processar {user_id}: {e}", flush=True)
+        print(f"[CHAT API] Erro ao processar session={session_id} user={user_id}: {e}", flush=True)
         response_text = FALLBACK_MESSAGE
         status = "error"
 
     # Sinaliza a thread da requisição com o resultado
     with _chat_lock:
-        state = _chat_state.get(user_id)
+        state = _chat_state.get(session_id)
         if state:
             state["result"] = {
+                "session_id": session_id,
                 "response": response_text,
                 "user_id": user_id,
                 "status": status,
@@ -118,10 +127,18 @@ def chat():
     Endpoint unificado.
 
     Modo API (canal externo — Botmaker, webchat, etc.):
-      Payload: { "user_id": "...", "message": "...", "channel": "botmaker", "metadata": {} }
+      Payload: {
+        "session_id": "identificador de sessão da Botmaker",
+        "user_id": "telefone do lead — opcional, para histórico no Supabase",
+        "message": "mensagem do lead",
+        "channel": "botmaker | webchat | whatsapp | outro",
+        "metadata": {}
+      }
       Requer header: Authorization: Bearer <API_SECRET_TOKEN>
       Aplica debounce de RESPONSE_DELAY_SECONDS para acumular mensagens rápidas.
-      Resposta: { "response": "...", "user_id": "...", "status": "success|error" }
+      O timer de debounce é indexado por session_id (sessão ativa da Botmaker).
+      O histórico no Supabase usa user_id (telefone do lead) para continuidade.
+      Resposta: { "session_id": "...", "response": "...", "user_id": "...", "status": "success|error" }
 
     Modo sandbox (UI de chat interna):
       Payload: { "message": "...", "session_id": "sandbox" }
@@ -129,26 +146,33 @@ def chat():
     """
     data = request.get_json(silent=True) or {}
 
-    # ── Modo API: payload tem user_id ─────────────────────────────────────────
-    if "user_id" in data:
+    # ── Modo API: payload tem session_id (integração Botmaker/canais externos)
+    if "session_id" in data and data.get("session_id") != "sandbox":
         # Autenticação
         if not _check_auth(request):
             return jsonify({"error": "Unauthorized", "status": "error"}), 401
 
-        user_id = (data.get("user_id") or "").strip()
+        session_id = (data.get("session_id") or "").strip()
         message = (data.get("message") or "").strip()
         channel = data.get("channel", "api")
 
-        if not user_id:
-            return jsonify({"error": "user_id é obrigatório", "status": "error"}), 400
+        # user_id é opcional — se não vier, usa session_id como fallback
+        user_id = (data.get("user_id") or "").strip() or session_id
+
+        if not session_id:
+            return jsonify({"error": "session_id é obrigatório", "status": "error"}), 400
         if not message:
             return jsonify({"error": "message é obrigatório", "status": "error"}), 400
 
-        # ── Segurança: rate limit ──────────────────────────────────────────────
-        allowed, count = rate_limiter(user_id)
+        # ── Segurança: rate limit (por session_id para evitar abuso por sessão) ─
+        allowed, count = rate_limiter(session_id)
         if not allowed:
-            log_security_event("RATE_LIMIT_EXCEEDED", hash_user_id(user_id), {"count": count})
-            return jsonify({"error": "Muitas mensagens. Aguarde um momento.", "status": "error"}), 429
+            log_security_event("RATE_LIMIT_EXCEEDED", hash_user_id(session_id), {"count": count})
+            return jsonify({
+                "session_id": session_id,
+                "error": "Muitas mensagens. Aguarde um momento.",
+                "status": "error",
+            }), 429
 
         # ── Segurança: sanitização e detecção de injection ─────────────────────
         message, warnings = sanitize_input(message)
@@ -162,18 +186,23 @@ def chat():
             # Mas registra para auditoria
             print(f"[SECURITY] Injection pattern detectado de {hash_user_id(user_id)}", flush=True)
 
+        # ── Debounce indexado por session_id ──────────────────────────────────
         with _chat_lock:
-            if user_id not in _chat_state:
-                _chat_state[user_id] = {
+            if session_id not in _chat_state:
+                _chat_state[session_id] = {
                     "messages": [],
                     "timer": None,
                     "event": threading.Event(),
                     "result": None,
                     "channel": channel,
+                    "user_id": user_id,
                 }
 
-            state = _chat_state[user_id]
+            state = _chat_state[session_id]
             state["messages"].append(message)
+            # Atualiza user_id caso venha em mensagem posterior
+            if user_id != session_id:
+                state["user_id"] = user_id
 
             # Reinicia o timer a cada mensagem recebida (debounce)
             if state["timer"] is not None:
@@ -182,7 +211,7 @@ def chat():
             state["event"].clear()
             state["result"] = None
 
-            timer = threading.Timer(RESPONSE_DELAY_SECONDS, _flush_and_respond, args=[user_id])
+            timer = threading.Timer(RESPONSE_DELAY_SECONDS, _flush_and_respond, args=[session_id])
             timer.daemon = True
             state["timer"] = timer
             timer.start()
@@ -193,20 +222,21 @@ def chat():
         triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 15)
 
         with _chat_lock:
-            result = _chat_state.get(user_id, {}).get("result")
+            result = _chat_state.get(session_id, {}).get("result")
             if result:
-                _chat_state.pop(user_id, None)
+                _chat_state.pop(session_id, None)
 
         if triggered and result:
             return jsonify(result)
         else:
             return jsonify({
+                "session_id": session_id,
                 "response": FALLBACK_MESSAGE,
                 "user_id": user_id,
                 "status": "error",
             })
 
-    # ── Modo sandbox: payload tem session_id (ou nenhum user_id) ─────────────
+    # ── Modo sandbox: payload sem session_id ou session_id="sandbox" ──────────
     user_message = (data.get("message") or "").strip()
     session_id = data.get("session_id", "sandbox")
     if not user_message:
