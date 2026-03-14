@@ -27,6 +27,18 @@ COMPETITORS_PATH    = os.path.join(BASE_DIR, "data/competitors.json")
 OBJECTIONS_PATH     = os.path.join(BASE_DIR, "data/objections.json")
 SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
 
+# Tag estruturada de escalação — o Claude inclui no início da resposta quando quer escalar.
+# É removida antes de enviar ao lead.
+ESCALATION_TAG = "[ESCALAR]"
+
+# Fallback: frases de escalação por string matching (caso o Claude não use a tag)
+ESCALATION_FALLBACK_PHRASES = [
+    "vou conectar você com",
+    "consultor humano",
+    "vou te passar para um consultor",
+    "vou transferir você",
+]
+
 
 def _load_json(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
@@ -90,9 +102,27 @@ class SalesAgent:
         truncated = _truncate_history(full_history)
 
         response_text = call_claude(self.system_prompt, truncated)
+
+        # ── Detecção de escalação ────────────────────────────────────────────
+        # Prioridade 1: tag estruturada [ESCALAR] no início da resposta
+        escalate = response_text.strip().startswith(ESCALATION_TAG)
+
+        if escalate:
+            # Remove a tag — o lead nunca deve vê-la
+            response_text = response_text.strip()[len(ESCALATION_TAG):].strip()
+            print(f"[AGENT] Escalação detectada via tag [ESCALAR]", flush=True)
+        else:
+            # Prioridade 2: fallback por string matching (caso Claude não use a tag)
+            escalate = any(
+                phrase in response_text.lower()
+                for phrase in ESCALATION_FALLBACK_PHRASES
+            )
+            if escalate:
+                print(f"[AGENT] Escalação detectada via fallback (string match)", flush=True)
+
+        # Salva a resposta LIMPA (sem tag) no histórico
         self.memory.add(session_id, "assistant", response_text)
 
-        escalate = any(t in response_text.lower() for t in ["vou conectar você com", "consultor humano"])
         if escalate:
             self.memory.set_status(session_id, "escalated")
 
