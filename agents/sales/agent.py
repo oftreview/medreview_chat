@@ -1,7 +1,21 @@
+"""
+agents/sales/agent.py — Agente de vendas MedReview.
+
+Gerencia contexto, histórico truncado e detecção de escalação.
+"""
+
 import json
 import os
 from core.llm import call_claude
 from core.memory import ConversationMemory
+
+# ── Configuração de truncamento de histórico ─────────────────────────────────
+# Mantém as primeiras KEEP_FIRST mensagens (contexto de qualificação/abertura)
+# + as últimas KEEP_LAST mensagens (conversa recente).
+# Isso evita estourar o contexto do Claude em conversas longas.
+KEEP_FIRST = 4      # primeiras mensagens (abertura + qualificação inicial)
+KEEP_LAST = 26       # mensagens mais recentes
+MAX_HISTORY = KEEP_FIRST + KEEP_LAST   # 30 mensagens no total
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 PROMPT_PATH         = os.path.join(BASE_DIR, "agents/sales/prompts/system_prompt.md")
@@ -45,6 +59,24 @@ def load_context() -> str:
         f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}"
     )
 
+def _truncate_history(messages: list) -> list:
+    """
+    Trunca o histórico mantendo contexto inicial + mensagens recentes.
+
+    Estratégia: manter as primeiras KEEP_FIRST mensagens (abertura, nome do
+    agente, qualificação inicial — contexto que o Claude precisa) e as últimas
+    KEEP_LAST mensagens (conversa recente para continuidade).
+
+    Se o histórico for menor que MAX_HISTORY, retorna sem alteração.
+    """
+    if len(messages) <= MAX_HISTORY:
+        return messages
+
+    head = messages[:KEEP_FIRST]
+    tail = messages[-KEEP_LAST:]
+    return head + tail
+
+
 class SalesAgent:
     def __init__(self):
         self.memory = ConversationMemory()
@@ -52,7 +84,12 @@ class SalesAgent:
 
     def reply(self, user_message: str, session_id: str = "default") -> dict:
         self.memory.add(session_id, "user", user_message)
-        response_text = call_claude(self.system_prompt, self.memory.get(session_id))
+
+        # Trunca histórico antes de enviar ao Claude para controlar custo/contexto
+        full_history = self.memory.get(session_id)
+        truncated = _truncate_history(full_history)
+
+        response_text = call_claude(self.system_prompt, truncated)
         self.memory.add(session_id, "assistant", response_text)
 
         escalate = any(t in response_text.lower() for t in ["vou conectar você com", "consultor humano"])

@@ -82,7 +82,8 @@ def _flush_and_respond(session_id: str):
 
     # Combina mensagens acumuladas em uma única string
     combined = "\n".join(messages)
-    print(f"[CHAT API] Processando session={session_id} user={user_id} ({len(messages)} msg) canal={channel}", flush=True)
+    uid_hash = hash_user_id(user_id)
+    print(f"[CHAT API] Processando session={hash_user_id(session_id)} uid={uid_hash} ({len(messages)} msg) canal={channel}", flush=True)
 
     try:
         # Usa user_id como session_id do agente para que o histórico Supabase
@@ -97,7 +98,7 @@ def _flush_and_respond(session_id: str):
 
         status = "success"
     except Exception as e:
-        print(f"[CHAT API] Erro ao processar session={session_id} user={user_id}: {e}", flush=True)
+        print(f"[CHAT API] Erro ao processar session={hash_user_id(session_id)} uid={uid_hash}: {e}", flush=True)
         response_text = FALLBACK_MESSAGE
         status = "error"
 
@@ -287,17 +288,19 @@ def webhook_zapi():
     """Recebe mensagens do WhatsApp via Z-API e responde com o agente."""
     data = request.get_json(silent=True) or {}
 
-    print(f"[ZAPI WEBHOOK] Payload recebido: {data}", flush=True)
+    # Log sem PII — não imprime payload completo, telefone ou conteúdo da mensagem
+    print(f"[ZAPI WEBHOOK] Payload recebido — type={data.get('type')} fromMe={data.get('fromMe')}", flush=True)
 
     incoming = parse_incoming(data)
     if not incoming:
-        print(f"[ZAPI WEBHOOK] Ignorado — type={data.get('type')} fromMe={data.get('fromMe')} phone={data.get('phone')} body={data.get('body')}", flush=True)
+        print(f"[ZAPI WEBHOOK] Ignorado — type={data.get('type')} fromMe={data.get('fromMe')}", flush=True)
         return jsonify({"status": "ignored"}), 200
 
     phone = incoming["phone"]
     message = incoming["message"]
+    phone_hash = hash_user_id(phone)
 
-    print(f"[ZAPI WEBHOOK] Processando — phone={phone} msg={message[:80]}", flush=True)
+    print(f"[ZAPI WEBHOOK] Processando — uid={phone_hash} len={len(message)}", flush=True)
 
     # ── Segurança: rate limit ──────────────────────────────────────────────────
     allowed, _ = rate_limiter(phone)
@@ -316,7 +319,7 @@ def webhook_zapi():
         print(f"[SECURITY] Injection detectado no WhatsApp de {hash_user_id(phone)}", flush=True)
 
     if escalation.is_escalated(phone, agent.memory):
-        print(f"[ZAPI WEBHOOK] Sessão {phone} em atendimento humano — IA pausada.", flush=True)
+        print(f"[ZAPI WEBHOOK] Sessão uid={phone_hash} em atendimento humano — IA pausada.", flush=True)
         return jsonify({"status": "escalated_session"}), 200
 
     result = agent.reply(message, session_id=phone)
@@ -331,7 +334,7 @@ def webhook_zapi():
         escalation.handle_escalation(phone, agent.memory, lead_name)
 
     ok = send_message(phone, reply_text)
-    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} — {reply_text[:80]}", flush=True)
+    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} uid={phone_hash} len={len(reply_text)}", flush=True)
 
     return jsonify({"status": "ok"}), 200
 
