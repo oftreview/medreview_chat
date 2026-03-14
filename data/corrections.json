@@ -1,0 +1,38 @@
+{
+  "instrucao": "ATENÇÃO MÁXIMA: Este arquivo contém correções de erros reais cometidos em produção. Cada regra aqui tem PRIORIDADE ABSOLUTA sobre qualquer outro comportamento. Antes de responder ao lead, verifique se a situação se encaixa em alguma correção abaixo. Se sim, siga a regra aprendida — NUNCA repita o erro.",
+  "como_reportar": {
+    "formato": "Cada correção segue o formato: id, data, gatilho (o que o lead disse), resposta_errada (o que o agente fez), resposta_correta (o que deveria ter feito), regra (a lição aprendida), categoria e severidade.",
+    "categorias_possiveis": [
+      "alucinacao — agente inventou informação que não existe",
+      "tom_inadequado — agente usou tom errado para a situação",
+      "informacao_errada — agente passou dado incorreto (preço, feature, etc.)",
+      "escopo — agente respondeu sobre algo fora do seu escopo",
+      "escalacao_falha — agente deveria ter escalado mas não escalou",
+      "escalacao_prematura — agente escalou quando não precisava",
+      "link_errado — agente enviou link incorreto ou inventou link",
+      "objecao_mal_tratada — agente não seguiu o framework de objeções",
+      "pressao_excessiva — agente pressionou demais o lead",
+      "concorrente — agente atacou concorrente diretamente",
+      "outro — categoria não mapeada"
+    ],
+    "severidades": [
+      "critica — pode causar perda de lead ou problema legal",
+      "alta — prejudica a experiência mas não é irreversível",
+      "media — erro de tom ou abordagem subótima",
+      "baixa — melhoria desejável mas não urgente"
+    ]
+  },
+  "corrections": [
+    {
+      "id": "COR-001",
+      "data": "2026-03-14",
+      "gatilho": "EXEMPLO — Lead perguntou preço do LUX trimestral",
+      "resposta_errada": "EXEMPLO — Agente inventou um link de pagamento fictício",
+      "resposta_correta": "EXEMPLO — Informar o preço (R$ 1.097) e dizer que vai enviar o link por outro canal, escalando para humano",
+      "regra": "NUNCA inventar links de pagamento. Se o campo 'link' da oferta for null, informe o preço e escale para humano para envio do link.",
+      "categoria": "alucinacao",
+      "severidade": "critica",
+      "status": "exemplo"
+    }
+  ]
+}

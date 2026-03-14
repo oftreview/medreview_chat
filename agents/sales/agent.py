@@ -25,6 +25,8 @@ RULES_PATH          = os.path.join(BASE_DIR, "data/commercial_rules.json")
 PRODUCT_INFO_PATH   = os.path.join(BASE_DIR, "data/product_info.json")
 COMPETITORS_PATH    = os.path.join(BASE_DIR, "data/competitors.json")
 OBJECTIONS_PATH     = os.path.join(BASE_DIR, "data/objections.json")
+CONVERSION_PATH     = os.path.join(BASE_DIR, "data/conversion_bible.json")
+CORRECTIONS_PATH    = os.path.join(BASE_DIR, "data/corrections.json")
 SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
 
 # Tag estruturada de escalação — o Claude inclui no início da resposta quando quer escalar.
@@ -50,6 +52,38 @@ def _load_text(path: str) -> str:
         return f.read()
 
 
+def _build_corrections_block(corrections_data: dict) -> str:
+    """
+    Monta o bloco de correções para injeção no system prompt.
+    Filtra apenas correções ativas (ignora status='exemplo').
+    Formata cada correção como regra imperativa de alta prioridade.
+    """
+    active = [
+        c for c in corrections_data.get("corrections", [])
+        if c.get("status") != "exemplo"
+    ]
+    if not active:
+        return ""
+
+    lines = [
+        "# ⚠️ CORREÇÕES OBRIGATÓRIAS (PRIORIDADE MÁXIMA)",
+        "",
+        "As regras abaixo foram aprendidas de ERROS REAIS em produção.",
+        "Você DEVE seguir cada uma delas. NUNCA repita esses erros.",
+        "",
+    ]
+    for c in active:
+        sev = c.get("severidade", "alta").upper()
+        lines.append(f"## [{sev}] {c['id']} — {c.get('categoria', 'outro')}")
+        lines.append(f"Gatilho: {c['gatilho']}")
+        lines.append(f"❌ ERRADO: {c['resposta_errada']}")
+        lines.append(f"✅ CORRETO: {c['resposta_correta']}")
+        lines.append(f"REGRA: {c['regra']}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 def load_context() -> str:
     prompt        = _load_text(PROMPT_PATH)
     stage_scripts = _load_text(STAGE_SCRIPTS_PATH)
@@ -59,15 +93,22 @@ def load_context() -> str:
     product_info  = _load_json(PRODUCT_INFO_PATH)
     competitors   = _load_json(COMPETITORS_PATH)
     objections    = _load_json(OBJECTIONS_PATH)
+    conversion    = _load_json(CONVERSION_PATH)
+    corrections   = _load_json(CORRECTIONS_PATH)
+
+    # Bloco de correções — injetado LOGO APÓS o prompt base (prioridade máxima)
+    corrections_block = _build_corrections_block(corrections)
 
     return (
         f"{prompt}\n\n"
+        f"{corrections_block}"
         f"# SCRIPTS POR ETAPA (tom, exemplos, transições)\n{stage_scripts}\n\n"
         f"# TÉCNICAS DE VENDAS\n{sales_tech}\n\n"
         f"# OFERTAS (preços, planos e links de pagamento)\n{json.dumps(offers, ensure_ascii=False, indent=2)}\n\n"
-        f"# INFORMAÇÕES DE PRODUTO (descrições detalhadas e FAQ)\n{json.dumps(product_info, ensure_ascii=False, indent=2)}\n\n"
-        f"# CONCORRENTES (argumentos e abordagem por plataforma)\n{json.dumps(competitors, ensure_ascii=False, indent=2)}\n\n"
-        f"# OBJEÇÕES (framework de contorno por tipo de objeção)\n{json.dumps(objections, ensure_ascii=False, indent=2)}\n\n"
+        f"# INFORMAÇÕES DE PRODUTO (descrições detalhadas, módulos e FAQ)\n{json.dumps(product_info, ensure_ascii=False, indent=2)}\n\n"
+        f"# CONCORRENTES (argumentos e abordagem por plataforma + comparativos por módulo)\n{json.dumps(competitors, ensure_ascii=False, indent=2)}\n\n"
+        f"# OBJEÇÕES (framework de contorno por tipo de objeção — geral + por módulo)\n{json.dumps(objections, ensure_ascii=False, indent=2)}\n\n"
+        f"# BÍBLIA DE CONVERSÃO (100 dores do mercado vs soluções MED-Review + scripts IA)\n{json.dumps(conversion, ensure_ascii=False, indent=2)}\n\n"
         f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}"
     )
 

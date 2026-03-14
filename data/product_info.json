@@ -138,5 +138,164 @@
       "observacao_link": "Sem link disponível — escale para humano ao fechar.",
       "faq": []
     }
+  },
+  "modulos": {
+    "aulas": {
+      "nome": "Módulo Aulas",
+      "conceito": "Ferramentas de engenharia cognitiva, não simples vídeos",
+      "metodologia": {
+        "dual_channel_learning": {
+          "descricao": "Aprendizado processado por dois canais distintos: verbal (fala e texto) e visual (imagens e associações)",
+          "beneficio": "O cérebro processa estímulos visuais 60 mil vezes mais rápido que textos. O uso simultâneo dos canais triplica a memorização de longo prazo",
+          "fim_das_aulas_excel": "Elimina o padrão de slides brancos/azuis entupidos de tabelas estáticas e textos que sobrecarregam o canal verbal"
+        },
+        "regra_75_30": {
+          "tempo_maximo": "Nenhuma aula ultrapassa 30 minutos",
+          "economia_real": "O aluno economiza 75% do tempo teórico comparado ao mercado tradicional",
+          "foco_estudo_ativo": "Todo o tempo economizado na aula é convertido em Estudo Ativo na veia (Questões e Flashcards)"
+        },
+        "planejamento_milimetrico": "Aulas ultra-roteirizadas e planejadas para serem objetivas, sem enrolação ou conteúdos desnecessários"
+      },
+      "storytelling": {
+        "celula_faminta": "O estado de choque é ensinado através da humanização de uma célula em sofrimento, facilitando a empatia e a fixação do conceito de hipóxia",
+        "analogia_da_pizza": "O conceito complexo de Delivery de Oxigênio (DO2) é explicado como uma entrega de pizza, onde o coração é a pizzaria e o sangue são as estradas",
+        "logica_vs_decoreba": "Fórmulas e protocolos são ensinados através da lógica visual, eliminando a necessidade de memorização mecânica"
+      },
+      "pacote_5_pilares": [
+        "Videoaula Lúdica Superior: Roteiro planejado com design instrucional lúdico e personagens",
+        "E-book da Aula: Resumo visual dos slides para capturar a memória fotográfica do aluno",
+        "Apostila da Aula: Material técnico denso para consulta e aprofundamento opcional",
+        "Trilha de Questões: Selecionadas pelo professor para aplicação prática imediata",
+        "Trilha de Flashcards: Cards específicos da aula para revisão via repetição espaçada"
+      ],
+      "tecnologia": {
+        "busca_inteligente_ia": "O aluno pesquisa uma dúvida no título da aula e o sistema o leva ao minuto exato em que o professor explica o tema",
+        "assistir_offline": "Funcionalidade exclusiva do aplicativo para baixar aulas e assistir sem internet durante plantões ou deslocamentos",
+        "tira_duvidas_24h": "Espaço para registrar dúvidas ou críticas abaixo de cada vídeo, com resposta dos professores em até 24 horas"
+      }
+    },
+    "flow": {
+      "nome": "Módulo Flow",
+      "conceito": "O planejador inteligente que resolve a tríade: O que estudar? Quando estudar? E quanto estudar?",
+      "funcionalidades": {
+        "personalizacao_absoluta": "O sistema entende que cada aluno tem uma realidade distinta, considerando horas livres diárias/semanais e a rotina de internato ou plantão",
+        "jornada_orientada_resultados": "Foco em garantir a obtenção de mais pontos com menos esforço, otimizando o tempo para o que realmente cai na prova",
+        "adaptacao_metas_especificas": "O aluno escolhe suas provas prioritárias (SUS-SP, USP, Enamed, Revalida, etc.) e o sistema recalcula a jornada com base nelas"
+      },
+      "inteligencia_estatistica": {
+        "analise_modular_macro": "Hierarquia de Importância — análise estatística de dezenas de módulos, do mais importante para o menos importante",
+        "seguranca_imprevistos": "Temas que mais caem entram primeiro no cronograma, garantindo que o aluno não deixará de ver o essencial",
+        "frequencia_revisao": "Módulos de alta relevância estatística entram com maior frequência no sistema de revisão espaçada",
+        "analise_por_aula_micro": "Cada aula individual é classificada como Altíssima, Alta ou Baixa Prioridade baseada na incidência nos últimos 5 anos",
+        "filtro_de_ruido": "Ajuda o aluno a não desperdiçar energia em temas que caíram apenas uma vez em 5 anos"
+      },
+      "sincronizacao_academica": {
+        "descricao": "Resolve o conflito entre o cronograma do cursinho e o dia a dia da faculdade",
+        "sincronizacao": "O aluno pode sincronizar os temas do cronograma de estudos para a residência com os temas que ele está vendo no internato ou nas matérias da faculdade",
+        "estudo_unificado": "Permite criar um cronograma perfeito que unifica as duas jornadas"
+      },
+      "gestao_tarefas": {
+        "areas_status": "O aluno gerencia suas atividades através de blocos claros: A Fazer, Fazendo, Feito e Pulado",
+        "liberdade_cognitiva": "O registro fiel das atividades permite que o aluno estude livre de preocupações",
+        "jornada_unica": "Cada aluno trilha um caminho personalizado, sem a pressão de seguir um cronograma de massa"
+      }
+    },
+    "banco_de_questoes": {
+      "nome": "Módulo Banco de Questões (Sistema LUX)",
+      "conceito": "Braço de Estudo Ativo da metodologia — volume com profundidade pedagógica",
+      "numeros": {
+        "total_questoes": "Mais de 30.000 questões cadastradas",
+        "padrao_comentario": "Cada comentário funciona como uma aula à parte, reforçando o gabarito e abordando cada alternativa (corretas e incorretas) em detalhe",
+        "treinamento_precisao": "Foco em explicar o porquê de cada erro e acerto para evitar pegadinhas"
+      },
+      "agilidade": {
+        "regra_2_cliques": "Enquanto a concorrência exige até 10 cliques para o aluno chegar à primeira questão, na MED Review o treinamento começa com apenas dois cliques",
+        "menos_burocracia": "Interface desenhada para que o aluno gaste energia resolvendo questões, não navegando em menus complexos"
+      },
+      "filtros": {
+        "liberdade_temas": "Escolher temas isolados ou combinar múltiplos temas conforme critério. Vários níveis de especificidade (Abdome Agudo -> Abdome Agudo Inflamatório -> Apendicite Aguda)",
+        "filtros_instituicoes": "Base de dados com provas de USP, UNIFESP, SUS-SP, Minas, UFRJ, UERJ, ENARE, ENAMED e Revalida",
+        "filtros_especiais_imagem": "Possibilidade de filtrar questões que contenham imagens como ECGs para treinar diagnósticos visuais",
+        "busca_palavra_chave": "Buscar termos específicos dentro dos comentários (ex: tratamento de diverticulite)",
+        "filtros_temporais": "Seleção por ano específico ou por conjuntos de anos (ex: questões de 2020 a 2024)"
+      },
+      "simulados": {
+        "criacao_personalizada": "Liberdade para montar simulados próprios, escolhendo a dedo a quantidade de questões de cada tema",
+        "ambiente_prova_real": "Funcionalidade para salvar progresso, cronometrar tempo e usar relógio para simular a pressão do dia da prova",
+        "analise_performance": "Ao final de cada simulado, análise detalhada de evolução por grande área, identificando pontos fracos",
+        "simulados_oficiais_mensais": "Simulados mensais com o estilo e as características das principais provas do Brasil (ENAMED, ENARE, Residências)"
+      }
+    },
+    "trending_topics": {
+      "nome": "Módulo Trending Topics",
+      "conceito": "Material escrito que rompe com o modelo de Apostilas Excel — materiais densos com tabelas áridas e texto puramente acadêmico",
+      "filosofia": {
+        "storytelling_enredo": "Aplica o conceito de narrativa e linguagem acessível das aulas, tornando o estudo leve e envolvente",
+        "abordagem_sensorial_dual_channel": "Combinação de canal verbal e visual para despertar associações rápidas no cérebro do aluno",
+        "material_roteirizado": "Fluxo de leitura planejado para que o conteúdo faça sentido lógico e emocional"
+      },
+      "estrutura": {
+        "secao_sem_tempo": "Abre com 'Está sem tempo?' — uma tabela comparativa ultra-objetiva com os mecanismos de ação, fisiopatologia básica e prognósticos que as bancas cobram. Revisão de 1 minuto",
+        "conteudo_aprofundado": "Para o aluno que deseja entender todos os detalhes técnicos, com linguagem acessível e integrada às questões de prova"
+      },
+      "identidade_visual": {
+        "personificacoes": "Vírus com expressões (Angry Viruses) e anticorpos humanizados",
+        "mnemonicos_visuais": "Conceitos como 'O pau tá quebrando!' para IgM (infecção aguda) e 'Sobrou eu!' para IgG (cicatriz imunológica) criam gatilhos de memória imediatos",
+        "roteiro_de_atos": "Fases da doença explicadas como um roteiro de 4 atos (Incubação, Fase Prodrômica, Fase Ictérica e Convalescença)"
+      }
+    },
+    "flashcards": {
+      "nome": "Módulo Flashcards",
+      "conceito": "Não são resumos em cartões, mas unidades mínimas de informação (átomos) desenhadas para retenção máxima",
+      "metodologia": {
+        "active_recall_spaced_repetition": "Implementação pura de Active Recall e Spaced Repetition — as técnicas mais validadas pela neurociência para aprovação em provas extensas",
+        "fim_cards_ladroes_tempo": "Combate o modelo da concorrência que cria milhares de cards inúteis baseados em resumos teóricos. Se um assunto não cai em prova, ele não vira card",
+        "informacao_atomizada": "Cada card contém uma única informação rápida e direta, evitando fadiga mental e permitindo revisão de centenas de conceitos em poucos minutos"
+      },
+      "pilares_exclusivos": {
+        "origem_questoes_reais": {
+          "total_cards": "Mais de 13.000 cards criados exclusivamente a partir de questões reais de prova",
+          "eficiencia_pratica": "O aluno estuda exatamente o que as bancas cobram, eliminando 90% de conteúdo irrelevante"
+        },
+        "memoria_visual_dual_channel": {
+          "descricao": "Todo card associa o texto a uma imagem lúdica ou mnemônica visual",
+          "exemplo": "Linfonodo de Mascagni — a MED-Review usa um personagem mascando chiclete (Masca-gni) sobre a artéria cística para criar gatilho mental imediato e inesquecível"
+        },
+        "algoritmo_sm2": {
+          "descricao": "Utilização do algoritmo SM-2 (SuperMemo-2), o padrão-ouro mundial para repetição espaçada",
+          "personalizacao": "O sistema identifica quais conceitos o aluno está prestes a esquecer e os traz de volta no momento exato"
+        }
+      },
+      "metricas_gamificacao": {
+        "liberdade_tematica": "Filtrar cards por temas específicos (ex: apendicite aguda, pré-natal, abdome agudo inflamatório)",
+        "analise_metricas": "Área dedicada para avaliar evolução, consistência diária e identificar melhores dias",
+        "gamificacao_duolingo": "Metas diárias e sistema de sequência (streaks) para manter a motivação e consistência no longo prazo"
+      }
+    }
+  },
+  "diferenciais_metodologicos": {
+    "fundamentacao": "Ciência cognitiva aplicada ao ensino médico",
+    "conceitos_chave": [
+      "Fim das Aulas Excel: Combate ao método tradicional de slides estáticos, textos longos e tabelas densas",
+      "Dual Channel Learning: Aprendizado unindo canal verbal (fala/escrita) ao canal visual (personagens, histórias e associações)",
+      "Regra de Ouro 75/30: Nenhuma aula ultrapassa 30 minutos, economia de 75% do tempo teórico",
+      "Estudo Ativo na veia: Tempo salvo das aulas é convertido em treinamento prático com questões e flashcards"
+    ],
+    "ecossistema_conteudo": "Cada tema é entregue através de um pacote de cinco ferramentas integradas: Videoaula Lúdica Superior, E-book da Aula, Apostila da Aula, Trilha de Questões e Trilha de Flashcards",
+    "funcionalidades_tecnologicas": [
+      "Busca Inteligente por IA: pesquisa um tema e o sistema indica o minuto exato da aula",
+      "Mobilidade (App MED Review): Aulas offline, ideal para plantões e internato",
+      "Versão Desktop: Interface completa otimizada para PC ou Notebook",
+      "Suporte Tira-Dúvidas: Resposta dos professores em aproximadamente 24 horas",
+      "Módulo Onboarding: Aulas fundamentais que ensinam o aluno a extrair o máximo do cronograma, banco de questões e suporte",
+      "Simulados Mensais: Treinamento de ritmo de prova para medir evolução constante"
+    ],
+    "youtube": "https://www.youtube.com/@grupomed-review"
+  },
+  "personalidade_agente": {
+    "tom_de_voz": "Prático, empático com a rotina corrida e focado em eficiência",
+    "terminologia_chave": "Sempre contrastar as 'Aulas Excel' (ruins) com o 'Estudo Ativo na veia' (bom)",
+    "simplicidade": "Enfatizar que a plataforma é simples e direta, sem ferramentas inúteis que poluem a jornada",
+    "prova_social": "Encaminhar para o YouTube da MED Review para demonstração da metodologia"
   }
 }

@@ -78,6 +78,150 @@
       "reframe": "Quem começa cedo normalmente faz o conteúdo uma vez com calma, revisita duas vezes e chega na prova descansado. Quem começa tarde entra em modo de corrida e retém menos. Não é regra, mas é o padrão de quem passou.",
       "qualificacao": "Se prova é em mais de 18 meses e o lead não quer começar agora: respeite. 'Faz sentido. Quando chegar a hora, me chama — estarei por aqui!'",
       "quando_escalar": "Se a prova está em menos de 6 meses e o lead quer esperar mais — crie urgência real baseada em fatos. Se em mais de 18 meses e não quer começar — desqualifique com respeito."
+    },
+    {
+      "id": "aula-curta-incompleta",
+      "trigger": ["aula curta", "30 minutos", "superficial", "incompleta", "pouco tempo de aula", "aula rápida demais"],
+      "categoria": "metodologia-aulas",
+      "tom": "confiante, educativo",
+      "resposta_padrao": "Pelo contrário! Elas são ultra-roteirizadas para entregar em 30 min o que outros levam 2h enrolando em 'Aulas Excel'. Você ganha tempo e retém muito mais através do Dual Channel Learning.",
+      "resposta_alternativa": "São aulas planejadas milimetricamente — sem enrolação ou conteúdo desnecessário. Entregamos em 30 min o que outros levam 2h, sem enrolação.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "nao-consigo-concentrar-video",
+      "trigger": ["não consigo concentrar", "perco foco", "não gosto de vídeo", "não consigo assistir vídeo", "fico distraído"],
+      "categoria": "metodologia-aulas",
+      "tom": "empático, demonstrativo",
+      "resposta_padrao": "Nossas aulas são lúdicas e mudam de estímulo visual constantemente. É impossível ficar entediado quando você está acompanhando uma história visual como a da 'Célula Faminta'.",
+      "resposta_alternativa": "O Dual Channel Learning mantém os dois canais cerebrais ativos — o verbal e o visual. A retenção triplica e o engajamento é muito maior que aulas tradicionais.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "quero-ver-didatica",
+      "trigger": ["quero ver a didática", "como são as aulas", "mostrar uma aula", "ver o método", "didática é boa"],
+      "categoria": "prova-de-valor-aulas",
+      "tom": "confiante, direcionador",
+      "resposta_padrao": "Encaminhe o aluno para o YouTube da MED Review para ver a mágica do design instrucional em ação: https://www.youtube.com/@grupomed-review",
+      "resposta_alternativa": "Temos exemplos gratuitos no nosso canal do YouTube que mostram exatamente como funciona o Dual Channel Learning. Quer que eu te envie o link?",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "nao-vou-dar-conta-cronograma",
+      "trigger": ["não vou dar conta", "cronograma pesado", "cronograma difícil", "não consigo seguir cronograma", "cronograma rígido"],
+      "categoria": "metodologia-flow",
+      "tom": "acolhedor, informativo",
+      "resposta_padrao": "Na MED o cronograma não é uma prisão. O Flow adapta a jornada à sua rotina real. Se você tiver menos tempo, ele garante que você veja o que dá mais pontos primeiro, protegendo sua aprovação.",
+      "resposta_alternativa": "O Flow é inteligente — ele recalcula sua rota automaticamente sem gerar culpa. Se você parar 1 semana, ele redistribui sem acumular o que não é vital.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "cursinho-atrapalha-faculdade",
+      "trigger": ["atrapalha faculdade", "conciliar faculdade", "internato", "jornada dupla", "faculdade e cursinho", "rodízio"],
+      "categoria": "metodologia-flow",
+      "tom": "empático, solucionador",
+      "resposta_padrao": "Pelo contrário! O Flow permite sincronizar o que você vê no hospital com o seu cronograma de estudos. Você unifica as duas jornadas e para de estudar temas desconexos.",
+      "resposta_alternativa": "Se o aluno está no módulo de Hepatologia na faculdade, ele pode priorizar esse tema no Flow, estudando uma vez só com eficiência máxima.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "medo-esquecer-conteudo",
+      "trigger": ["esquecer", "esquecimento", "medo de esquecer", "não lembro", "vou esquecer as fórmulas", "não retenho"],
+      "categoria": "metodologia-flow-flashcards",
+      "tom": "educativo, tranquilizador",
+      "resposta_padrao": "O Flow integra a revisão espaçada de forma inteligente. Ele sabe quais temas são mais importantes e faz com que eles apareçam com mais frequência para você. Além disso, nossos Flashcards usam o algoritmo SM-2 que traz cada conceito de volta no momento exato antes de você esquecer.",
+      "resposta_alternativa": "Nós usamos lógica visual, não decoreba. Lembra da analogia da pizza? O Dual Channel Learning triplica a memorização de longo prazo.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "focar-prova-especifica",
+      "trigger": ["prova específica", "foco na USP", "só Enamed", "só Revalida", "SUS-SP", "prova alvo"],
+      "categoria": "metodologia-flow",
+      "tom": "confiante, personalizado",
+      "resposta_padrao": "O Flow é perfeito para isso. Ele analisa as particularidades da prova que você escolheu (seja USP, SUS-SP ou Revalida) e prioriza os módulos de acordo com a estatística dessa instituição.",
+      "resposta_alternativa": "Nossos filtros de questões também permitem treinar exclusivamente com questões da sua banca alvo. Temos base de dados completa de USP, UNIFESP, SUS-SP, ENARE, ENAMED, Revalida e mais.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "banco-questoes-atualizado",
+      "trigger": ["atualizado", "questões novas", "questões recentes", "banco velho", "desatualizado"],
+      "categoria": "banco-questoes",
+      "tom": "confiante, factual",
+      "resposta_padrao": "Sim! Temos mais de 30.000 questões, incluindo as provas mais recentes da USP, UNIFESP, ENARE e Revalida, todas com comentários detalhados alternativa por alternativa.",
+      "resposta_alternativa": "Nossa base é focada no padrão de provas recentes (2020-2025). Nada de questões desatualizadas de 10 anos atrás.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "tempo-configurando-filtros",
+      "trigger": ["tempo configurando", "muitos cliques", "burocracia", "complicado de usar", "difícil de navegar"],
+      "categoria": "banco-questoes",
+      "tom": "prático, diferenciador",
+      "resposta_padrao": "Na MED a agilidade é prioridade. Com apenas 2 cliques você já está resolvendo a primeira questão. Menos burocracia e mais estudo ativo na veia.",
+      "resposta_alternativa": "Enquanto na concorrência o aluno precisa de 10 cliques para chegar à primeira questão, na MED Review você começa em 2. Tempo é vida!",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "como-sei-evolucao",
+      "trigger": ["evolução", "progresso", "estou evoluindo", "melhoria", "como medir", "desempenho"],
+      "categoria": "banco-questoes-simulados",
+      "tom": "confiante, orientador",
+      "resposta_padrao": "Nossos simulados mensais e personalizados entregam uma análise completa da sua evolução. Você saberá exatamente em qual grande área está pecando para ajustar seu estudo no Flow.",
+      "resposta_alternativa": "Temos Dashboard de Performance que mostra sua evolução por grande área, e a barra de evolução estatística está vinculada ao Qbank e ao Flow.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "nao-tenho-paciencia-apostilas",
+      "trigger": ["paciência para ler", "apostila cansativa", "texto longo", "material chato", "não gosto de ler"],
+      "categoria": "trending-topics",
+      "tom": "empático, diferenciador",
+      "resposta_padrao": "Nossos Trending Topics não são textos cansativos. Eles são roteirizados com storytelling e linguagem fácil, como se o professor estivesse conversando com você no papel.",
+      "resposta_alternativa": "Toda apostila começa com a seção 'Está sem tempo?', onde você revisa o que há de mais importante em apenas 1 minuto através de tabelas ágeis.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "muitos-cards-nao-vou-dar-conta",
+      "trigger": ["muitos cards", "cards demais", "flashcards difícil", "não dou conta dos cards"],
+      "categoria": "flashcards",
+      "tom": "tranquilizador, educativo",
+      "resposta_padrao": "Nossos cards são atomizados. Você não lê textos, você fixa imagens e conceitos rápidos. O algoritmo SM-2 cuida do resto, garantindo que você revise apenas o necessário.",
+      "resposta_alternativa": "O sistema prioriza automaticamente — conceitos que você já domina aparecem com menos frequência, enquanto os que você está prestes a esquecer voltam no momento certo.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "diferenca-cards-gratuitos",
+      "trigger": ["cards gratuitos", "anki", "cards free", "flashcard de graça", "usar anki"],
+      "categoria": "flashcards",
+      "tom": "educativo, diferenciador",
+      "resposta_padrao": "Cards gratuitos são ladrões de tempo com textos gigantes. Os nossos são feitos sobre questões reais e usam memória visual. Você lembra do conteúdo pela imagem associativa, como o Linfonodo de Mascagni mascando chiclete.",
+      "resposta_alternativa": "Nossos 13.000+ cards são 100% baseados em questões reais de prova — zero lixo. Cada card contém uma única informação atômica com gatilho visual, não resumos genéricos de livros.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "manter-rotina-estudos",
+      "trigger": ["manter rotina", "consistência", "disciplina", "motivação", "desistir", "não consigo manter"],
+      "categoria": "flashcards-gamificacao",
+      "tom": "motivacional, prático",
+      "resposta_padrao": "Nossa plataforma é gamificada ao estilo Duolingo. Você tem metas diárias e vê sua sequência de dias estudados, o que gera o compromisso necessário para a sua aprovação.",
+      "resposta_alternativa": "O sistema de streaks e metas diárias cria micro-recompensas que mantêm a motivação alta. É o mesmo princípio que torna o Duolingo viciante, mas aplicado à medicina.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "funciona-dispositivos",
+      "trigger": ["funciona no iPad", "funciona no celular", "tablet", "desktop", "dispositivos", "TV", "computador"],
+      "categoria": "tecnologia",
+      "tom": "direto, informativo",
+      "resposta_padrao": "Sim, 100% otimizado para tablets e desktops. Temos App MED Review com modo offline para plantões e uma versão desktop completa.",
+      "resposta_alternativa": "O app permite baixar aulas e flashcards para usar offline — perfeito para estudar no ônibus, metrô ou durante plantões sem internet.",
+      "quando_escalar": "Raramente necessário."
+    },
+    {
+      "id": "muita-coisa-para-estudar",
+      "trigger": ["muita coisa", "muito conteúdo", "é muita matéria", "não sei por onde começar", "conteúdo enorme"],
+      "categoria": "flow-priorizacao",
+      "tom": "tranquilizador, estratégico",
+      "resposta_padrao": "O FLOW prioriza os 20% dos temas que dão 80% dos pontos. Você nunca estuda no escuro — o sistema analisa a estatística de 5 anos de provas e garante que o mais importante venha primeiro.",
+      "resposta_alternativa": "É exatamente para isso que o Flow existe. Ele faz uma hierarquia estatística dos módulos e garante que você veja primeiro o que mais cai. Sem se perder no que não importa.",
+      "quando_escalar": "Raramente necessário."
     }
   ]
 }

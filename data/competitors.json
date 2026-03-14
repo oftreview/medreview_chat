@@ -238,5 +238,48 @@
       "Tem algo que sente falta ou gostaria que fosse diferente?",
       "O que te trouxe a buscar outras opções agora?"
     ]
+  },
+
+  "comparativos_por_modulo": {
+    "trending_topics_vs_concorrencia": {
+      "titulo": "Trending Topics vs. Apostilas da Concorrência",
+      "comparativo": {
+        "estilo_escrita": {"medreview": "Narrativo, lúdico e acessível", "concorrencia": "Acadêmico, denso e formal"},
+        "foco_conteudo": {"medreview": "Baseado em questões; direto ao ponto", "concorrencia": "Descritivo e enciclopédico"},
+        "recursos_visuais": {"medreview": "Personagens e analogias (ex: Pizza)", "concorrencia": "Tabelas complexas e figuras técnicas"},
+        "velocidade": {"medreview": "Revisão de 1 minuto no início da apostila", "concorrencia": "Sumário tradicional e leitura linear"},
+        "energy_level": {"medreview": "Super energético e envolvente", "concorrencia": "Passivo e exaustivo"}
+      }
+    },
+    "flashcards_vs_concorrencia": {
+      "titulo": "Flashcards MED-Review vs. Concorrência Tradicional",
+      "comparativo": {
+        "conteudo": {"medreview": "100% baseado em questões reais", "concorrencia": "Resumo genérico de livros/apostilas"},
+        "formato": {"medreview": "Atomizado (Rápido e direto)", "concorrencia": "Textão cansativo e lento"},
+        "gatilho_memoria": {"medreview": "Memória Visual (Personagens/Imagens)", "concorrencia": "Apenas texto em fundo branco"},
+        "engajamento": {"medreview": "Gamificação e Meta Diária", "concorrencia": "Estudo burocrático e repetitivo"},
+        "retencao": {"medreview": "Triplicada pelo Dual Channel", "concorrencia": "Baixa devido à sobrecarga cognitiva"}
+      }
+    },
+    "aulas_vs_concorrencia": {
+      "titulo": "Aulas MED-Review vs. Aulas Tradicionais",
+      "comparativo": {
+        "duracao": {"medreview": "Máximo 30 minutos", "concorrencia": "1-2 horas por aula"},
+        "metodologia": {"medreview": "Dual Channel Learning (verbal + visual)", "concorrencia": "Canal único (slides com texto)"},
+        "retencao": {"medreview": "Triplicada por estímulo duplo", "concorrencia": "80% de esquecimento em 48h"},
+        "eficiencia": {"medreview": "75% de economia de tempo teórico", "concorrencia": "Carga horária massiva"},
+        "estilo": {"medreview": "Lúdico, storytelling, personagens", "concorrencia": "Palestra burocrática, slides Excel"}
+      }
+    },
+    "banco_questoes_vs_concorrencia": {
+      "titulo": "Banco de Questões MED-Review vs. Concorrência",
+      "comparativo": {
+        "agilidade": {"medreview": "2 cliques para começar", "concorrencia": "Até 10 cliques"},
+        "comentarios": {"medreview": "Detalhado alternativa por alternativa", "concorrencia": "Apenas cita o livro"},
+        "cobertura": {"medreview": "Nacional (todos estados + ENARE + ENAMED + Revalida)", "concorrencia": "Foco em SP"},
+        "busca": {"medreview": "Palavra-chave dentro de comentários", "concorrencia": "Apenas filtros básicos"},
+        "simulados": {"medreview": "Mensais fiéis ao estilo real das provas", "concorrencia": "Genéricos sem ambiente real"}
+      }
+    }
   }
 }
