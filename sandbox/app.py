@@ -7,7 +7,9 @@ monkey.patch_all()
 
 import sys
 import os
+import re
 import random
+import time
 import threading
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -129,15 +131,16 @@ def chat():
 
     Modo API (canal externo — Botmaker, webchat, etc.):
       Payload: {
-        "session_id": "identificador de sessão da Botmaker",
-        "user_id": "telefone do lead — opcional, para histórico no Supabase",
-        "message": "mensagem do lead",
-        "channel": "botmaker | webchat | whatsapp | outro",
-        "metadata": {}
+        "user_id":    "telefone do lead (OBRIGATÓRIO para Botmaker)",
+        "message":    "mensagem do lead",
+        "channel":    "botmaker | webchat | whatsapp | outro",
+        "session_id": "identificador de sessão (OPCIONAL — se ausente, usa user_id)",
+        "metadata":   {}
       }
+      Ativado quando user_id OU session_id (≠ "sandbox") está presente.
       Requer header: Authorization: Bearer <API_SECRET_TOKEN>
       Aplica debounce de RESPONSE_DELAY_SECONDS para acumular mensagens rápidas.
-      O timer de debounce é indexado por session_id (sessão ativa da Botmaker).
+      O timer de debounce é indexado por session_id (ou user_id se session_id ausente).
       O histórico no Supabase usa user_id (telefone do lead) para continuidade.
       Resposta: { "session_id": "...", "response": "...", "user_id": "...", "status": "success|error" }
 
@@ -147,21 +150,34 @@ def chat():
     """
     data = request.get_json(silent=True) or {}
 
-    # ── Modo API: payload tem session_id (integração Botmaker/canais externos)
-    if "session_id" in data and data.get("session_id") != "sandbox":
+    # ── Detecta modo API vs sandbox ──────────────────────────────────────────
+    # Modo API é ativado quando:
+    #   1. session_id está presente e NÃO é "sandbox", OU
+    #   2. user_id está presente (integração Botmaker envia apenas user_id)
+    # Isso garante compatibilidade com a Botmaker, que envia { user_id, message }
+    # sem session_id no payload.
+    _has_session = "session_id" in data and data.get("session_id") != "sandbox"
+    _has_user_id = "user_id" in data and (data.get("user_id") or "").strip()
+    _is_api_mode = _has_session or _has_user_id
+
+    if _is_api_mode:
         # Autenticação
         if not _check_auth(request):
             return jsonify({"error": "Unauthorized", "status": "error"}), 401
 
-        session_id = (data.get("session_id") or "").strip()
         message = (data.get("message") or "").strip()
         channel = data.get("channel", "api")
 
-        # user_id é opcional — se não vier, usa session_id como fallback
-        user_id = (data.get("user_id") or "").strip() or session_id
+        # user_id é o identificador primário (telefone do lead).
+        # session_id é opcional — se não vier, usa user_id como chave de debounce.
+        user_id = (data.get("user_id") or "").strip()
+        session_id = (data.get("session_id") or "").strip() or user_id
 
         if not session_id:
-            return jsonify({"error": "session_id é obrigatório", "status": "error"}), 400
+            return jsonify({"error": "user_id ou session_id é obrigatório", "status": "error"}), 400
+        if not user_id:
+            # Fallback: se veio session_id mas não user_id, usa session_id
+            user_id = session_id
         if not message:
             return jsonify({"error": "message é obrigatório", "status": "error"}), 400
 
@@ -339,12 +355,61 @@ def webhook_zapi():
     return jsonify({"status": "ok"}), 200
 
 
+# ── Rate limiter específico para /webhook/form (por IP, mais agressivo) ──────
+FORM_MAX_PER_MINUTE = int(os.getenv("FORM_RATE_LIMIT", "5"))
+_form_rate_store: dict = {}
+_form_rate_lock = threading.Lock()
+
+# Regex para validar telefone brasileiro (DDI 55 + DDD 2 dígitos + 8-9 dígitos)
+_PHONE_RE = re.compile(r"^55\d{10,11}$")
+
+
+def _form_rate_limiter(ip: str) -> tuple:
+    """Rate limit por IP para /webhook/form — 5 req/min por padrão."""
+    now = time.time()
+    window_start = now - 60
+    with _form_rate_lock:
+        _form_rate_store[ip] = [ts for ts in _form_rate_store.get(ip, []) if ts > window_start]
+        count = len(_form_rate_store[ip])
+        if count >= FORM_MAX_PER_MINUTE:
+            return False, count
+        _form_rate_store[ip].append(now)
+        return True, count + 1
+
+
+def _normalize_phone(raw: str) -> str:
+    """Remove caracteres não-numéricos e adiciona DDI 55 se ausente."""
+    digits = re.sub(r"\D", "", raw)
+    if digits.startswith("0"):
+        digits = digits[1:]  # remove zero à esquerda (0XX)
+    if not digits.startswith("55"):
+        digits = "55" + digits
+    return digits
+
+
 @app.route("/webhook/form", methods=["POST"])
 def webhook_form():
-    """Recebe lead do Quill Forms e inicia conversa no WhatsApp."""
+    """
+    Recebe lead do Quill Forms e inicia conversa no WhatsApp.
+
+    Requer header: Authorization: Bearer <API_SECRET_TOKEN>
+    Rate limit: FORM_RATE_LIMIT req/min por IP (padrão 5).
+    Valida formato de telefone brasileiro (55 + DDD + 8-9 dígitos).
+    """
+    # ── Autenticação ─────────────────────────────────────────────────────────
+    if not _check_auth(request):
+        return jsonify({"error": "Unauthorized", "status": "error"}), 401
+
+    # ── Rate limit por IP ────────────────────────────────────────────────────
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
+    allowed, count = _form_rate_limiter(client_ip)
+    if not allowed:
+        log_security_event("FORM_RATE_LIMIT", client_ip, {"count": count})
+        return jsonify({"error": "Muitas requisições. Tente novamente em instantes.", "status": "error"}), 429
+
     data = request.get_json(silent=True) or {}
 
-    phone = (
+    phone_raw = (
         data.get("phone") or data.get("celular") or
         data.get("telefone") or data.get("whatsapp") or ""
     ).strip()
@@ -354,8 +419,16 @@ def webhook_form():
         data.get("primeiro_nome") or "Lead"
     ).strip()
 
-    if not phone:
-        return jsonify({"error": "Campo 'phone' não encontrado no payload"}), 400
+    if not phone_raw:
+        return jsonify({"error": "Campo 'phone' não encontrado no payload", "status": "error"}), 400
+
+    # ── Normalização e validação do telefone ─────────────────────────────────
+    phone = _normalize_phone(phone_raw)
+    if not _PHONE_RE.match(phone):
+        log_security_event("FORM_INVALID_PHONE", client_ip, {"raw": phone_raw[:20]})
+        return jsonify({"error": "Formato de telefone inválido. Use DDI + DDD + número.", "status": "error"}), 400
+
+    print(f"[FORM WEBHOOK] Novo lead uid={hash_user_id(phone)} ip={client_ip}", flush=True)
 
     database.upsert_lead(phone=phone, name=name, source="form")
 

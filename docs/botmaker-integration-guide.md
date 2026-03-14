@@ -24,12 +24,16 @@ Authorization: Bearer SEU_API_SECRET_TOKEN
 }
 ```
 
-| Campo      | Tipo   | Obrigatório | Descrição |
-|------------|--------|-------------|-----------|
-| `user_id`  | string | ✅ sim      | Telefone do lead (com DDI). Usado para manter histórico da conversa. |
-| `message`  | string | ✅ sim      | Texto da mensagem digitada pelo lead (`user_message` na Botmaker). |
-| `channel`  | string | não         | Identificador do canal. Use `"botmaker"`. |
-| `metadata` | objeto | não         | Dados extras opcionais. |
+| Campo        | Tipo   | Obrigatório | Descrição |
+|--------------|--------|-------------|-----------|
+| `user_id`    | string | ✅ sim      | Telefone do lead (com DDI). Identificador primário — usado como chave de histórico no Supabase e chave de debounce. Na Botmaker, use `contact?.whatsApp` ou `contact?.phone`. |
+| `message`    | string | ✅ sim      | Texto da mensagem digitada pelo lead (`user_message` na Botmaker). |
+| `channel`    | string | não         | Identificador do canal. Use `"botmaker"`. |
+| `session_id` | string | não         | Identificador de sessão (opcional). Se ausente, `user_id` é usado como chave de debounce. Útil quando múltiplas sessões podem existir para o mesmo lead. |
+| `metadata`   | objeto | não         | Dados extras opcionais. |
+
+> **Nota:** O endpoint aceita `user_id` sozinho (sem `session_id`). Quando `session_id` não é
+> enviado, `user_id` é usado automaticamente como chave de sessão para debounce e histórico.
 
 ## Resposta da IA
 
