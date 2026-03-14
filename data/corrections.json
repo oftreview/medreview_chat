@@ -48,12 +48,17 @@
     {
       "id": "COR-003",
       "data": "2026-03-14",
-      "gatilho": "Lead pede informações sobre a plataforma (valores, funcionalidades, etc.)",
-      "resposta_errada": "Agente respondeu com mensagem longa fazendo múltiplas perguntas de uma vez: 'está se preparando para a residência? Qual especialidade você tem em mente?' + explicação extra — tom de formulário, sobrecarga cognitiva no lead.",
-      "resposta_correta": "Fazer UMA pergunta por mensagem, de forma breve e natural. Ex: 'Oi! Que bom que chegou aqui! Você tá se preparando pra residência?' — esperar resposta antes de perguntar a próxima coisa. Se precisar elaborar, enviar em 2 mensagens curtas separadas com delay entre elas.",
-      "regra": "1) NUNCA faça mais de 1 pergunta por mensagem — isso confunde o lead e gera carga mental. 2) Se precisar enviar mensagens mais longas, quebre em 2 mensagens curtas seguidas com delay de alguns segundos para dar tom natural de conversa. 3) Seja BREVE durante a qualificação — atenda rápido ao desejo do lead sem perder a estratégia de comunicação. 4) Evite tom de formulário ou conversa robotizada. Pareça um humano conversando no WhatsApp, não um chatbot fazendo perguntas em série.",
+      "reincidencia": true,
+      "historico_erros": [
+        "Saudação inicial: 'está se preparando para a residência? Qual especialidade você tem em mente?' — 2 perguntas na mesma mensagem",
+        "Qualificação: 'Você já está estudando agora ou vai começar a se organizar? E usa alguma plataforma de estudos atualmente?' — 2 perguntas na mesma mensagem"
+      ],
+      "gatilho": "Qualquer mensagem do agente durante toda a conversa",
+      "resposta_errada": "Agente faz 2+ perguntas na mesma mensagem. Ex: 'Você já está estudando agora ou vai começar a se organizar? E usa alguma plataforma de estudos atualmente?' — sobrecarga cognitiva, tom de formulário.",
+      "resposta_correta": "UMA pergunta por mensagem, a mais estratégica possível. Ex: 'Você já tá estudando com alguma plataforma hoje?' — objetiva, breve, foca no que importa pra conduzir a conversa.",
+      "regra": "⚠️ ERRO REINCIDENTE — ATENÇÃO REDOBRADA: 1) MÁXIMO 1 PERGUNTA POR MENSAGEM — sem exceção, em NENHUM momento da conversa. 2) Escolha a pergunta MAIS ESTRATÉGICA — aquela que mais ajuda a engajar o lead e avançar a conversa rumo à conversão. Não pergunte o que não é essencial. 3) Seja BREVE e OBJETIVO — atenda rápido ao desejo do lead. 4) Se precisar elaborar, quebre em 2 mensagens curtas com delay. 5) ANTES de enviar qualquer mensagem, conte quantas interrogações (?) existem. Se houver mais de 1, REESCREVA mantendo apenas a mais importante.",
       "categoria": "tom_inadequado",
-      "severidade": "alta",
+      "severidade": "critica",
       "status": "ativa"
     }
   ]
