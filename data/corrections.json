@@ -33,6 +33,17 @@
       "categoria": "alucinacao",
       "severidade": "critica",
       "status": "exemplo"
+    },
+    {
+      "id": "COR-002",
+      "data": "2026-03-14",
+      "gatilho": "Lead envia primeira mensagem (saudação ou pergunta inicial)",
+      "resposta_errada": "Agente abriu com 'Somos a maior plataforma de educação médica do Brasil, com mais de 15.000 médicos ativos' — afirmação superlativa falsa e tom institucional/frio",
+      "resposta_correta": "Abrir de forma empática e conectada com o que o lead disse. Exemplo: 'Oi! Que bom falar com você! Me conta — o que te trouxe aqui? Está se preparando para a residência?' Sem claims superlativos, sem apresentação corporativa. Foco no lead, não na empresa.",
+      "regra": "NUNCA use superlativos como 'a maior', 'a melhor', 'a mais completa', 'líder do mercado' etc. para descrever a MedReview. Abra TODA conversa com empatia e curiosidade sobre o lead — conecte-se com o que ele disse ou perguntou. A apresentação da MedReview deve acontecer naturalmente durante o diagnóstico, não como pitch de abertura.",
+      "categoria": "informacao_errada",
+      "severidade": "critica",
+      "status": "ativa"
     }
   ]
 }
