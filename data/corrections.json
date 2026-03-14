@@ -44,6 +44,17 @@
       "categoria": "informacao_errada",
       "severidade": "critica",
       "status": "ativa"
+    },
+    {
+      "id": "COR-003",
+      "data": "2026-03-14",
+      "gatilho": "Lead pede informações sobre a plataforma (valores, funcionalidades, etc.)",
+      "resposta_errada": "Agente respondeu com mensagem longa fazendo múltiplas perguntas de uma vez: 'está se preparando para a residência? Qual especialidade você tem em mente?' + explicação extra — tom de formulário, sobrecarga cognitiva no lead.",
+      "resposta_correta": "Fazer UMA pergunta por mensagem, de forma breve e natural. Ex: 'Oi! Que bom que chegou aqui! Você tá se preparando pra residência?' — esperar resposta antes de perguntar a próxima coisa. Se precisar elaborar, enviar em 2 mensagens curtas separadas com delay entre elas.",
+      "regra": "1) NUNCA faça mais de 1 pergunta por mensagem — isso confunde o lead e gera carga mental. 2) Se precisar enviar mensagens mais longas, quebre em 2 mensagens curtas seguidas com delay de alguns segundos para dar tom natural de conversa. 3) Seja BREVE durante a qualificação — atenda rápido ao desejo do lead sem perder a estratégia de comunicação. 4) Evite tom de formulário ou conversa robotizada. Pareça um humano conversando no WhatsApp, não um chatbot fazendo perguntas em série.",
+      "categoria": "tom_inadequado",
+      "severidade": "alta",
+      "status": "ativa"
     }
   ]
 }
