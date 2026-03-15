@@ -5,7 +5,7 @@ load_dotenv()
 
 # --- Claude ---
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20241022")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-3-5-haiku-20241022")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4000"))
 
 # --- Servidor ---
