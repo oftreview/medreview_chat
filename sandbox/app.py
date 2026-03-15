@@ -14,7 +14,7 @@ import threading
 import gevent
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect
 from agents.sales.agent import SalesAgent
 from core.config import DEBUG, PORT
 from core.whatsapp import send_message, parse_incoming
@@ -22,6 +22,13 @@ from core import database, escalation
 from core.security import sanitize_input, check_injection_patterns, rate_limiter, filter_output, hash_user_id
 from core.logger import log_security_event, log_conversation
 from core.message_splitter import split_response, DELAY_SECONDS as MSG_DELAY
+
+# ── Instala captura de logs para o dashboard ──────────────────────────────────
+try:
+    from core.log_buffer import install as install_log_capture
+    install_log_capture()
+except Exception:
+    pass
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
@@ -191,7 +198,32 @@ def _flush_and_respond(session_id: str):
 
 @app.route("/")
 def index():
-    return render_template("chat.html")
+    return redirect("/dashboard/sandbox")
+
+
+@app.route("/dashboard/sandbox")
+def dashboard_sandbox():
+    return render_template("dashboard/sandbox.html", active_page="sandbox")
+
+
+@app.route("/dashboard/conversations")
+def dashboard_conversations():
+    return render_template("dashboard/conversations.html", active_page="conversations")
+
+
+@app.route("/dashboard/corrections")
+def dashboard_corrections():
+    return render_template("dashboard/corrections.html", active_page="corrections")
+
+
+@app.route("/dashboard/costs")
+def dashboard_costs():
+    return render_template("dashboard/costs.html", active_page="costs")
+
+
+@app.route("/dashboard/logs")
+def dashboard_logs():
+    return render_template("dashboard/logs.html", active_page="logs")
 
 
 @app.route("/chat", methods=["POST"])
@@ -678,6 +710,116 @@ def leads_escalated():
         if agent.memory.get_status(s) == "escalated"
     ]
     return jsonify({"escalated": escalated, "count": len(escalated)}), 200
+
+
+# ── API: Correções do Agente ──────────────────────────────────────────────────
+
+import json
+
+_CORRECTIONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "corrections.json")
+
+
+def _load_corrections():
+    try:
+        with open(_CORRECTIONS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("corrections", data) if isinstance(data, dict) else data
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def _save_corrections(corrections):
+    os.makedirs(os.path.dirname(_CORRECTIONS_PATH), exist_ok=True)
+    with open(_CORRECTIONS_PATH, "w", encoding="utf-8") as f:
+        json.dump({"corrections": corrections}, f, ensure_ascii=False, indent=2)
+
+
+@app.route("/api/corrections", methods=["GET"])
+def api_corrections_list():
+    return jsonify({"corrections": _load_corrections()})
+
+
+@app.route("/api/corrections", methods=["POST"])
+def api_corrections_add():
+    data = request.get_json(silent=True) or {}
+    corr_id = data.get("id", "").strip()
+    regra = data.get("regra", "").strip()
+    if not corr_id or not regra:
+        return jsonify({"error": "id e regra sao obrigatorios"}), 400
+
+    corrections = _load_corrections()
+    new_corr = {
+        "id": corr_id,
+        "regra": regra,
+        "exemplo": data.get("exemplo", ""),
+        "severidade": data.get("severidade", "alta"),
+        "status": data.get("status", "ativa"),
+        "reincidencia": data.get("reincidencia", False),
+    }
+
+    # Update if ID exists, else append
+    idx = next((i for i, c in enumerate(corrections) if c.get("id") == corr_id), None)
+    if idx is not None:
+        corrections[idx].update(new_corr)
+    else:
+        corrections.append(new_corr)
+
+    _save_corrections(corrections)
+    return jsonify({"status": "ok", "correction": new_corr})
+
+
+# ── API: Métricas e Configuração ─────────────────────────────────────────────
+
+from core.config import CLAUDE_MODEL, MAX_TOKENS
+
+
+@app.route("/api/metrics", methods=["GET"])
+def api_metrics():
+    """Retorna métricas de uso da API (tokens, custos, cache)."""
+    try:
+        from core.metrics import get_metrics
+        metrics = get_metrics()
+    except ImportError:
+        metrics = {
+            "model": CLAUDE_MODEL,
+            "max_tokens": MAX_TOKENS,
+            "total_calls": 0,
+            "total_input_tokens": 0,
+            "total_output_tokens": 0,
+            "total_cache_read": 0,
+            "total_cache_write": 0,
+            "total_cost": 0,
+            "recent_calls": [],
+        }
+    return jsonify({"metrics": metrics})
+
+
+@app.route("/api/config", methods=["POST"])
+def api_config_update():
+    """Atualiza modelo e max_tokens em runtime (sem reiniciar servidor)."""
+    import core.config as cfg
+    data = request.get_json(silent=True) or {}
+    if "model" in data:
+        cfg.CLAUDE_MODEL = data["model"]
+        print(f"[CONFIG] Modelo alterado para: {cfg.CLAUDE_MODEL}", flush=True)
+    if "max_tokens" in data:
+        cfg.MAX_TOKENS = int(data["max_tokens"])
+        print(f"[CONFIG] Max tokens alterado para: {cfg.MAX_TOKENS}", flush=True)
+    return jsonify({"status": "ok", "model": cfg.CLAUDE_MODEL, "max_tokens": cfg.MAX_TOKENS})
+
+
+# ── API: Logs ────────────────────────────────────────────────────────────────
+
+@app.route("/api/logs", methods=["GET"])
+def api_logs():
+    """Retorna logs recentes do sistema."""
+    try:
+        from core.log_buffer import get_logs
+        since = int(request.args.get("since", 0))
+        logs = get_logs(since=since)
+    except ImportError:
+        logs = []
+    return jsonify({"logs": logs})
 
 
 # ── Health checks ─────────────────────────────────────────────────────────────

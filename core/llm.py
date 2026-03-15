@@ -83,6 +83,19 @@ def call_claude(system_prompt: str, messages: list) -> str:
                 flush=True,
             )
 
+            # Registra métricas para o dashboard
+            try:
+                from core.metrics import record_call
+                record_call(
+                    model=CLAUDE_MODEL,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cache_read=cache_read,
+                    cache_write=cache_created,
+                )
+            except Exception:
+                pass  # Não bloqueia se métricas falharem
+
             return response.content[0].text
 
         except RateLimitError as e:
