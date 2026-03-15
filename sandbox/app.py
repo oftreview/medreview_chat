@@ -290,10 +290,12 @@ def chat():
                     "result": None,
                     "channel": channel,
                     "user_id": user_id,
+                    "_waiters": 0,
                 }
 
             state = _chat_state[session_id]
             state["messages"].append(message)
+            state["_waiters"] = state.get("_waiters", 0) + 1
             # Atualiza user_id caso venha em mensagem posterior
             if user_id != session_id:
                 state["user_id"] = user_id
@@ -313,12 +315,16 @@ def chat():
             event = state["event"]
 
         # Bloqueia a thread até o timer disparar e o processamento completar
-        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 15)
+        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 30)
 
         with _chat_lock:
-            result = _chat_state.get(session_id, {}).get("result")
+            state = _chat_state.get(session_id, {})
+            result = state.get("result")
+            # Decrementa contador de threads esperando; última thread limpa o state
             if result:
-                _chat_state.pop(session_id, None)
+                state["_waiters"] = state.get("_waiters", 1) - 1
+                if state["_waiters"] <= 0:
+                    _chat_state.pop(session_id, None)
 
         if triggered and result:
             return jsonify(result)
@@ -330,21 +336,22 @@ def chat():
                 "status": "error",
             })
 
-    # ── Modo sandbox: payload sem session_id ou session_id="sandbox" ──────────
+    # ── Modo sandbox: mesma lógica de debounce do API mode ──────────────────
+    # Cada mensagem do frontend é um POST separado (simula WhatsApp real).
+    # O backend acumula por RESPONSE_DELAY_SECONDS e processa tudo junto.
     user_message = (data.get("message") or "").strip()
     session_id = data.get("session_id", "sandbox")
     if not user_message:
         return jsonify({"error": "Mensagem vazia"}), 400
 
-    # ── Comando secreto de escalação/desescalação (sandbox) ─────────────
+    # ── Comando secreto de escalação/desescalação (sem debounce) ─────────
     cmd_result = _check_secret_command(user_message, session_id)
     if cmd_result is not None:
         cmd_result["session_id"] = session_id
-        # No sandbox, formato de resposta usa "message" em vez de "response"
         cmd_result["message"] = cmd_result.pop("response", "")
         return jsonify(cmd_result)
 
-    # Sanitização e injection detection mesmo no sandbox
+    # Sanitização e injection detection
     user_message, warnings = sanitize_input(user_message)
     if warnings:
         log_security_event("INPUT_SANITIZED", session_id, {"warnings": warnings, "source": "sandbox"})
@@ -353,20 +360,55 @@ def chat():
     if is_suspicious:
         log_security_event("INJECTION_DETECTED", session_id, {"patterns": patterns, "source": "sandbox"})
 
-    result = agent.reply(user_message, session_id=session_id)
+    # ── Debounce (mesma lógica do API mode) ───────────────────────────────
+    with _chat_lock:
+        if session_id not in _chat_state:
+            _chat_state[session_id] = {
+                "messages": [],
+                "timer": None,
+                "event": threading.Event(),
+                "result": None,
+                "channel": "sandbox",
+                "user_id": session_id,
+                "_waiters": 0,
+            }
 
-    # Filtrar output
-    result["message"], redactions = filter_output(result["message"])
-    if redactions:
-        log_security_event("OUTPUT_FILTERED", session_id, {"redactions": redactions})
+        state = _chat_state[session_id]
+        state["messages"].append(user_message)
+        state["_waiters"] = state.get("_waiters", 0) + 1
 
-    # Quebra em múltiplas mensagens
-    parts = split_response(result["message"])
-    result["messages"] = parts
-    result["message"] = parts[0]           # Retrocompatível
-    result["delay_seconds"] = MSG_DELAY
+        if state["timer"] is not None:
+            state["timer"].cancel()
 
-    return jsonify(result)
+        state["event"].clear()
+        state["result"] = None
+
+        timer = threading.Timer(RESPONSE_DELAY_SECONDS, _flush_and_respond, args=[session_id])
+        timer.daemon = True
+        state["timer"] = timer
+        timer.start()
+
+        event = state["event"]
+
+    # Bloqueia até o timer disparar e o processamento completar
+    triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 30)
+
+    with _chat_lock:
+        state = _chat_state.get(session_id, {})
+        result = state.get("result")
+        if result:
+            state["_waiters"] = state.get("_waiters", 1) - 1
+            if state["_waiters"] <= 0:
+                _chat_state.pop(session_id, None)
+
+    if triggered and result:
+        return jsonify(result)
+    else:
+        return jsonify({
+            "session_id": session_id,
+            "response": FALLBACK_MESSAGE,
+            "status": "error",
+        })
 
 
 @app.route("/reset", methods=["POST"])
