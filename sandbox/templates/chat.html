@@ -184,13 +184,40 @@ function showTyping(){
 }
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 
+// ── Debounce de input: acumula mensagens do usuário por 2s ──────────────────
+let _inputBuffer=[];
+let _inputTimer=null;
+const INPUT_DEBOUNCE_MS=2000;
+
+function _flushInput(){
+  if(!_inputBuffer.length)return;
+  const combined=_inputBuffer.join('\n');
+  _inputBuffer=[];
+  _inputTimer=null;
+  _doSend(combined);
+}
+
 async function sendMessage(){
-  const text=inputEl.value.trim();if(!text||sendBtn.disabled)return;
+  const text=inputEl.value.trim();if(!text)return;
   if(isFirst){document.getElementById('welcome')?.remove();isFirst=false}
-  appendMessage('user',text);inputEl.value='';inputEl.style.height='auto';sendBtn.disabled=true;showTyping();
+  appendMessage('user',text);inputEl.value='';inputEl.style.height='auto';
+  _inputBuffer.push(text);
+  if(_inputTimer)clearTimeout(_inputTimer);
+  _inputTimer=setTimeout(_flushInput,INPUT_DEBOUNCE_MS);
+}
+
+async function _doSend(text){
+  sendBtn.disabled=true;showTyping();
   try{
     const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
-    const data=await res.json();hideTyping();appendMessage('agent',data.message);
+    const data=await res.json();hideTyping();
+    // Renderiza múltiplas mensagens com delay
+    const msgs=data.messages||[data.message];
+    const delay=(data.delay_seconds||3)*1000;
+    for(let i=0;i<msgs.length;i++){
+      if(i>0){showTyping();await new Promise(r=>setTimeout(r,delay));hideTyping();}
+      appendMessage('agent',msgs[i]);
+    }
     if(data.escalate){statusDot.className='dot escalated';statusText.textContent='Escalando para humano'}
   }catch(e){hideTyping();appendMessage('agent','Erro de conexão.')}
   sendBtn.disabled=false;inputEl.focus();

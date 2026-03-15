@@ -20,6 +20,7 @@ from core.whatsapp import send_message, parse_incoming
 from core import database, escalation
 from core.security import sanitize_input, check_injection_patterns, rate_limiter, filter_output, hash_user_id
 from core.logger import log_security_event, log_conversation
+from core.message_splitter import split_response, DELAY_SECONDS as MSG_DELAY
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
@@ -62,6 +63,12 @@ FALLBACK_MESSAGE = os.getenv(
 #   WEB_CONCURRENCY=1  (ou use gunicorn --workers=1 --threads=8)
 _chat_state: dict = {}
 _chat_lock = threading.Lock()
+
+# ── Estado de debounce para /webhook/zapi ─────────────────────────────────────
+# Mesma lógica do /chat: acumula mensagens do mesmo telefone por RESPONSE_DELAY_SECONDS.
+# Estrutura: { phone -> { messages: [], timer: Timer } }
+_zapi_state: dict = {}
+_zapi_lock = threading.Lock()
 
 # ── App e agente ──────────────────────────────────────────────────────────────
 
@@ -146,10 +153,14 @@ def _flush_and_respond(session_id: str):
         if redactions:
             log_security_event("OUTPUT_FILTERED", hash_user_id(user_id), {"redactions": redactions})
 
+        # Quebra em múltiplas mensagens curtas (1 a 3)
+        response_parts = split_response(response_text)
+        print(f"[CHAT API] Resposta dividida em {len(response_parts)} parte(s) uid={uid_hash}", flush=True)
+
         status = "success"
     except Exception as e:
         print(f"[CHAT API] Erro ao processar session={hash_user_id(session_id)} uid={uid_hash}: {e}", flush=True)
-        response_text = FALLBACK_MESSAGE
+        response_parts = [FALLBACK_MESSAGE]
         status = "error"
 
     # Sinaliza a thread da requisição com o resultado
@@ -158,7 +169,9 @@ def _flush_and_respond(session_id: str):
         if state:
             state["result"] = {
                 "session_id": session_id,
-                "response": response_text,
+                "response": response_parts[0],           # Retrocompatível: primeira mensagem
+                "responses": response_parts,              # Novo: array completo
+                "delay_seconds": MSG_DELAY,               # Delay sugerido entre mensagens
                 "user_id": user_id,
                 "status": status,
             }
@@ -347,6 +360,12 @@ def chat():
     if redactions:
         log_security_event("OUTPUT_FILTERED", session_id, {"redactions": redactions})
 
+    # Quebra em múltiplas mensagens
+    parts = split_response(result["message"])
+    result["messages"] = parts
+    result["message"] = parts[0]           # Retrocompatível
+    result["delay_seconds"] = MSG_DELAY
+
     return jsonify(result)
 
 
@@ -371,9 +390,56 @@ def sessions():
 
 # ── Webhooks WhatsApp (Z-API) ─────────────────────────────────────────────────
 
+
+def _zapi_flush(phone: str):
+    """
+    Callback do timer de debounce do Z-API.
+    Acumula mensagens do mesmo telefone, processa com o agente e envia
+    resposta(s) com delay entre elas.
+    """
+    with _zapi_lock:
+        state = _zapi_state.get(phone)
+        if not state:
+            return
+        messages = list(state["messages"])
+        # Limpa o estado para liberar novas mensagens
+        _zapi_state.pop(phone, None)
+
+    phone_hash = hash_user_id(phone)
+    combined = "\n".join(messages)
+    print(f"[ZAPI WEBHOOK] Processando uid={phone_hash} ({len(messages)} msg acumuladas)", flush=True)
+
+    try:
+        result = agent.reply(combined, session_id=phone)
+        reply_text, redactions = filter_output(result["message"])
+        if redactions:
+            log_security_event("OUTPUT_FILTERED", hash_user_id(phone), {"redactions": redactions})
+
+        if result.get("escalate"):
+            lead_name = agent.memory.get(phone)[0].get("content", "Lead") if agent.memory.get(phone) else "Lead"
+            escalation.handle_escalation(phone, agent.memory, lead_name)
+
+        # Quebra em múltiplas mensagens e envia com delay entre elas
+        parts = split_response(reply_text)
+        print(f"[ZAPI WEBHOOK] Enviando {len(parts)} parte(s) uid={phone_hash} escalate={result.get('escalate')}", flush=True)
+
+        for i, part in enumerate(parts):
+            if i > 0:
+                time.sleep(MSG_DELAY)
+            ok = send_message(phone, part)
+            print(f"[ZAPI WEBHOOK] Parte {i+1}/{len(parts)} enviada={ok} len={len(part)}", flush=True)
+
+    except Exception as e:
+        print(f"[ZAPI WEBHOOK] Erro ao processar uid={phone_hash}: {e}", flush=True)
+        send_message(phone, FALLBACK_MESSAGE)
+
+
 @app.route("/webhook/zapi", methods=["POST"])
 def webhook_zapi():
-    """Recebe mensagens do WhatsApp via Z-API e responde com o agente."""
+    """
+    Recebe mensagens do WhatsApp via Z-API e responde com o agente.
+    Usa debounce para acumular mensagens rápidas do mesmo lead.
+    """
     data = request.get_json(silent=True) or {}
 
     # Log sem PII — não imprime payload completo, telefone ou conteúdo da mensagem
@@ -388,7 +454,7 @@ def webhook_zapi():
     message = incoming["message"]
     phone_hash = hash_user_id(phone)
 
-    print(f"[ZAPI WEBHOOK] Processando — uid={phone_hash} len={len(message)}", flush=True)
+    print(f"[ZAPI WEBHOOK] Recebido — uid={phone_hash} len={len(message)}", flush=True)
 
     # ── Segurança: rate limit ──────────────────────────────────────────────────
     allowed, _ = rate_limiter(phone)
@@ -406,35 +472,39 @@ def webhook_zapi():
         log_security_event("INJECTION_DETECTED", hash_user_id(phone), {"patterns": patterns, "source": "zapi"})
         print(f"[SECURITY] Injection detectado no WhatsApp de {hash_user_id(phone)}", flush=True)
 
-    # ── Comando secreto de escalação/desescalação ────────────────────────
+    # ── Comando secreto de escalação/desescalação (sem debounce) ──────────
     cmd_result = _check_secret_command(message, phone)
     if cmd_result is not None:
-        # Envia confirmação ao chat (se houver mensagem de confirmação)
         confirm_msg = cmd_result.get("response", "")
         if confirm_msg:
             send_message(phone, confirm_msg)
         print(f"[ZAPI WEBHOOK] Comando secreto '{cmd_result['command']}' uid={phone_hash}", flush=True)
         return jsonify({"status": cmd_result["status"]}), 200
 
+    # ── Sessão escalada — IA pausada ──────────────────────────────────────
     if escalation.is_escalated(phone, agent.memory):
         print(f"[ZAPI WEBHOOK] Sessão uid={phone_hash} em atendimento humano — IA pausada.", flush=True)
         return jsonify({"status": "escalated_session"}), 200
 
-    result = agent.reply(message, session_id=phone)
+    # ── Debounce: acumula mensagens por RESPONSE_DELAY_SECONDS ────────────
+    with _zapi_lock:
+        if phone not in _zapi_state:
+            _zapi_state[phone] = {"messages": [], "timer": None}
 
-    # Filtrar output antes de enviar ao lead
-    reply_text, redactions = filter_output(result["message"])
-    if redactions:
-        log_security_event("OUTPUT_FILTERED", hash_user_id(phone), {"redactions": redactions})
+        state = _zapi_state[phone]
+        state["messages"].append(message)
 
-    if result.get("escalate"):
-        lead_name = agent.memory.get(phone)[0].get("content", "Lead") if agent.memory.get(phone) else "Lead"
-        escalation.handle_escalation(phone, agent.memory, lead_name)
+        # Reinicia o timer a cada mensagem
+        if state["timer"] is not None:
+            state["timer"].cancel()
 
-    ok = send_message(phone, reply_text)
-    print(f"[ZAPI WEBHOOK] Resposta enviada={ok} escalate={result.get('escalate')} uid={phone_hash} len={len(reply_text)}", flush=True)
+        timer = threading.Timer(RESPONSE_DELAY_SECONDS, _zapi_flush, args=[phone])
+        timer.daemon = True
+        state["timer"] = timer
+        timer.start()
 
-    return jsonify({"status": "ok"}), 200
+    # Retorna 200 imediatamente — resposta será enviada pelo _zapi_flush
+    return jsonify({"status": "queued"}), 200
 
 
 # ── Rate limiter específico para /webhook/form (por IP, mais agressivo) ──────
