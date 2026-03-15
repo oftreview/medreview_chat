@@ -23,6 +23,20 @@ from core.logger import log_security_event, log_conversation
 
 HOST = os.getenv("HOST", "0.0.0.0")
 
+# ── Comandos secretos de escalação manual ─────────────────────────────────────
+# Palavras-chave que o operador pode digitar no chat para assumir/devolver
+# o atendimento manualmente, sem precisar chamar a API /escalation/resolve.
+# Match exato (case-insensitive, strip de espaços).
+
+ESCALATE_COMMAND   = "#transferindo-para-atendimento-dedicado"
+DEESCALATE_COMMAND = "#retorno-para-atendimento-agente"
+
+ESCALATE_CONFIRM_MSG = (
+    "Entendido! Estou transferindo você para um atendimento dedicado. "
+    "Um especialista vai continuar a conversa por aqui. 😊"
+)
+DEESCALATE_CONFIRM_MSG = ""   # Silencioso — agente retoma sem aviso
+
 # ── Configurações do endpoint /chat ───────────────────────────────────────────
 
 # Tempo de espera (em segundos) antes de processar mensagens acumuladas.
@@ -63,6 +77,40 @@ def _check_auth(req) -> bool:
         return True
     auth = req.headers.get("Authorization", "")
     return auth == f"Bearer {API_SECRET_TOKEN}"
+
+
+def _check_secret_command(message: str, user_id: str) -> dict | None:
+    """
+    Verifica se a mensagem é um comando secreto de escalação/desescalação.
+
+    Retorna dict com a resposta JSON pronta, ou None se não for comando.
+    Match é case-insensitive e ignora espaços nas pontas.
+    """
+    normalized = message.strip().lower()
+
+    if normalized == ESCALATE_COMMAND:
+        # Escalar: marca sessão como "escalated", IA para de responder
+        escalation.handle_escalation(user_id, agent.memory, lead_name="Lead")
+        print(f"[SECRET CMD] ESCALAÇÃO MANUAL ativada para uid={hash_user_id(user_id)}", flush=True)
+        return {
+            "response": ESCALATE_CONFIRM_MSG,
+            "status": "escalated",
+            "user_id": user_id,
+            "command": "escalate",
+        }
+
+    if normalized == DEESCALATE_COMMAND:
+        # Desescalar: devolve controle para a IA
+        escalation.resolve_escalation(user_id, agent.memory)
+        print(f"[SECRET CMD] DESESCALAÇÃO MANUAL ativada para uid={hash_user_id(user_id)}", flush=True)
+        return {
+            "response": DEESCALATE_CONFIRM_MSG,
+            "status": "active",
+            "user_id": user_id,
+            "command": "deescalate",
+        }
+
+    return None
 
 
 def _flush_and_respond(session_id: str):
@@ -181,6 +229,22 @@ def chat():
         if not message:
             return jsonify({"error": "message é obrigatório", "status": "error"}), 400
 
+        # ── Comando secreto de escalação/desescalação ────────────────────────
+        cmd_result = _check_secret_command(message, user_id)
+        if cmd_result is not None:
+            cmd_result["session_id"] = session_id
+            return jsonify(cmd_result)
+
+        # ── Checagem de sessão já escalada ────────────────────────────────────
+        if escalation.is_escalated(user_id, agent.memory):
+            print(f"[CHAT API] Sessão uid={hash_user_id(user_id)} em atendimento humano — IA pausada.", flush=True)
+            return jsonify({
+                "session_id": session_id,
+                "response": "",
+                "user_id": user_id,
+                "status": "escalated_session",
+            })
+
         # ── Segurança: rate limit (por session_id para evitar abuso por sessão) ─
         allowed, count = rate_limiter(session_id)
         if not allowed:
@@ -259,6 +323,14 @@ def chat():
     if not user_message:
         return jsonify({"error": "Mensagem vazia"}), 400
 
+    # ── Comando secreto de escalação/desescalação (sandbox) ─────────────
+    cmd_result = _check_secret_command(user_message, session_id)
+    if cmd_result is not None:
+        cmd_result["session_id"] = session_id
+        # No sandbox, formato de resposta usa "message" em vez de "response"
+        cmd_result["message"] = cmd_result.pop("response", "")
+        return jsonify(cmd_result)
+
     # Sanitização e injection detection mesmo no sandbox
     user_message, warnings = sanitize_input(user_message)
     if warnings:
@@ -333,6 +405,16 @@ def webhook_zapi():
     if is_suspicious:
         log_security_event("INJECTION_DETECTED", hash_user_id(phone), {"patterns": patterns, "source": "zapi"})
         print(f"[SECURITY] Injection detectado no WhatsApp de {hash_user_id(phone)}", flush=True)
+
+    # ── Comando secreto de escalação/desescalação ────────────────────────
+    cmd_result = _check_secret_command(message, phone)
+    if cmd_result is not None:
+        # Envia confirmação ao chat (se houver mensagem de confirmação)
+        confirm_msg = cmd_result.get("response", "")
+        if confirm_msg:
+            send_message(phone, confirm_msg)
+        print(f"[ZAPI WEBHOOK] Comando secreto '{cmd_result['command']}' uid={phone_hash}", flush=True)
+        return jsonify({"status": cmd_result["status"]}), 200
 
     if escalation.is_escalated(phone, agent.memory):
         print(f"[ZAPI WEBHOOK] Sessão uid={phone_hash} em atendimento humano — IA pausada.", flush=True)
