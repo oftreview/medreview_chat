@@ -11,6 +11,7 @@ import re
 import random
 import time
 import threading
+import gevent
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, request, jsonify, render_template
@@ -140,7 +141,8 @@ def _flush_and_respond(session_id: str):
     # Combina mensagens acumuladas em uma única string
     combined = "\n".join(messages)
     uid_hash = hash_user_id(user_id)
-    print(f"[CHAT API] Processando session={hash_user_id(session_id)} uid={uid_hash} ({len(messages)} msg) canal={channel}", flush=True)
+    print(f"[FLUSH] Timer disparou! session={hash_user_id(session_id)} uid={uid_hash} msgs_acumuladas={len(messages)} canal={channel}", flush=True)
+    print(f"[FLUSH] Mensagens combinadas: {combined[:200]}{'...' if len(combined) > 200 else ''}", flush=True)
 
     try:
         # Usa user_id como session_id do agente para que o histórico Supabase
@@ -308,21 +310,23 @@ def chat():
                 state["user_id"] = user_id
 
             # Reinicia o timer a cada mensagem recebida (debounce)
+            # Usa gevent.spawn_later (nativo) em vez de threading.Timer
+            # pois monkey.patch_all() pode causar disparo prematuro do Timer.
             if state["timer"] is not None:
-                state["timer"].cancel()
+                state["timer"].kill()
 
             state["event"].clear()
             state["result"] = None
 
-            timer = threading.Timer(RESPONSE_DELAY_SECONDS, _flush_and_respond, args=[session_id])
-            timer.daemon = True
+            print(f"[DEBOUNCE] Msg acumulada session={hash_user_id(session_id)} total={len(state['messages'])} delay={RESPONSE_DELAY_SECONDS}s", flush=True)
+
+            timer = gevent.spawn_later(RESPONSE_DELAY_SECONDS, _flush_and_respond, session_id)
             state["timer"] = timer
-            timer.start()
 
             event = state["event"]
 
         # Bloqueia a thread até o timer disparar e o processamento completar
-        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 30)
+        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 60)
 
         with _chat_lock:
             state = _chat_state.get(session_id, {})
@@ -384,21 +388,22 @@ def chat():
         state["messages"].append(user_message)
         state["_waiters"] = state.get("_waiters", 0) + 1
 
+        # Usa gevent.spawn_later (nativo) em vez de threading.Timer
         if state["timer"] is not None:
-            state["timer"].cancel()
+            state["timer"].kill()
 
         state["event"].clear()
         state["result"] = None
 
-        timer = threading.Timer(RESPONSE_DELAY_SECONDS, _flush_and_respond, args=[session_id])
-        timer.daemon = True
+        print(f"[DEBOUNCE SANDBOX] Msg acumulada total={len(state['messages'])} delay={RESPONSE_DELAY_SECONDS}s", flush=True)
+
+        timer = gevent.spawn_later(RESPONSE_DELAY_SECONDS, _flush_and_respond, session_id)
         state["timer"] = timer
-        timer.start()
 
         event = state["event"]
 
     # Bloqueia até o timer disparar e o processamento completar
-    triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 30)
+    triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 60)
 
     with _chat_lock:
         state = _chat_state.get(session_id, {})
@@ -543,14 +548,14 @@ def webhook_zapi():
         state = _zapi_state[phone]
         state["messages"].append(message)
 
-        # Reinicia o timer a cada mensagem
+        # Reinicia o timer a cada mensagem (gevent nativo)
         if state["timer"] is not None:
-            state["timer"].cancel()
+            state["timer"].kill()
 
-        timer = threading.Timer(RESPONSE_DELAY_SECONDS, _zapi_flush, args=[phone])
-        timer.daemon = True
+        print(f"[DEBOUNCE ZAPI] Msg acumulada uid={phone_hash} total={len(state['messages'])} delay={RESPONSE_DELAY_SECONDS}s", flush=True)
+
+        timer = gevent.spawn_later(RESPONSE_DELAY_SECONDS, _zapi_flush, phone)
         state["timer"] = timer
-        timer.start()
 
     # Retorna 200 imediatamente — resposta será enviada pelo _zapi_flush
     return jsonify({"status": "queued"}), 200
