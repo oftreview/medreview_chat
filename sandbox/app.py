@@ -159,8 +159,15 @@ def _flush_and_respond(session_id: str):
 
         status = "success"
     except Exception as e:
-        print(f"[CHAT API] Erro ao processar session={hash_user_id(session_id)} uid={uid_hash}: {e}", flush=True)
-        response_parts = [FALLBACK_MESSAGE]
+        import traceback
+        error_detail = f"{type(e).__name__}: {e}"
+        print(f"[CHAT API] Erro ao processar session={hash_user_id(session_id)} uid={uid_hash}: {error_detail}", flush=True)
+        traceback.print_exc()
+        # No sandbox, mostra o erro real para debug. Em produção, mostra fallback genérico.
+        if channel == "sandbox":
+            response_parts = [f"[ERRO DEBUG] {error_detail}"]
+        else:
+            response_parts = [FALLBACK_MESSAGE]
         status = "error"
 
     # Sinaliza a thread da requisição com o resultado
