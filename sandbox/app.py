@@ -630,15 +630,16 @@ def webhook_form():
     """
     Recebe lead do Quill Forms e inicia conversa no WhatsApp.
 
-    Requer header: Authorization: Bearer <API_SECRET_TOKEN>
+    SEM autenticação por Bearer token — o Quill Forms não suporta headers
+    customizados de forma confiável. A proteção é feita por:
+      1. Rate limit agressivo por IP (5 req/min)
+      2. Validação rigorosa do telefone (formato brasileiro)
+      3. Nenhum dado sensível é exposto no response
+
     Rate limit: FORM_RATE_LIMIT req/min por IP (padrão 5).
     Valida formato de telefone brasileiro (55 + DDD + 8-9 dígitos).
     """
-    # ── Autenticação ─────────────────────────────────────────────────────────
-    if not _check_auth(request):
-        return jsonify({"error": "Unauthorized", "status": "error"}), 401
-
-    # ── Rate limit por IP ────────────────────────────────────────────────────
+    # ── Rate limit por IP (proteção principal sem auth) ───────────────────────
     client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
     allowed, count = _form_rate_limiter(client_ip)
     if not allowed:
@@ -683,9 +684,11 @@ def webhook_form():
     agent.memory.add(phone, "user", f"[NOVO LEAD] Nome: {name}. Agente: {agent_name}.", channel="whatsapp")
     agent.memory.add(phone, "assistant", opening, channel="whatsapp")
 
-    send_message(phone, opening)
+    sent = send_message(phone, opening)
+    if not sent:
+        print(f"[FORM WEBHOOK] FALHA ao enviar mensagem Z-API uid={hash_user_id(phone)}", flush=True)
 
-    return jsonify({"status": "ok", "phone": phone}), 200
+    return jsonify({"status": "ok", "phone": phone, "message_sent": sent}), 200
 
 
 # ── Escalação humana ──────────────────────────────────────────────────────────
