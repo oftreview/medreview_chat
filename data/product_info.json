@@ -264,12 +264,36 @@
       "Módulo Onboarding: Aulas fundamentais que ensinam o aluno a extrair o máximo do cronograma, banco de questões e suporte",
       "Simulados Mensais: Treinamento de ritmo de prova para medir evolução constante"
     ],
-    "youtube": "https://www.youtube.com/@grupomed-review"
+    "youtube": "https://www.youtube.com/@grupomed-review/playlists"
+  },
+  "recursos_gratuitos": {
+    "intro": "Use estes recursos para engajar o lead, gerar confiança e quebrar objeções. Ofereça 1 por vez, de forma contextual.",
+    "minicursos_youtube": {
+      "nome": "Minicursos gratuitos no YouTube",
+      "descricao": "Minicurso de Bases da Ventilação Mecânica e Minicurso de Bases do Eletrocardiograma — conteúdo gratuito para o lead conhecer a didática MedReview na prática",
+      "link": "https://www.youtube.com/@grupomed-review/playlists",
+      "quando_usar": "Lead quer ver a didática antes de decidir, mencionou ECG ou ventilação mecânica, ou quer sentir a qualidade do conteúdo antes de investir",
+      "exemplo_frase": "Temos minicursos gratuitos no YouTube sobre Ventilação Mecânica e ECG — dá pra sentir a didática antes de decidir"
+    },
+    "freemium_7_dias": {
+      "nome": "Teste grátis de 7 dias (Freemium)",
+      "descricao": "Acesso à plataforma completa por 7 dias, sem compromisso e sem cartão de crédito",
+      "link": "https://grupomedreview.com.br/r1-fremium/",
+      "quando_usar": "Lead está indeciso, quer testar antes, tem objeção de confiança ou não quer se comprometer sem ver",
+      "exemplo_frase": "Que tal testar a plataforma por 7 dias sem compromisso? Assim você vê se faz sentido pra você"
+    },
+    "instagram_resumos": {
+      "nome": "Super resumos e flashcards no Instagram",
+      "descricao": "Feed do @grupomedreview com super resumos visuais em formato de flashcard — conteúdo leve e educativo",
+      "link": "https://www.instagram.com/grupomedreview/",
+      "quando_usar": "Lead está no começo da jornada, quer conteúdo leve, mencionou flashcards ou resumos, ou está conhecendo a marca",
+      "exemplo_frase": "Nosso Instagram tá cheio de super resumos em formato de flashcard — dá uma olhada pra conhecer o estilo"
+    }
   },
   "personalidade_agente": {
     "tom_de_voz": "Prático, empático com a rotina corrida e focado em eficiência",
     "terminologia_chave": "Sempre contrastar as 'Aulas Excel' (ruins) com o 'Estudo Ativo na veia' (bom)",
     "simplicidade": "Enfatizar que a plataforma é simples e direta, sem ferramentas inúteis que poluem a jornada",
-    "prova_social": "Encaminhar para o YouTube da MED Review para demonstração da metodologia"
+    "prova_social": "Encaminhar para os minicursos gratuitos no YouTube (Ventilação Mecânica e ECG) para demonstração da metodologia: https://www.youtube.com/@grupomed-review/playlists"
   }
 }
