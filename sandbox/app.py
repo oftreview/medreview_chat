@@ -221,6 +221,11 @@ def dashboard_costs():
     return render_template("dashboard/costs.html", active_page="costs")
 
 
+@app.route("/dashboard/analytics")
+def dashboard_analytics():
+    return render_template("dashboard/analytics.html", active_page="analytics")
+
+
 @app.route("/dashboard/logs")
 def dashboard_logs():
     return render_template("dashboard/logs.html", active_page="logs")
