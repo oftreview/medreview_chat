@@ -14,6 +14,8 @@ env/
 *.egg-info/
 dist/
 build/
+.pytest_cache/
+.ruff_cache/
 
 # IDEs
 .vscode/
@@ -26,5 +28,9 @@ build/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs (runtime only)
+src/logs/
 *.log
+
+# Local cache (dual-write)
+local_cache/

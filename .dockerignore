@@ -1,8 +1,38 @@
-.venv/
-.env
+# Git & VCS
 .git/
+.gitignore
+
+# Python
+.venv/
+venv/
 __pycache__/
 *.pyc
-.DS_Store
+*.egg-info/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# IDE
 .vscode/
 .idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs & tests (not needed in production)
+docs/
+tests/
+*.md
+!README.md
+
+# Local cache
+local_cache/
+
+# Legacy code (will be removed after migration)
+sandbox/
+core/
+agents/
