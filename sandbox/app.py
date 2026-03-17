@@ -761,14 +761,15 @@ def api_lead_data(user_id):
     }), 200
 
 
-# ── API: Correções do Agente ──────────────────────────────────────────────────
+# ── API: Correções do Agente (Fase 4 — Supabase + cache JSON local) ──────────
 
 import json
 
 _CORRECTIONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "corrections.json")
 
 
-def _load_corrections():
+def _load_corrections_json():
+    """Carrega corrections do JSON local (cache/fallback)."""
     try:
         with open(_CORRECTIONS_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -777,44 +778,136 @@ def _load_corrections():
         return []
 
 
-def _save_corrections(corrections):
+def _save_corrections_json(corrections):
+    """Salva corrections no JSON local (cache)."""
     os.makedirs(os.path.dirname(_CORRECTIONS_PATH), exist_ok=True)
     with open(_CORRECTIONS_PATH, "w", encoding="utf-8") as f:
         json.dump({"corrections": corrections}, f, ensure_ascii=False, indent=2)
 
 
+def _sync_json_to_supabase():
+    """Sync one-way: envia todas as correções do JSON local para o Supabase."""
+    corrections = _load_corrections_json()
+    synced = 0
+    for c in corrections:
+        if database.save_correction(c):
+            synced += 1
+    return synced
+
+
 @app.route("/api/corrections", methods=["GET"])
 def api_corrections_list():
-    return jsonify({"corrections": _load_corrections()})
+    """
+    Lista correções. Tenta Supabase primeiro, fallback para JSON local.
+    Query params: source (supabase|json|auto), include_archived (true|false)
+    """
+    source = request.args.get("source", "auto")
+    include_archived = request.args.get("include_archived", "false").lower() == "true"
+
+    if source == "json":
+        return jsonify({"corrections": _load_corrections_json(), "source": "json"})
+
+    # Tenta Supabase
+    db_corrections = database.load_corrections(include_archived=include_archived)
+    if db_corrections:
+        return jsonify({"corrections": db_corrections, "source": "supabase"})
+
+    # Fallback para JSON
+    return jsonify({"corrections": _load_corrections_json(), "source": "json_fallback"})
 
 
 @app.route("/api/corrections", methods=["POST"])
 def api_corrections_add():
+    """
+    Adiciona/atualiza uma correção. Salva no Supabase E no JSON local.
+    Campos opcionais: conversation_user_id, conversation_message_id (para linkar com conversa original)
+    """
     data = request.get_json(silent=True) or {}
     corr_id = data.get("id", "").strip()
     regra = data.get("regra", "").strip()
     if not corr_id or not regra:
         return jsonify({"error": "id e regra sao obrigatorios"}), 400
 
-    corrections = _load_corrections()
     new_corr = {
         "id": corr_id,
+        "gatilho": data.get("gatilho", ""),
+        "resposta_errada": data.get("resposta_errada", ""),
+        "resposta_correta": data.get("resposta_correta", ""),
         "regra": regra,
-        "exemplo": data.get("exemplo", ""),
+        "categoria": data.get("categoria", "outro"),
         "severidade": data.get("severidade", "alta"),
         "status": data.get("status", "ativa"),
         "reincidencia": data.get("reincidencia", False),
+        "reincidencia_count": data.get("reincidencia_count", 0),
     }
 
-    # Update if ID exists, else append
+    # Link com conversa original (opcional)
+    if data.get("conversation_user_id"):
+        new_corr["conversation_user_id"] = data["conversation_user_id"]
+    if data.get("conversation_message_id"):
+        new_corr["conversation_message_id"] = data["conversation_message_id"]
+
+    # Salva no Supabase
+    db_ok = database.save_correction(new_corr)
+
+    # Salva no JSON local (cache)
+    corrections = _load_corrections_json()
     idx = next((i for i, c in enumerate(corrections) if c.get("id") == corr_id), None)
     if idx is not None:
         corrections[idx].update(new_corr)
     else:
         corrections.append(new_corr)
+    _save_corrections_json(corrections)
 
-    _save_corrections(corrections)
-    return jsonify({"status": "ok", "correction": new_corr})
+    return jsonify({"status": "ok", "correction": new_corr, "supabase_synced": db_ok})
+
+
+@app.route("/api/corrections/reincidence", methods=["POST"])
+def api_corrections_reincidence():
+    """
+    Registra reincidência de uma correção.
+    Payload: { "id": "COR-003" }
+    """
+    data = request.get_json(silent=True) or {}
+    corr_id = data.get("id", "").strip()
+    if not corr_id:
+        return jsonify({"error": "id obrigatório"}), 400
+
+    ok = database.increment_reincidence(corr_id)
+    return jsonify({"status": "ok" if ok else "error", "correction_id": corr_id})
+
+
+@app.route("/api/corrections/sync", methods=["POST"])
+def api_corrections_sync():
+    """
+    Sync manual: envia todas as correções do JSON local para o Supabase.
+    Útil para migração inicial.
+    """
+    synced = _sync_json_to_supabase()
+    return jsonify({"status": "ok", "synced": synced})
+
+
+@app.route("/api/corrections/auto-archive", methods=["POST"])
+def api_corrections_auto_archive():
+    """
+    Arquiva correções sem reincidência nos últimos N dias.
+    Query param: days (default 30)
+    """
+    days = int(request.args.get("days", 30))
+    archived = database.auto_archive_corrections(days=days)
+    return jsonify({"status": "ok", "archived": archived, "period_days": days})
+
+
+@app.route("/api/corrections/analytics", methods=["GET"])
+def api_corrections_analytics():
+    """
+    Análise de erros dos últimos N dias.
+    Query param: days (default 7)
+    Retorna: total ativas, reincidências por categoria, críticas reincidentes.
+    """
+    days = int(request.args.get("days", 7))
+    analytics = database.correction_analytics(days=days)
+    return jsonify(analytics)
 
 
 # ── API: Métricas e Configuração ─────────────────────────────────────────────
