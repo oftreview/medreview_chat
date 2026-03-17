@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Criatons — Shared CSS Components
+   Estilos reutilizáveis extraídos das páginas do dashboard.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Stat / Summary Cards ─────────────────────────────────────────
+   Usados em: corrections, costs, analytics
+   Aplicar classe .stats-row no container e .stat-card em cada card.
+   Variantes de cor: .stat-card.purple, .green, .orange, .red       */
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--purple); }
+
+.stat-card .card-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.stat-card .card-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+}
+.stat-card .card-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Cor padrão (purple) */
+.stat-card .card-value { color: var(--purple-light); }
+
+/* Variantes de cor */
+.stat-card.green  .card-value { color: var(--green); }
+.stat-card.orange .card-value { color: var(--orange); }
+.stat-card.red    .card-value { color: var(--red); }
+.stat-card.purple .card-value { color: var(--purple-light); }
+
+
+/* ── Tables ───────────────────────────────────────────────────────
+   Usadas em: corrections, costs, analytics
+   Aplicar classe .data-table na <table>.                          */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(139,63,187,0.06);
+  color: var(--text);
+}
+.data-table tr:hover td {
+  background: rgba(139,63,187,0.04);
+}
+
+
+/* ── Section Title ────────────────────────────────────────────────
+   Usado em: costs, analytics
+   Padrão: <div class="section-title"><span class="dot purple"></span> Texto</div> */
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 22px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.section-title .dot.purple { background: var(--purple-light); }
+.section-title .dot.green  { background: var(--green); }
+.section-title .dot.orange { background: var(--orange); }
+
+
+/* ── Badges & Pills ───────────────────────────────────────────────
+   Usados em: corrections, conversations                           */
+
+.sev-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sev-badge.critica { background: rgba(224,85,85,0.15); color: var(--red); }
+.sev-badge.alta    { background: rgba(224,195,64,0.15); color: var(--yellow); }
+.sev-badge.media   { background: rgba(139,63,187,0.15); color: var(--purple-light); }
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.status-pill.ativa    { background: rgba(224,85,85,0.12); color: var(--red); }
+.status-pill.resolvida { background: rgba(76,175,128,0.12); color: var(--green); }
+.status-pill.arquivada { background: rgba(139,128,168,0.12); color: var(--text-dim); }
+
+
+/* ── Score Bars ───────────────────────────────────────────────────
+   Usadas em: analytics (quality table)                            */
+
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.score-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(139,63,187,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.score-bar-fill.good { background: var(--green); }
+.score-bar-fill.mid  { background: var(--yellow); }
+.score-bar-fill.bad  { background: var(--red); }
+
+
+/* ── Config Panel ─────────────────────────────────────────────────
+   Usado em: costs                                                 */
+
+.config-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(139,63,187,0.06);
+}
+.config-row:last-child { border-bottom: none; }
+.config-label { font-size: 12px; color: var(--text-dim); }
+.config-value {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', monospace;
+}
+
+
+/* ── Form Elements ────────────────────────────────────────────────
+   Usados em: corrections (add form), filters                     */
+
+.form-group {
+  margin-bottom: 12px;
+}
+.form-group label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+
+/* ── Modal / Overlay ──────────────────────────────────────────────
+   Usado em: corrections (add correction form)                    */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.modal-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+}
+.modal-panel h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+
+/* ── Shared Animations ────────────────────────────────────────────
+   Usadas em: sandbox, conversations, chat                         */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+
+/* ── Scrollbar Theme ──────────────────────────────────────────────
+   Padrão em todas as páginas                                      */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+
+/* ── Responsive Helpers ───────────────────────────────────────────
+   Media queries compartilhadas                                    */
+
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: 1fr; }
+}

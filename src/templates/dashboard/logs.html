@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Logs{% endblock %}
+
+{% block extra_styles %}
+.logs-page { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+/* ── Tabs ── */
+.log-tabs {
+  display:flex; gap:0; padding:0 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(13,10,20,0.5);
+}
+.log-tab {
+  padding:10px 18px; font-size:12px; font-weight:500;
+  color:var(--text-dim); cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.15s;
+}
+.log-tab:hover { color:var(--text); }
+.log-tab.active { color:var(--purple-light); border-bottom-color:var(--purple); }
+.log-tab .tab-count {
+  margin-left:6px; font-size:9px; font-weight:600;
+  background:rgba(139,63,187,0.2); color:var(--purple-light);
+  padding:1px 6px; border-radius:8px;
+}
+
+/* ── Controls ── */
+.log-controls {
+  display:flex; align-items:center; gap:12px; padding:10px 24px;
+  border-bottom:1px solid var(--border);
+}
+.log-controls input {
+  flex:1; background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:6px 12px; font-size:12px;
+  font-family:'Space Grotesk',sans-serif; color:var(--text); outline:none;
+}
+.log-controls input:focus { border-color:var(--purple); }
+.log-controls label { font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:5px; cursor:pointer; }
+.log-controls input[type=checkbox] { width:14px; height:14px; accent-color:var(--purple); }
+
+/* ── Log entries ── */
+.log-stream {
+  flex:1; overflow-y:auto; padding:12px 24px;
+  font-family:'JetBrains Mono','Fira Code','Courier New',monospace;
+  font-size:11.5px; line-height:1.7;
+}
+.log-stream::-webkit-scrollbar { width:4px; }
+.log-stream::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+.log-entry { padding:2px 0; display:flex; gap:10px; border-bottom:1px solid rgba(139,63,187,0.05); }
+.log-entry:hover { background:rgba(139,63,187,0.03); }
+.log-time { color:var(--text-dim); flex-shrink:0; width:70px; font-size:10px; padding-top:2px; }
+.log-tag {
+  flex-shrink:0; width:80px; font-size:9px; font-weight:700;
+  padding:1px 0; text-transform:uppercase; letter-spacing:0.5px;
+}
+.log-tag.system { color:var(--purple-light); }
+.log-tag.security { color:var(--orange); }
+.log-tag.error { color:var(--red); }
+.log-tag.debug { color:var(--text-dim); }
+.log-tag.flush { color:var(--green); }
+.log-tag.debounce { color:var(--yellow); }
+.log-msg { color:var(--text); word-break:break-all; flex:1; }
+.log-msg.error { color:var(--red); }
+
+.log-empty { text-align:center; padding:60px 20px; color:var(--text-dim); font-size:13px; font-family:'Space Grotesk',sans-serif; }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-title">
+    <h1>Logs</h1>
+    <span class="page-badge green" id="logStatus">Conectado</span>
+  </div>
+  <div class="page-actions">
+    <button class="btn-ghost" onclick="clearLogs()">Limpar</button>
+    <button class="btn-ghost" id="pauseBtn" onclick="togglePause()">&#9646;&#9646; Pausar</button>
+  </div>
+</div>
+
+<div class="logs-page">
+  <div class="log-tabs">
+    <div class="log-tab active" data-tab="all" onclick="switchTab('all')">Todos <span class="tab-count" id="countAll">0</span></div>
+    <div class="log-tab" data-tab="system" onclick="switchTab('system')">Sistema <span class="tab-count" id="countSystem">0</span></div>
+    <div class="log-tab" data-tab="security" onclick="switchTab('security')">Seguranca <span class="tab-count" id="countSecurity">0</span></div>
+    <div class="log-tab" data-tab="error" onclick="switchTab('error')">Erros <span class="tab-count" id="countError">0</span></div>
+  </div>
+
+  <div class="log-controls">
+    <input type="text" id="logFilter" placeholder="Filtrar logs..." oninput="filterLogs()">
+    <label><input type="checkbox" id="autoScroll" checked> Auto-scroll</label>
+  </div>
+
+  <div class="log-stream" id="logStream">
+    <div class="log-empty">Logs serao exibidos em tempo real apos implementacao do backend (Task 4)</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allLogs = [];
+let activeTab = 'all';
+let paused = false;
+let pollInterval = null;
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.log-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderLogs();
+}
+
+function filterLogs() { renderLogs(); }
+
+function renderLogs() {
+  const stream = document.getElementById('logStream');
+  const filter = document.getElementById('logFilter').value.toLowerCase();
+  let filtered = allLogs;
+  if (activeTab !== 'all') filtered = filtered.filter(l => l.tag === activeTab);
+  if (filter) filtered = filtered.filter(l => l.msg.toLowerCase().includes(filter) || l.tag.includes(filter));
+
+  if (!filtered.length) {
+    stream.innerHTML = '<div class="log-empty">Nenhum log encontrado</div>';
+    return;
+  }
+
+  stream.innerHTML = filtered.map(l => `<div class="log-entry">
+    <span class="log-time">${l.time}</span>
+    <span class="log-tag ${l.tag}">${l.tag}</span>
+    <span class="log-msg ${l.tag === 'error' ? 'error' : ''}">${escHtml(l.msg)}</span>
+  </div>`).join('');
+
+  if (document.getElementById('autoScroll').checked) stream.scrollTop = stream.scrollHeight;
+  updateCounts();
+}
+
+function updateCounts() {
+  document.getElementById('countAll').textContent = allLogs.length;
+  document.getElementById('countSystem').textContent = allLogs.filter(l=>l.tag==='system').length;
+  document.getElementById('countSecurity').textContent = allLogs.filter(l=>l.tag==='security').length;
+  document.getElementById('countError').textContent = allLogs.filter(l=>l.tag==='error').length;
+}
+
+async function pollLogs() {
+  if (paused) return;
+  try {
+    const res = await fetch('/api/logs?since=' + (allLogs.length ? allLogs[allLogs.length-1].id||0 : 0));
+    const data = await res.json();
+    if (data.logs && data.logs.length) {
+      allLogs.push(...data.logs);
+      if (allLogs.length > 2000) allLogs = allLogs.slice(-1500);
+      renderLogs();
+    }
+  } catch(e) {
+    document.getElementById('logStatus').textContent = 'Desconectado';
+    document.getElementById('logStatus').className = 'page-badge orange';
+  }
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pauseBtn').innerHTML = paused ? '&#9654; Retomar' : '&#9646;&#9646; Pausar';
+}
+
+function clearLogs() { allLogs = []; renderLogs(); }
+
+function escHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+// Poll every 2 seconds
+pollInterval = setInterval(pollLogs, 2000);
+pollLogs();
+</script>
+{% endblock %}
