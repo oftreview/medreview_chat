@@ -910,6 +910,64 @@ def api_corrections_analytics():
     return jsonify(analytics)
 
 
+# ── API: Analytics Avançado (Fase 5) ─────────────────────────────────────────
+
+@app.route("/api/analytics/funnel", methods=["GET"])
+def api_analytics_funnel():
+    """
+    Funil de conversão: quantos leads em cada stage, taxa de avanço e conversão.
+    """
+    return jsonify(database.analytics_funnel()), 200
+
+
+@app.route("/api/analytics/time-per-stage", methods=["GET"])
+def api_analytics_time_per_stage():
+    """Tempo médio que leads ficam em cada stage do funil."""
+    return jsonify(database.analytics_time_per_stage()), 200
+
+
+@app.route("/api/analytics/keywords", methods=["GET"])
+def api_analytics_keywords():
+    """
+    Palavras-chave mais frequentes nas mensagens dos leads.
+    Query param: limit (default 30)
+    """
+    limit = int(request.args.get("limit", 30))
+    return jsonify(database.analytics_keywords(limit=limit)), 200
+
+
+@app.route("/api/analytics/quality", methods=["GET"])
+def api_analytics_quality():
+    """
+    Score de qualidade das conversas (engajamento, profundidade, equilíbrio, progresso).
+    Query param: user_id (opcional — se fornecido, analisa só esse lead)
+    """
+    user_id = request.args.get("user_id", None)
+    return jsonify(database.analytics_conversation_quality(user_id=user_id)), 200
+
+
+@app.route("/api/analytics/summary", methods=["GET"])
+def api_analytics_summary():
+    """
+    Resumo geral: funil + qualidade + keywords + correções em um só endpoint.
+    Ideal para o dashboard.
+    """
+    funnel = database.analytics_funnel()
+    quality = database.analytics_conversation_quality()
+    keywords = database.analytics_keywords(limit=10)
+    corrections = database.correction_analytics(days=7)
+
+    return jsonify({
+        "funnel": funnel,
+        "quality": {
+            "avg_score": quality.get("avg_quality_score", 0),
+            "total_conversations": quality.get("total_conversations", 0),
+        },
+        "top_keywords": keywords.get("keywords", [])[:10],
+        "corrections_7d": corrections,
+    }), 200
+
+
 # ── API: Métricas e Configuração ─────────────────────────────────────────────
 
 from core.config import CLAUDE_MODEL, MAX_TOKENS
