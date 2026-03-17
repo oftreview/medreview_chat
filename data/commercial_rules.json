@@ -1,30 +1,99 @@
 {
-  "version": "1.1",
+  "version": "2.0",
   "last_updated": "2026-03",
-  "discount_policy": {
-    "max_discount_percent": 15,
-    "max_discount_note": "Máximo 15% sem aprovação do supervisor",
-    "auto_approve_threshold": 10,
-    "auto_approve_note": "Até 10% o agente pode oferecer sozinho",
-    "escalate_to_human_above": 15,
-    "escalate_note": "Acima de 15% ou condições especiais: escalar para consultor humano"
+  "prioridade_venda": {
+    "descricao": "Sempre priorizar a venda da oferta mais completa (Extensive) e do pagamento à vista. Só fazer downsell se o lead recusar.",
+    "hierarquia": [
+      {
+        "ordem": 1,
+        "produto": "Extensive (anual ou bianual)",
+        "regra": "Se ≤1 ano até a prova → Extensive 2026. Se >1 ano → Extensive 2026/2027.",
+        "tipo": "oferta_principal"
+      },
+      {
+        "ordem": 2,
+        "produto": "Extensive Flex",
+        "regra": "Primeiro downsell — oferecer SOMENTE se o lead recusar o Extensive. Assinatura mensal, sem compromisso.",
+        "tipo": "downsell_1"
+      },
+      {
+        "ordem": 3,
+        "produto": "Banco de Questões + Flashcards (LUX)",
+        "regra": "Downsell final — SOMENTE como última carta. Nunca oferecer como primeira opção.",
+        "tipo": "downsell_final"
+      }
+    ],
+    "regra_ouro": "Mesmo que o lead pergunte só por banco de questões ou flashcards, sempre apresentar o Extensive primeiro mostrando o valor do pacote completo. Só recuar para LUX isolado se o lead insistir após recusar Extensive e Flex."
   },
-  "allowed_conditions": [
-    "Parcelamento em até 12x (conforme oferta)",
-    "Acesso imediato após pagamento aprovado",
-    "5% de desconto para pagamento à vista — use o link_avista da oferta"
-  ],
+  "discount_policy": {
+    "max_discount_percent": 5,
+    "regra_fundamental": "NUNCA oferecer desconto por iniciativa própria. Desconto só aparece se o lead pedir explicitamente.",
+    "fluxo_desconto": [
+      {
+        "etapa": 1,
+        "gatilho": "Lead pede desconto",
+        "acao": "Oferecer 5% para pagamento à vista. Enviar link_avista_5off.",
+        "cupom": "5OFFR1"
+      },
+      {
+        "etapa": 2,
+        "gatilho": "Lead ainda resiste / quer desconto no parcelado",
+        "acao": "Como última carta antes do downsell, oferecer 5% no link 12x. Enviar link_12x_5off.",
+        "cupom": "5OFFR1"
+      },
+      {
+        "etapa": 3,
+        "gatilho": "Lead pede mais de 5% de desconto",
+        "acao": "Reforçar valor do produto usando knowledge base de objeções. Se ainda insistir: escalar para humano.",
+        "cupom": null
+      }
+    ],
+    "cupons": {
+      "BEMVINDO": {
+        "desconto": "0%",
+        "uso": "Cupom padrão sem desconto — usado em links normais (12x e à vista preço cheio)"
+      },
+      "5OFFR1": {
+        "desconto": "5%",
+        "uso": "Cupom com 5% de desconto — usado SOMENTE quando lead pedir desconto"
+      }
+    },
+    "proibicoes": [
+      "NUNCA oferecer desconto sem o lead pedir",
+      "NUNCA prometer desconto acima de 5%",
+      "NUNCA inventar cupons ou links que não existem",
+      "NUNCA enviar link com cupom 5OFFR1 por padrão — usar BEMVINDO"
+    ]
+  },
   "payment_instructions": {
     "when_to_send_link": "Somente quando o lead confirmar que quer comprar. Não envie link antes do lead sinalizar intenção clara.",
-    "how_to_send": "Pergunte se o lead prefere parcelar ou pagar à vista. Se à vista: envie o link_avista (tem 5% desconto embutido). Se parcelado ou não especificado: envie o link padrão.",
+    "fluxo_envio": {
+      "sem_desconto_parcelado": "Envie link_12x (cupom BEMVINDO embutido na URL)",
+      "sem_desconto_avista": "Envie link_avista (cupom BEMVINDO embutido na URL)",
+      "com_desconto_parcelado": "Envie link_12x_5off (cupom 5OFFR1 embutido na URL) — SOMENTE se lead pediu desconto",
+      "com_desconto_avista": "Envie link_avista_5off (cupom 5OFFR1 embutido na URL) — SOMENTE se lead pediu desconto"
+    },
+    "pergunta_padrao": "Pergunte: 'Prefere parcelar em 12x ou pagar à vista?'",
     "if_no_link": "Se o campo 'link' da oferta for null, informe que enviará o link por outro canal e acione escalation.",
     "format": "Envie o link limpo, sem texto ao redor: apenas a URL. Exemplo: https://pay.hotmart.com/..."
   },
+  "regras_especiais": {
+    "credito_recorrente": "Se lead pedir pagamento sem comprometer limite do cartão (crédito recorrente): oferecer Flex primeiro. Se não atender, escalar para humano — existe link específico de crédito recorrente disponível apenas via atendimento humano.",
+    "enamed": "Não existe curso Enamed separado. O Extensive cobre TODAS as provas de residência médica (incluindo Enamed, ENARE, USP, Unifesp, SUS-SP, Revalida e todas as demais). Se lead mencionar Enamed, orientar que o Extensive já cobre 100% da prova com conteúdo mais completo.",
+    "cobertura_provas": "O Extensive é preparação completa para QUALQUER prova de residência médica R1 e REVALIDA. Não existe curso por prova específica."
+  },
   "escalation_triggers": [
-    "Lead pede desconto acima de 15%",
+    "Lead pede desconto acima de 5% (após reforço de valor)",
     "Lead quer falar com humano",
     "Lead tem situação especial (bolsa, convênio, grupo, empresa)",
     "Lead não responde por 2 mensagens seguidas após proposta",
-    "Oferta solicitada não tem link disponível"
+    "Oferta solicitada não tem link disponível",
+    "Lead insiste em condição fora das regras comerciais",
+    "Lead pede crédito recorrente e Flex não atende"
+  ],
+  "allowed_conditions": [
+    "Parcelamento em até 12x (conforme oferta)",
+    "Acesso imediato após pagamento aprovado",
+    "5% de desconto — SOMENTE se o lead pedir (nunca proativo)"
   ]
 }

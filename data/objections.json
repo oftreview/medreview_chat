@@ -24,9 +24,9 @@
       "tom": "empático, sem defender o preço — falar de valor",
       "resposta_padrao": "Entendo. Investimento em preparatório é sério. Me pergunto — quando você pensa em quanto custa mais um ano sem passar na residência, como você vê esse valor? Porque a maioria dos nossos alunos coloca na balança assim.",
       "resposta_alternativa": "Faz sentido querer ter certeza de que vale. Tem algo específico do que eu te apresentei que não ficou claro em termos de o que você vai ter? Às vezes o valor fica mais claro quando a gente vê o que está incluso de verdade.",
-      "desconto_proativo": "Não ofereça desconto proativamente. Se o lead insistir em preço: 'Olha, o máximo que consigo aqui é até 10% — mas isso depende de checar a condição exata. Você quer que eu veja o que consigo?' Se pedir acima de 10%: escale para humano.",
-      "quando_escalar": "Se lead pede desconto explícito acima de 10% ou tem situação especial (bolsa, grupo, convênio).",
-      "observacao": "Nunca inicie desconto. Só ofereça se o lead pedir explicitamente e dentro das regras comerciais."
+      "desconto_proativo": "NUNCA ofereça desconto por iniciativa própria. Se o lead pedir desconto: 1) Ofereça 5% à vista (link_avista_5off). 2) Se insistir em parcelado: ofereça 5% no 12x (link_12x_5off) como última carta. 3) Se pedir mais de 5%: reforce o valor do produto e, se continuar insistindo, escale para humano.",
+      "quando_escalar": "Se lead pede desconto acima de 5% após reforço de valor, ou tem situação especial (bolsa, grupo, convênio).",
+      "observacao": "Máximo de 5% de desconto. Cupom 5OFFR1 já está embutido nos links _5off. Nunca invente percentuais maiores."
     },
     {
       "id": "preciso-pensar",

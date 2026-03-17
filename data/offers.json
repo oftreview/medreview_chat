@@ -1,7 +1,29 @@
 {
   "vertical": "R1 - Residência Médica",
   "company": "MedReview",
-  "payment_conditions": "12x com juros ou 5% de desconto à vista",
+  "cupons": {
+    "sem_desconto": "BEMVINDO",
+    "desconto_5": "5OFFR1",
+    "nota": "BEMVINDO = cupom sem desconto (preço cheio). 5OFFR1 = cupom com 5% de desconto. Ambos são aplicados via offDiscount na URL Hotmart."
+  },
+  "regra_links": {
+    "padrao_4_variantes": "Cada oferta parcelável deve ter 4 links: link_12x, link_12x_5off, link_avista, link_avista_5off",
+    "excecao_flex": "Extensive Flex é assinatura mensal — aceita apenas link padrão e link com 5% de desconto",
+    "regra_credito_recorrente": "Se o lead pedir pagamento sem comprometer limite do cartão (crédito recorrente): oferecer Flex primeiro. Se não atender, escalar para humano — existe link específico de crédito recorrente disponível apenas via atendimento humano.",
+    "quando_enviar_desconto": "NUNCA enviar link com desconto (5OFFR1) por iniciativa própria. Somente se o lead pedir desconto explicitamente."
+  },
+  "prioridade_venda": {
+    "ordem": [
+      "1. Extensive (anual ou bianual conforme proximidade da prova)",
+      "2. Extensive Flex (primeiro downsell — assinatura mensal)",
+      "3. Banco de Questões + Flashcards (downsell final — somente como última carta)"
+    ],
+    "regra_extensive": "Se faltam ≤1 ano para a prova → indicar Extensive 2026. Se faltam >1 ano → indicar Extensive 2026/2027 (melhor custo-benefício).",
+    "cobertura_provas": "O Extensive cobre TODAS as provas de residência médica e REVALIDA. Não existe curso separado por prova — o Extensive é a preparação completa para qualquer prova R1, incluindo Enamed, ENARE, USP, Unifesp, SUS-SP e todas as demais.",
+    "regra_enamed": "Não existe mais curso Enamed separado. Se o lead mencionar Enamed, orientar que o Extensive já cobre 100% da prova do Enamed com conteúdo mais completo e aprofundado.",
+    "regra_downsell": "Só oferecer downsell se o lead recusar a oferta principal. Nunca começar por produto menor.",
+    "regra_banco_questoes": "Banco de questões isolado (LUX) só deve ser oferecido como último recurso de downsell, nunca como primeira opção."
+  },
   "offers": [
     {
       "id": "extensive-2026",
@@ -11,9 +33,12 @@
       "price_avista_display": "R$ 5.127 (5% off à vista)",
       "access": "1 ano",
       "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
-      "best_for": "Candidato focado na prova de 2026",
-      "link": "https://pay.hotmart.com/R91654048X?off=wi3tpwxq",
-      "link_avista": "https://pay.hotmart.com/R91654048X?off=ly65zo8a"
+      "best_for": "Candidato focado na prova de 2026 (≤1 ano até a prova)",
+      "prioridade": 1,
+      "link_12x": "https://pay.hotmart.com/R91654048X?off=8h0jsbyi&offDiscount=BEMVINDO",
+      "link_12x_5off": "https://pay.hotmart.com/R91654048X?off=8h0jsbyi&offDiscount=5OFFR1",
+      "link_avista": "https://pay.hotmart.com/R91654048X?off=ly65zo8a&offDiscount=BEMVINDO",
+      "link_avista_5off": "https://pay.hotmart.com/R91654048X?off=ly65zo8a&offDiscount=5OFFR1"
     },
     {
       "id": "extensive-2026-2027",
@@ -23,21 +48,12 @@
       "price_avista_display": "R$ 7.811 (5% off à vista)",
       "access": "2 anos",
       "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
-      "best_for": "Candidato que quer 2 anos de preparação completa, prova de 2026 e 2027",
-      "link": "https://pay.hotmart.com/R91654048X?off=rql0d4se",
-      "link_avista": "https://pay.hotmart.com/R91654048X?off=05s0xc31"
-    },
-    {
-      "id": "extensive-2026-recorrente",
-      "name": "Extensive 2026 — Mensal Recorrente",
-      "price": 5397,
-      "price_display": "R$ 5.397 (cobrado mensalmente)",
-      "price_avista_display": null,
-      "access": "1 ano",
-      "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
-      "best_for": "Candidato que prefere pagar mensalmente o plano anual completo",
-      "link": "https://pay.hotmart.com/R91654048X?off=8h0jsbyi",
-      "link_avista": null
+      "best_for": "Candidato que quer 2 anos de preparação completa (>1 ano até a prova)",
+      "prioridade": 1,
+      "link_12x": "https://pay.hotmart.com/R91654048X?off=rql0d4sei&offDiscount=BEMVINDO",
+      "link_12x_5off": "https://pay.hotmart.com/R91654048X?off=rql0d4se&offDiscount=5OFFR1",
+      "link_avista": "https://pay.hotmart.com/R91654048X?off=ly65zo8a&offDiscount=BEMVINDO",
+      "link_avista_5off": "https://pay.hotmart.com/R91654048X?off=ly65zo8a&offDiscount=5OFFR1"
     },
     {
       "id": "extensive-flex",
@@ -47,21 +63,13 @@
       "price_avista_display": null,
       "access": "Mensal — cancela quando quiser",
       "entregavel": "Curso Extensive + Sistema LUX Questões + Flashcards",
-      "best_for": "Candidato que prefere flexibilidade sem compromisso anual",
+      "best_for": "Candidato que prefere flexibilidade sem compromisso anual (primeiro downsell)",
+      "prioridade": 2,
       "link": "https://pay.hotmart.com/T101014755S?sck=HOTMART_PRODUCT_PAGE&off=1pulw8b7",
-      "link_avista": null
-    },
-    {
-      "id": "enamed",
-      "name": "Enamed",
-      "price": 97,
-      "price_display": "R$ 97",
-      "price_avista_display": null,
-      "access": "3 meses",
-      "entregavel": "Curso Enamed",
-      "best_for": "Candidato focado em intensivo de curta duração para o Enamed",
-      "link": "https://pay.hotmart.com/E100233236Q?off=ovc2s6qa",
-      "link_avista": null
+      "link_5off": null,
+      "link_avista": null,
+      "link_avista_5off": null,
+      "nota": "Assinatura mensal recorrente — sem opção à vista. Link com 5% de desconto não disponível — escalar para humano se lead pedir desconto no Flex."
     },
     {
       "id": "lux-anual",
@@ -71,9 +79,13 @@
       "price_avista_display": null,
       "access": "1 ano",
       "entregavel": "Banco completo de questões e flashcards",
-      "best_for": "Candidato que quer banco de questões e flashcards por 1 ano",
-      "link": null,
-      "link_avista": null
+      "best_for": "Downsell final — candidato que recusou Extensive e Flex",
+      "prioridade": 3,
+      "link_12x": null,
+      "link_12x_5off": null,
+      "link_avista": null,
+      "link_avista_5off": null,
+      "nota": "Sem link disponível — escalar para humano ao fechar"
     },
     {
       "id": "lux-semestral",
@@ -83,9 +95,13 @@
       "price_avista_display": null,
       "access": "6 meses",
       "entregavel": "Banco completo de questões e flashcards",
-      "best_for": "Candidato que quer banco de questões e flashcards por 6 meses",
-      "link": null,
-      "link_avista": null
+      "best_for": "Downsell final — candidato com prova próxima que recusou Extensive e Flex",
+      "prioridade": 3,
+      "link_12x": null,
+      "link_12x_5off": null,
+      "link_avista": null,
+      "link_avista_5off": null,
+      "nota": "Sem link disponível — escalar para humano ao fechar"
     },
     {
       "id": "lux-trimestral",
@@ -95,9 +111,13 @@
       "price_avista_display": null,
       "access": "3 meses",
       "entregavel": "Banco completo de questões e flashcards",
-      "best_for": "Candidato que quer banco de questões e flashcards por 3 meses",
-      "link": null,
-      "link_avista": null
+      "best_for": "Downsell final — candidato com prova iminente que recusou Extensive e Flex",
+      "prioridade": 3,
+      "link_12x": null,
+      "link_12x_5off": null,
+      "link_avista": null,
+      "link_avista_5off": null,
+      "nota": "Sem link disponível — escalar para humano ao fechar"
     }
   ]
 }

@@ -60,15 +60,6 @@
         { "q": "Posso parcelar?", "a": "Sim, em até 12x. À vista tem 5% de desconto." }
       ]
     },
-    "extensive-2026-recorrente": {
-      "nome_completo": "Extensive 2026 — Mensal Recorrente",
-      "descricao_curta": "Plano anual pago de forma mensal automática.",
-      "descricao_venda": "Mesmo conteúdo do Extensive 2026, mas com a cobrança distribuída mensalmente de forma recorrente. Para quem prefere não desembolsar o valor todo de uma vez.",
-      "para_quem_e": "Candidato que quer o plano completo mas prefere gestão de caixa mensal.",
-      "faq": [
-        { "q": "Qual a diferença para o parcelado comum?", "a": "O recorrente cobra mensalmente de forma automática. O parcelado é uma compra única dividida. No recorrente, o acesso depende da cobrança estar ativa." }
-      ]
-    },
     "extensive-flex": {
       "nome_completo": "Extensive Flex",
       "descricao_curta": "Plano mensal sem compromisso anual. Cancela quando quiser.",
@@ -85,23 +76,6 @@
       "faq": [
         { "q": "Posso cancelar a qualquer momento?", "a": "Sim. É um plano mensal sem fidelidade." },
         { "q": "Tem desconto pra pagar mais meses de uma vez?", "a": "Para compromisso mais longo, o Extensive 2026 (anual) costuma sair mais vantajoso." }
-      ]
-    },
-    "enamed": {
-      "nome_completo": "Intensivo Enamed",
-      "descricao_curta": "Preparação intensiva e focada para a prova Enamed em 3 meses.",
-      "descricao_venda": "Curso objetivo, sem enrolação, feito especificamente para quem vai fazer o Enamed. Conteúdo enxuto, direto ao ponto, com foco nas especialidades e formato da prova.",
-      "para_quem_e": "Candidato focado exclusivamente no Enamed com prazo curto para preparação.",
-      "features_detalhadas": [
-        "Conteúdo específico para o formato Enamed",
-        "Duração de 3 meses de acesso",
-        "Preço acessível: R$ 97",
-        "Objetivo: cobrir o essencial da prova sem dispersão"
-      ],
-      "observacao": "Não é o curso completo de R1 geral — é um intensivo focado no Enamed.",
-      "faq": [
-        { "q": "Serve para R1 geral?", "a": "O foco é no Enamed especificamente. Para R1 em geral, o Extensive é mais completo." },
-        { "q": "Qual a duração do acesso?", "a": "3 meses de acesso." }
       ]
     },
     "lux-anual": {
