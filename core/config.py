@@ -16,3 +16,8 @@ PORT = int(os.getenv("PORT", "5000"))
 ZAPI_INSTANCE_ID = os.getenv("ZAPI_INSTANCE_ID", "")
 ZAPI_TOKEN = os.getenv("ZAPI_TOKEN", "")
 ZAPI_CLIENT_TOKEN = os.getenv("ZAPI_CLIENT_TOKEN", "")
+
+# --- HubSpot ---
+HUBSPOT_ACCESS_TOKEN = os.getenv("HUBSPOT_ACCESS_TOKEN", "")
+HUBSPOT_PIPELINE_ID = os.getenv("HUBSPOT_PIPELINE_ID", "default")
+HUBSPOT_ENABLED = os.getenv("HUBSPOT_ENABLED", "false").lower() in ("true", "1", "yes")

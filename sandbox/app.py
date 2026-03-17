@@ -871,11 +871,70 @@ def api_logs():
     return jsonify({"logs": logs})
 
 
+# ── API: HubSpot (Fase 3) ────────────────────────────────────────────────────
+
+@app.route("/api/hubspot/status", methods=["GET"])
+def api_hubspot_status():
+    """Retorna status da integração HubSpot (habilitado, conectado, mapeamento)."""
+    from core import hubspot
+    return jsonify(hubspot.get_status()), 200
+
+
+@app.route("/api/hubspot/sync/<user_id>", methods=["POST"])
+def api_hubspot_sync(user_id):
+    """
+    Sync manual de um lead para o HubSpot.
+    Útil para reprocessar leads que falharam ou forçar atualização.
+    """
+    from core import hubspot
+    if not hubspot.is_enabled():
+        return jsonify({"error": "HubSpot não habilitado", "status": "error"}), 400
+
+    # Busca dados do lead
+    lead_data = agent.get_lead_data(user_id)
+    if not lead_data:
+        lead_data = database.get_lead_metadata(user_id) or {}
+
+    funnel_stage = lead_data.get("stage", lead_data.get("funnel_stage", "abertura"))
+
+    result = hubspot.sync_lead(
+        phone=user_id,
+        funnel_stage=funnel_stage,
+        lead_data=lead_data,
+    )
+    return jsonify({"status": "ok", "hubspot": result}), 200
+
+
+@app.route("/api/hubspot/mapping", methods=["GET", "POST"])
+def api_hubspot_mapping():
+    """
+    GET: retorna mapeamento atual de stages Criatons → HubSpot.
+    POST: atualiza mapeamento customizado.
+    Payload: { "abertura": "qualifiedtobuy", "fechamento": "closedwon", ... }
+    """
+    from core import hubspot
+    if request.method == "GET":
+        return jsonify({"mapping": hubspot._get_stage_map()}), 200
+
+    data = request.get_json(silent=True) or {}
+    hubspot.set_stage_mapping(data)
+    return jsonify({"status": "ok", "mapping": hubspot._get_stage_map()}), 200
+
+
 # ── Health checks ─────────────────────────────────────────────────────────────
 
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok", "version": "1.0"})
+
+
+@app.route("/health/hubspot", methods=["GET"])
+def health_hubspot():
+    """Testa conexão com o HubSpot."""
+    from core import hubspot
+    status = hubspot.get_status()
+    code = 200 if status["connected"] else (200 if not status["enabled"] else 500)
+    return jsonify(status), code
 
 
 @app.route("/health/security", methods=["GET"])

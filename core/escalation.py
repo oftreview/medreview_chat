@@ -144,6 +144,14 @@ def handle_escalation(lead_phone: str, agent_memory, lead_name: str = "Lead",
     # 4. Notifica supervisor com brief rico
     notify_supervisor(lead_phone, brief)
 
+    # 5. Sync escalação para HubSpot (se habilitado)
+    try:
+        from core import hubspot
+        if hubspot.is_enabled():
+            hubspot.sync_escalation(lead_phone, brief)
+    except Exception as e:
+        print(f"[ESCALATION HUBSPOT WARN] Sync falhou: {e}", flush=True)
+
 
 def resolve_escalation(lead_phone: str, agent_memory, resolution: str = None) -> None:
     """

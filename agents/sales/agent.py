@@ -183,6 +183,18 @@ class SalesAgent:
             from core import database
             database.save_lead_metadata(session_id, self._lead_data[session_id])
 
+            # Sync para HubSpot (assíncrono, não bloqueia a resposta)
+            try:
+                from core import hubspot
+                if hubspot.is_enabled():
+                    hubspot.sync_lead(
+                        phone=session_id,
+                        funnel_stage=metadata.get("stage", "desconhecido"),
+                        lead_data=self._lead_data[session_id],
+                    )
+            except Exception as e:
+                print(f"[AGENT HUBSPOT WARN] Sync falhou: {e}", flush=True)
+
         # ── Detecção de escalação ──────────────────────────────────────────
         escalate = response_text.strip().startswith(ESCALATION_TAG)
 
