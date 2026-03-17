@@ -321,6 +321,9 @@ def chat():
             # Mas registra para auditoria
             print(f"[SECURITY] Injection pattern detectado de {hash_user_id(user_id)}", flush=True)
 
+        # ── Salva mensagem bruta ANTES do debounce (proteção contra perda) ───
+        database.save_raw_incoming(user_id, message, channel=channel)
+
         # ── Debounce indexado por session_id ──────────────────────────────────
         with _chat_lock:
             if session_id not in _chat_state:
@@ -402,6 +405,9 @@ def chat():
     is_suspicious, patterns = check_injection_patterns(user_message)
     if is_suspicious:
         log_security_event("INJECTION_DETECTED", session_id, {"patterns": patterns, "source": "sandbox"})
+
+    # ── Salva mensagem bruta ANTES do debounce (proteção contra perda) ───
+    database.save_raw_incoming(session_id, user_message, channel="sandbox")
 
     # ── Debounce (mesma lógica do API mode) ───────────────────────────────
     with _chat_lock:
@@ -571,6 +577,9 @@ def webhook_zapi():
     if escalation.is_escalated(phone, agent.memory):
         print(f"[ZAPI WEBHOOK] Sessão uid={phone_hash} em atendimento humano — IA pausada.", flush=True)
         return jsonify({"status": "escalated_session"}), 200
+
+    # ── Salva mensagem bruta ANTES do debounce (proteção contra perda) ───
+    database.save_raw_incoming(phone, message, channel="whatsapp")
 
     # ── Debounce: acumula mensagens por RESPONSE_DELAY_SECONDS ────────────
     with _zapi_lock:
@@ -842,16 +851,20 @@ def health_security():
 
 @app.route("/health/db", methods=["GET"])
 def health_db():
-    """Testa conexão com o Supabase."""
-    if not database.is_enabled():
-        return jsonify({"status": "disabled", "message": "SUPABASE_URL/KEY não configurados"}), 200
-    try:
-        from supabase import create_client
-        db = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
-        result = db.table("leads").select("id").limit(1).execute()
-        return jsonify({"status": "ok", "message": "Supabase conectado ✅", "leads_count": len(result.data)}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    """Testa conexão real com o Supabase (leitura + escrita + delete)."""
+    result = database.health_check()
+    status_code = 200 if result["connected"] else (200 if not result["enabled"] else 500)
+    return jsonify(result), status_code
+
+
+@app.route("/health/memory", methods=["GET"])
+def health_memory():
+    """Retorna estatísticas de memória e persistência."""
+    return jsonify({
+        "status": "ok",
+        "memory": agent.memory.db_stats(),
+        "db_connection": database.get_connection_status(),
+    }), 200
 
 
 if __name__ == "__main__":
