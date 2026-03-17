@@ -20,6 +20,13 @@ def create_app():
         static_folder=os.path.join(_SRC_DIR, "static"),
     )
 
+    # Install log capture (stdout/stderr → ring buffer for /api/logs)
+    try:
+        from src.core.log_buffer import install as install_log_capture
+        install_log_capture()
+    except Exception:
+        pass
+
     # Register all blueprints
     from src.api import register_blueprints
     register_blueprints(app)
