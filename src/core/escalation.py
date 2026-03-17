@@ -140,7 +140,7 @@ def handle_escalation(lead_phone: str, agent_memory, lead_name: str = "Lead",
 
     # 5. Sync escalação para HubSpot (se habilitado)
     try:
-        from core import hubspot
+        from src.core import hubspot
         if hubspot.is_enabled():
             hubspot.sync_escalation(lead_phone, brief)
     except Exception as e:

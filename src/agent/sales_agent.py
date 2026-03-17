@@ -181,12 +181,12 @@ class SalesAgent:
             print(f"[AGENT META] session={session_id[:8]}... stage={stage} dados={metadata}", flush=True)
 
             # Salva metadados no banco de dados
-            from core import database
+            from src.core import database
             database.save_lead_metadata(session_id, self._lead_data[session_id])
 
             # Sync para HubSpot (assíncrono, não bloqueia a resposta)
             try:
-                from core import hubspot
+                from src.core import hubspot
                 if hubspot.is_enabled():
                     hubspot.sync_lead(
                         phone=session_id,
