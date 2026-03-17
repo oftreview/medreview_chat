@@ -1,5 +1,9 @@
 # Criatons — Plano de Refatoração Completa
 
+> **STATUS: CONCLUÍDO** — Todos os 5 steps executados em 17/03/2026.
+> Código legado (`sandbox/`, `core/`, `agents/`) ainda existe para referência mas não é mais usado.
+> O entrypoint de produção é `src.app:app` via `gunicorn.conf.py`.
+
 ## Diagnóstico: Problemas Atuais
 
 ### 1. `sandbox/app.py` é um monolito (1.124 linhas)
@@ -152,7 +156,7 @@ Pensado para começar hoje e terminar amanhã.
 
 ---
 
-### STEP 1 — Fundação: Estrutura `src/` e Configuração
+### STEP 1 — Fundação: Estrutura `src/` e Configuração ✅
 **Tempo estimado: 20 min · Risco: Baixo**
 
 O alicerce. Cria a nova estrutura de pastas e centraliza toda a configuração que hoje está espalhada.
@@ -172,7 +176,7 @@ O alicerce. Cria a nova estrutura de pastas e centraliza toda a configuração q
 
 ---
 
-### STEP 2 — Backend: Quebrar os Dois Monolitos
+### STEP 2 — Backend: Quebrar os Dois Monolitos ✅
 **Tempo estimado: 60 min · Risco: Alto (maior concentração de mudanças)**
 
 O coração da refatoração. Quebra os dois arquivos gigantes (`app.py` e `database.py`) em módulos menores.
@@ -193,7 +197,7 @@ O coração da refatoração. Quebra os dois arquivos gigantes (`app.py` e `data
 
 ---
 
-### STEP 3 — Frontend: Templates e CSS
+### STEP 3 — Frontend: Templates e CSS ✅
 **Tempo estimado: 20 min · Risco: Baixo**
 
 Organiza o frontend e elimina repetição de CSS entre as páginas.
@@ -211,7 +215,7 @@ Organiza o frontend e elimina repetição de CSS entre as páginas.
 
 ---
 
-### STEP 4 — Infraestrutura: Deploy e Testes
+### STEP 4 — Infraestrutura: Deploy e Testes ✅
 **Tempo estimado: 20 min · Risco: Médio**
 
 Atualiza tudo que faz o app rodar (Docker, start.sh) e moderniza os testes.
@@ -232,7 +236,7 @@ Atualiza tudo que faz o app rodar (Docker, start.sh) e moderniza os testes.
 
 ---
 
-### STEP 5 — Documentação: README e API Reference
+### STEP 5 — Documentação: README e API Reference ✅
 **Tempo estimado: 20 min · Risco: Zero**
 
 A camada de polimento para a apresentação. Nenhum código muda.
