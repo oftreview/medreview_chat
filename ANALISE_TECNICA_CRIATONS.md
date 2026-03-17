@@ -49,11 +49,6 @@
 - Detecção de escalação no `agent.py` por keywords na resposta ("vou conectar você com", "consultor humano").
 - Endpoint `/leads/escalated` para listar sessões em atendimento humano.
 
-**Pipeline de análise (`botmaker_pipeline/`):**
-- Extrator de conversas da API Botmaker com paginação, retry e rate limiting.
-- Analisador que classifica conversas (compra, objeção, dúvida), extrai padrões e gera exemplos few-shot.
-- Útil para alimentar o prompt com dados reais de vendas.
-
 ### 1.2 O que está incompleto, frágil ou com débito técnico
 
 **1. System prompt com tamanho excessivo (`agent.py:load_context()`):**
@@ -289,7 +284,7 @@ print(f"[ZAPI WEBHOOK] Payload recebido: {data}", flush=True)
 4. A/B testing de variações do prompt (abertura, fechamento, contorno de objeções)
 5. Dashboard completo: funil por estágio, taxa de conversão por oferta, tempo médio por etapa, objeções mais frequentes, performance do follow-up
 6. Integração Botmaker para transferência direta (quando API estiver disponível)
-7. Few-shot examples reais no prompt (usando output do `botmaker_analyzer.py` com dados de conversas reais)
+7. Few-shot examples reais no prompt (usando dados de conversas reais)
 8. Desconto dinâmico dentro das regras comerciais (o agente calcula e aplica até 10% sem escalar)
 9. Detecção de áudio/imagem no WhatsApp com resposta adequada ("Vi que mandou um áudio, pode me escrever por texto?")
 10. Rate limiting persistente (Redis ou Supabase) para sobreviver a restarts
