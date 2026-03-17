@@ -229,6 +229,130 @@ def update_session_status(session_id: str, status: str) -> bool:
         return False
 
 
+# ── Lead Metadata (qualification_data + funnel_stage) ─────────────────────────
+
+def save_lead_metadata(user_id: str, metadata: dict) -> bool:
+    """
+    Salva/atualiza metadados do lead (funnel_stage, especialidade, prova, etc).
+    Faz upsert na tabela lead_metadata por user_id.
+    """
+    db = _get_client()
+    if db is None:
+        return False
+
+    try:
+        row = {"user_id": user_id}
+        # Mapeia campos conhecidos
+        field_map = {
+            "stage": "funnel_stage",
+            "especialidade": "especialidade",
+            "prova": "prova_alvo",
+            "ano_prova": "ano_prova",
+            "ja_estuda": "ja_estuda",
+            "plataforma_atual": "plataforma_atual",
+        }
+        for meta_key, db_key in field_map.items():
+            if meta_key in metadata and metadata[meta_key] is not None:
+                row[db_key] = metadata[meta_key]
+
+        db.table("lead_metadata").upsert(row, on_conflict="user_id").execute()
+        return True
+    except Exception as e:
+        print(f"[DB WARN] save_lead_metadata user={user_id[:8]}...: {e}", flush=True)
+        return False
+
+
+def get_lead_metadata(user_id: str) -> dict:
+    """Carrega metadados do lead do banco."""
+    db = _get_client()
+    if db is None:
+        return {}
+
+    try:
+        result = (
+            db.table("lead_metadata")
+            .select("*")
+            .eq("user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        if result.data:
+            return result.data[0]
+        return {}
+    except Exception as e:
+        print(f"[DB WARN] get_lead_metadata: {e}", flush=True)
+        return {}
+
+
+# ── Escalações ────────────────────────────────────────────────────────────────
+
+def save_escalation(user_id: str, motivo: str, brief: dict,
+                    session_id: str = None) -> bool:
+    """
+    Registra uma escalação na tabela escalations.
+    O brief contém o resumo da conversa + dados do lead para o vendedor.
+    """
+    db = _get_client()
+    if db is None:
+        print(f"[DB ERROR] save_escalation — DB não conectado", flush=True)
+        return False
+
+    try:
+        import json as _json
+        db.table("escalations").insert({
+            "user_id": user_id,
+            "session_id": session_id,
+            "motivo": motivo,
+            "brief": _json.dumps(brief, ensure_ascii=False),
+            "status": "pending",
+        }).execute()
+        print(f"[DB] Escalação registrada: user={user_id[:8]}... motivo={motivo}", flush=True)
+        return True
+    except Exception as e:
+        print(f"[DB ERROR] save_escalation: {e}", flush=True)
+        return False
+
+
+def resolve_escalation_record(user_id: str, resolution: str = None) -> bool:
+    """Marca a escalação mais recente como resolvida."""
+    db = _get_client()
+    if db is None:
+        return False
+
+    try:
+        db.table("escalations").update({
+            "status": "resolved",
+            "resolution": resolution,
+            "resolved_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("user_id", user_id).eq("status", "pending").execute()
+        return True
+    except Exception as e:
+        print(f"[DB WARN] resolve_escalation_record: {e}", flush=True)
+        return False
+
+
+def list_escalations(status: str = None, limit: int = 50) -> list:
+    """Lista escalações. Se status fornecido, filtra por status."""
+    db = _get_client()
+    if db is None:
+        return []
+
+    try:
+        query = (
+            db.table("escalations")
+            .select("*")
+            .order("created_at", desc=True)
+            .limit(limit)
+        )
+        if status:
+            query = query.eq("status", status)
+        result = query.execute()
+        return result.data or []
+    except Exception as e:
+        print(f"[DB WARN] list_escalations: {e}", flush=True)
+        return []
+
+
 # ── Legado (deprecado — usar save_message) ────────────────────────────────────
 
 def save_message_legacy(phone: str, role: str, content: str) -> bool:

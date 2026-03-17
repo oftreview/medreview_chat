@@ -105,7 +105,7 @@ def _check_secret_command(message: str, user_id: str) -> dict | None:
 
     if normalized == ESCALATE_COMMAND:
         # Escalar: marca sessão como "escalated", IA para de responder
-        escalation.handle_escalation(user_id, agent.memory, lead_name="Lead")
+        escalation.handle_escalation(user_id, agent.memory, agent=agent, motivo="comando_manual")
         print(f"[SECRET CMD] ESCALAÇÃO MANUAL ativada para uid={hash_user_id(user_id)}", flush=True)
         return {
             "response": ESCALATE_CONFIRM_MSG,
@@ -508,8 +508,10 @@ def _zapi_flush(phone: str):
             log_security_event("OUTPUT_FILTERED", hash_user_id(phone), {"redactions": redactions})
 
         if result.get("escalate"):
-            lead_name = agent.memory.get(phone)[0].get("content", "Lead") if agent.memory.get(phone) else "Lead"
-            escalation.handle_escalation(phone, agent.memory, lead_name)
+            motivo = result.get("lead_data", {}).get("motivo_escalacao", "nao_especificado")
+            escalation.handle_escalation(
+                phone, agent.memory, agent=agent, motivo=motivo
+            )
 
         # Quebra em múltiplas mensagens e envia com delay entre elas
         parts = split_response(reply_text)
@@ -707,11 +709,12 @@ def escalation_resolve():
     """Devolve o controle da conversa para a IA após atendimento humano."""
     data = request.get_json(silent=True) or {}
     phone = data.get("phone", "").strip()
+    resolution = data.get("resolution", "").strip() or None
     if not phone:
         return jsonify({"error": "Campo 'phone' obrigatório"}), 400
 
-    escalation.resolve_escalation(phone, agent.memory)
-    return jsonify({"status": "ok", "message": f"Sessão {phone} retornada para IA."}), 200
+    escalation.resolve_escalation(phone, agent.memory, resolution=resolution)
+    return jsonify({"status": "ok", "message": f"Sessão {phone[:8]}... retornada para IA."}), 200
 
 
 @app.route("/leads/escalated", methods=["GET"])
@@ -722,6 +725,40 @@ def leads_escalated():
         if agent.memory.get_status(s) == "escalated"
     ]
     return jsonify({"escalated": escalated, "count": len(escalated)}), 200
+
+
+# ── API: Escalações (Fase 2) ────────────────────────────────────────────────
+
+@app.route("/api/escalations", methods=["GET"])
+def api_escalations():
+    """
+    Lista escalações do banco de dados.
+    Query params: status (pending|resolved), limit (default 50)
+    """
+    status_filter = request.args.get("status", None)
+    limit = int(request.args.get("limit", 50))
+    escalations = database.list_escalations(status=status_filter, limit=limit)
+    return jsonify({"escalations": escalations, "count": len(escalations)}), 200
+
+
+@app.route("/api/lead/<user_id>", methods=["GET"])
+def api_lead_data(user_id):
+    """
+    Retorna metadados coletados de um lead (funnel_stage, especialidade, etc).
+    Busca primeiro em memória (agent), depois no banco.
+    """
+    # Tenta dados em memória (mais recentes)
+    lead_data = agent.get_lead_data(user_id)
+
+    # Se não tem em memória, busca no banco
+    if not lead_data:
+        lead_data = database.get_lead_metadata(user_id)
+
+    return jsonify({
+        "user_id": user_id,
+        "lead_data": lead_data,
+        "source": "memory" if agent.get_lead_data(user_id) else "database",
+    }), 200
 
 
 # ── API: Correções do Agente ──────────────────────────────────────────────────
