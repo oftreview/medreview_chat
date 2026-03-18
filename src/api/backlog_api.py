@@ -1,13 +1,18 @@
 """
 src/api/backlog_api.py — Product backlog management endpoints.
-CRUD + analytics + reorder for backlog items with RICE prioritization.
+CRUD + analytics + reorder + trash for backlog items with RICE prioritization.
 """
 from flask import Blueprint, request, jsonify
 
 from src.core.database.backlog import (
     load_backlog,
+    load_trash,
     save_backlog_item,
     delete_backlog_item,
+    restore_backlog_item,
+    permanent_delete_item,
+    empty_trash,
+    auto_cleanup_trash,
     get_next_item_id,
     reorder_backlog,
     backlog_analytics,
@@ -20,11 +25,12 @@ bp = Blueprint("backlog_api", __name__)
 @bp.route("/api/backlog", methods=["GET"])
 def api_backlog_list():
     """
-    Lista itens do backlog.
+    Lista itens do backlog (exclui lixeira).
     Query params: status, phase
     """
-    # Seed on first access if empty
     seed_backlog_if_empty()
+    # Auto-cleanup trash older than 30 days
+    auto_cleanup_trash(days=30)
 
     status = request.args.get("status")
     phase = request.args.get("phase")
@@ -51,7 +57,7 @@ def api_backlog_save():
         "item_id": data["item_id"],
         "title": title,
         "description": data.get("description", ""),
-        "item_type": data.get("item_type", "feature"),
+        "item_type": data.get("item_type", "feat"),
         "module": data.get("module", "core"),
         "status": data.get("status", "backlog"),
         "phase": data.get("phase", "Phase 2"),
@@ -74,13 +80,11 @@ def api_backlog_update(item_id):
     """Atualiza campos específicos de um item."""
     data = request.get_json(silent=True) or {}
 
-    # Carrega item atual
-    items = load_backlog()
+    items = load_backlog(include_deleted=True)
     current = next((i for i in items if i.get("item_id") == item_id), None)
     if not current:
         return jsonify({"error": "Item não encontrado"}), 404
 
-    # Merge com dados novos
     for key in ["title", "description", "item_type", "module", "status",
                 "phase", "estimate", "dependencies", "notes"]:
         if key in data:
@@ -101,9 +105,37 @@ def api_backlog_update(item_id):
 
 @bp.route("/api/backlog/<item_id>", methods=["DELETE"])
 def api_backlog_delete(item_id):
-    """Remove um item do backlog."""
+    """Soft delete — move para lixeira."""
     ok = delete_backlog_item(item_id)
     return jsonify({"status": "ok" if ok else "error", "item_id": item_id})
+
+
+@bp.route("/api/backlog/trash", methods=["GET"])
+def api_backlog_trash():
+    """Lista itens na lixeira."""
+    items = load_trash()
+    return jsonify({"items": items, "total": len(items)})
+
+
+@bp.route("/api/backlog/<item_id>/restore", methods=["POST"])
+def api_backlog_restore(item_id):
+    """Restaura item da lixeira."""
+    ok = restore_backlog_item(item_id)
+    return jsonify({"status": "ok" if ok else "error", "item_id": item_id})
+
+
+@bp.route("/api/backlog/<item_id>/permanent-delete", methods=["DELETE"])
+def api_backlog_permanent_delete(item_id):
+    """Exclusão permanente de um item."""
+    ok = permanent_delete_item(item_id)
+    return jsonify({"status": "ok" if ok else "error", "item_id": item_id})
+
+
+@bp.route("/api/backlog/trash/empty", methods=["POST"])
+def api_backlog_empty_trash():
+    """Esvazia a lixeira completamente."""
+    count = empty_trash()
+    return jsonify({"status": "ok", "deleted": count})
 
 
 @bp.route("/api/backlog/reorder", methods=["POST"])

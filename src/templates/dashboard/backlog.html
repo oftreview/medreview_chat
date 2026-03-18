@@ -62,7 +62,7 @@
 }
 .rice-info-btn:hover { background:rgba(37,99,235,0.3); }
 .rice-tooltip {
-  display:none; position:absolute; top:100%; right:0; margin-top:8px;
+  display:none; position:absolute; top:100%; left:0; margin-top:8px;
   background:var(--surface); border:1px solid var(--border); border-radius:12px;
   padding:16px; width:320px; z-index:50; font-size:12px; line-height:1.6;
   box-shadow:0 8px 32px rgba(0,0,0,0.4);
@@ -275,6 +275,20 @@ tr:hover .row-actions { opacity:1; }
 }
 .expanded-content textarea:focus { outline:none; border-color:var(--primary); }
 
+/* ── Trash View ── */
+.trash-restore-btn {
+  background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3);
+  color:var(--primary-light); padding:4px 10px; border-radius:6px;
+  font-size:11px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.trash-restore-btn:hover { background:rgba(37,99,235,0.2); }
+.trash-delete-btn {
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+  color:var(--red); padding:4px 10px; border-radius:6px;
+  font-size:11px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.trash-delete-btn:hover { background:rgba(239,68,68,0.2); }
+
 /* ── Screenshot Upload ── */
 .screenshot-zone {
   border:2px dashed var(--border); border-radius:8px; padding:16px;
@@ -298,7 +312,7 @@ tr:hover .row-actions { opacity:1; }
   <div class="page-title">
     <h1>Backlog</h1>
     <div style="position:relative">
-      <button class="rice-info-btn" onclick="toggleRiceInfo()">? O que é RICE</button>
+      <button class="rice-info-btn" onclick="toggleRiceInfo()">O que é RICE ?</button>
       <div class="rice-tooltip" id="riceTooltip">
         <h4>RICE Scoring</h4>
         <p style="color:var(--text-dim)">Um método pra decidir o que construir primeiro, baseado em 4 fatores:</p>
@@ -379,6 +393,9 @@ tr:hover .row-actions { opacity:1; }
       <option value="data">Data</option><option value="devops">DevOps</option>
     </select>
     <div class="toolbar-spacer"></div>
+    <button class="btn-ghost" id="trashToggle" onclick="toggleTrash()" style="font-size:11px">
+      🗑 Lixeira <span id="trashCount" style="font-size:10px;opacity:0.7"></span>
+    </button>
     <div class="view-toggle">
       <button class="view-btn active" onclick="setView('table',this)">Tabela</button>
       <button class="view-btn" onclick="setView('kanban',this)">Kanban</button>
@@ -413,6 +430,24 @@ tr:hover .row-actions { opacity:1; }
 
   <!-- ── Kanban View ── -->
   <div class="kanban-container" id="kanbanView"></div>
+
+  <!-- ── Trash View ── -->
+  <div class="backlog-scroll" id="trashView" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 0 12px">
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;color:var(--text-dim)">🗑 Lixeira</h3>
+      <span style="font-size:11px;color:var(--text-dim)">Itens excluídos ficam aqui por 30 dias</span>
+      <div style="flex:1"></div>
+      <button class="btn-ghost" onclick="emptyTrashAction()" style="font-size:11px;color:var(--red);border-color:rgba(239,68,68,0.3)">Esvaziar lixeira</button>
+    </div>
+    <table class="backlog-table">
+      <thead><tr>
+        <th style="width:70px">ID</th><th>Título</th><th style="width:90px">Tipo</th>
+        <th style="width:140px">Excluído em</th><th style="width:120px">Ações</th>
+      </tr></thead>
+      <tbody id="trashBody"></tbody>
+    </table>
+    <div id="trashEmpty" style="display:none;text-align:center;padding:40px;color:var(--text-dim);font-size:13px">Lixeira vazia</div>
+  </div>
 </div>
 
 <!-- ── Context Menu ── -->
@@ -731,7 +766,7 @@ function renderTable(items) {
     <tr data-id="${esc(i.item_id)}" draggable="true"
         ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropRow(event)" ondragend="dragEnd(event)">
       <td><input type="checkbox" class="row-check" data-id="${esc(i.item_id)}" ${checked} onchange="toggleSelect(this)"></td>
-      <td><span class="drag-handle" onclick="showCtxMenu(event,'${esc(i.item_id)}')">⠿</span></td>
+      <td><span class="drag-handle" draggable="true" ondragstart="dragStart(event)" oncontextmenu="showCtxMenu(event,'${esc(i.item_id)}');return false" onclick="showCtxMenu(event,'${esc(i.item_id)}')">⠿</span></td>
       <td><span style="font-size:10px;color:var(--text-dim);font-weight:600">${esc(i.item_id)}</span></td>
       <td>
         <div class="cell-title editable" contenteditable="true" data-id="${esc(i.item_id)}" data-field="title" onblur="inlineEdit(this)">${esc(i.title)}</div>
@@ -967,7 +1002,66 @@ function exportBacklog() {
   a.href=URL.createObjectURL(blob); a.download='closi-ai-backlog.md'; a.click();
 }
 
+// ── Trash ──
+let showingTrash = false;
+
+async function toggleTrash() {
+  showingTrash = !showingTrash;
+  document.getElementById('tableView').style.display = showingTrash ? 'none' : (currentView==='table'?'block':'none');
+  document.getElementById('kanbanView').classList.toggle('active', !showingTrash && currentView==='kanban');
+  document.getElementById('trashView').style.display = showingTrash ? 'block' : 'none';
+  document.getElementById('trashToggle').style.background = showingTrash ? 'rgba(239,68,68,0.1)' : '';
+  document.getElementById('trashToggle').style.borderColor = showingTrash ? 'rgba(239,68,68,0.3)' : '';
+  document.getElementById('trashToggle').style.color = showingTrash ? 'var(--red)' : '';
+  if (showingTrash) await loadTrash();
+}
+
+async function loadTrash() {
+  try {
+    const r = await fetch('/api/backlog/trash');
+    const data = await r.json();
+    const items = data.items || [];
+    document.getElementById('trashEmpty').style.display = items.length ? 'none' : 'block';
+    document.getElementById('trashBody').innerHTML = items.map(i => `
+      <tr>
+        <td style="font-size:10px;color:var(--text-dim);font-weight:600">${esc(i.item_id)}</td>
+        <td>${esc(i.title)}</td>
+        <td><span class="type-badge ${i.item_type}">${i.item_type}</span></td>
+        <td style="font-size:11px;color:var(--text-dim)">${i.deleted_at ? new Date(i.deleted_at).toLocaleDateString('pt-BR') : ''}</td>
+        <td style="display:flex;gap:6px">
+          <button class="trash-restore-btn" onclick="restoreItem('${esc(i.item_id)}')">Restaurar</button>
+          <button class="trash-delete-btn" onclick="permDeleteItem('${esc(i.item_id)}')">Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('trashCount').textContent = items.length ? `(${items.length})` : '';
+  } catch(e) { console.error('loadTrash:', e); }
+}
+
+async function restoreItem(id) {
+  await fetch(`/api/backlog/${id}/restore`, { method:'POST' });
+  await loadTrash();
+  await loadBacklog();
+}
+
+async function permDeleteItem(id) {
+  if (!confirm(`Excluir ${id} permanentemente? Essa ação não pode ser desfeita.`)) return;
+  await fetch(`/api/backlog/${id}/permanent-delete`, { method:'DELETE' });
+  await loadTrash();
+}
+
+async function emptyTrashAction() {
+  if (!confirm('Esvaziar lixeira? Todos os itens serão excluídos permanentemente.')) return;
+  await fetch('/api/backlog/trash/empty', { method:'POST' });
+  await loadTrash();
+}
+
 // ── Init ──
 loadBacklog();
+// Load trash count on init
+fetch('/api/backlog/trash').then(r=>r.json()).then(d=>{
+  const c = (d.items||[]).length;
+  document.getElementById('trashCount').textContent = c ? `(${c})` : '';
+}).catch(()=>{});
 </script>
 {% endblock %}
