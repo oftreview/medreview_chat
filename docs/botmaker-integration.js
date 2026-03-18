@@ -1,5 +1,5 @@
 /**
- * CLOSI AI — Integração Botmaker ↔ IA (v2)
+ * CLOSI AI — Integração Botmaker ↔ IA (v3)
  * ==========================================
  * Cole este código no nó "Executar código" (Node.js) da Botmaker.
  *
@@ -7,20 +7,25 @@
  *   user_message  — mensagem digitada pelo lead (string, setada pelo nó anterior)
  *   contact       — objeto do contato Botmaker (contém whatsApp, phone, name, etc.)
  *
- * VARIÁVEL DE SAÍDA (disponível nos nós seguintes):
- *   IA_response   — resposta gerada pelo agente Closi AI (string)
- *   IA_status     — status da resposta: "success" | "error" (string)
+ * VARIÁVEIS DE SAÍDA (disponíveis nos nós seguintes):
+ *   IA_response       — resposta principal da IA (string)
+ *   IA_responses      — array com todas as partes da resposta (array de strings)
+ *   IA_status         — "success" | "error" | "escalated" (string)
+ *   IA_has_multipart  — true se a resposta tem mais de 1 parte (boolean)
+ *   IA_delay_seconds  — delay recomendado entre partes, em segundos (number)
  *
  * CONFIGURAÇÃO:
- *   1. No Railway, defina API_SECRET_TOKEN nas variáveis de ambiente
+ *   1. No Railway do Closi AI, a variável API_SECRET_TOKEN já está configurada
  *   2. Substitua CLOSI_AI_TOKEN abaixo pelo mesmo token
  *      (ou configure como variável de ambiente na Botmaker se disponível)
  *   3. Ajuste CLOSI_AI_URL se o domínio do Railway mudar
  *
- * COMO FUNCIONA:
- *   Botmaker recebe msg do WhatsApp → este nó envia para o Closi AI →
- *   Closi AI processa com Claude (com debounce de 10s) → retorna resposta →
- *   IA_response fica disponível para o próximo nó enviar ao lead.
+ * CHANGELOG v3 (2026-03):
+ *   - Tratamento de sessão escalada (handoff para humano)
+ *   - Suporte a respostas multi-part (responses[])
+ *   - Variável IA_status agora inclui "escalated"
+ *   - Novas variáveis de saída: IA_responses, IA_has_multipart, IA_delay_seconds
+ *   - Log estruturado com prefixo [Closi AI]
  */
 
 // ── Configuração ──────────────────────────────────────────────────────────────
@@ -28,12 +33,14 @@
 const CLOSI_AI_URL   = "https://web-production-63ae4.up.railway.app/chat";
 const CLOSI_AI_TOKEN = process.env.CLOSI_AI_TOKEN || "SEU_API_SECRET_TOKEN_AQUI";
 
-// Timeout: debounce (10s) + Claude (~5s) + margem (10s) = 25s
-// Em caso de retry interno do Closi AI, pode chegar a 30s
+// Timeout: debounce (10s) + Claude (~5s) + margem (15s) = 30s
 const TIMEOUT_MS = 30000;
 
 // Mensagem exibida ao lead quando a IA falha
 const FALLBACK_MSG = "Estou com uma instabilidade agora, em breve um consultor vai te atender.";
+
+// Mensagem exibida quando a sessão está em atendimento humano
+const ESCALATED_MSG = "Você está sendo atendido por um de nossos consultores. Aguarde, por favor!";
 
 // ── Função principal: envia mensagem para o Closi AI ─────────────────────────
 
@@ -83,13 +90,41 @@ async function askClosiAI(userId, message) {
         // ── Parsear resposta JSON ─────────────────────────────────────
         try {
           const parsed = JSON.parse(data);
-          if (parsed.status === "error" || !parsed.response) {
-            // IA retornou fallback interno (Claude falhou, Supabase off, etc.)
-            // Ainda usa a resposta — é o fallback amigável do Closi AI
-            resolve(parsed.response || FALLBACK_MSG);
-          } else {
-            resolve(parsed.response);
+
+          // Sessão escalada: lead está em atendimento humano, IA pausada
+          if (parsed.status === "escalated_session") {
+            resolve({
+              response:      ESCALATED_MSG,
+              responses:     [ESCALATED_MSG],
+              status:        "escalated",
+              delaySeconds:  0,
+            });
+            return;
           }
+
+          // Comandos de escalação/desescalação executados
+          if (parsed.command === "escalate" || parsed.command === "deescalate") {
+            resolve({
+              response:      parsed.response || "",
+              responses:     [parsed.response || ""],
+              status:        parsed.status || "success",
+              delaySeconds:  0,
+            });
+            return;
+          }
+
+          // Resposta normal (sucesso ou erro interno com fallback)
+          const mainResponse = parsed.response || FALLBACK_MSG;
+          const allResponses = parsed.responses || [mainResponse];
+          const delaySeconds = parsed.delay_seconds || 0;
+
+          resolve({
+            response:      mainResponse,
+            responses:     allResponses,
+            status:        parsed.status === "error" ? "error" : "success",
+            delaySeconds:  delaySeconds,
+          });
+
         } catch (e) {
           reject(new Error("[PARSE] Resposta inválida da IA: " + data.substring(0, 200)));
         }
@@ -120,20 +155,41 @@ const mensagem = user_message || "";
 
 if (!contato) {
   console.error("[Closi AI] Erro: não foi possível identificar o contato (sem whatsApp/phone/user_id)");
-  IA_response = FALLBACK_MSG;
-  IA_status = "error";
+  IA_response      = FALLBACK_MSG;
+  IA_responses     = [FALLBACK_MSG];
+  IA_status        = "error";
+  IA_has_multipart = false;
+  IA_delay_seconds = 0;
 } else if (!mensagem) {
   console.error("[Closi AI] Erro: mensagem vazia (user_message não definido)");
-  IA_response = FALLBACK_MSG;
-  IA_status = "error";
+  IA_response      = FALLBACK_MSG;
+  IA_responses     = [FALLBACK_MSG];
+  IA_status        = "error";
+  IA_has_multipart = false;
+  IA_delay_seconds = 0;
 } else {
   try {
-    IA_response = await askClosiAI(contato, mensagem);
-    IA_status = "success";
-    console.log("[Closi AI] Resposta recebida para contato:", contato.substring(0, 6) + "***");
+    const result = await askClosiAI(contato, mensagem);
+
+    IA_response      = result.response;
+    IA_responses     = result.responses;
+    IA_status        = result.status;
+    IA_has_multipart = result.responses.length > 1;
+    IA_delay_seconds = result.delaySeconds;
+
+    console.log(
+      "[Closi AI] OK |",
+      "contato:", contato.substring(0, 6) + "***",
+      "| status:", result.status,
+      "| partes:", result.responses.length,
+      "| delay:", result.delaySeconds + "s"
+    );
   } catch (err) {
     console.error("[Closi AI] Erro:", err.message);
-    IA_response = FALLBACK_MSG;
-    IA_status = "error";
+    IA_response      = FALLBACK_MSG;
+    IA_responses     = [FALLBACK_MSG];
+    IA_status        = "error";
+    IA_has_multipart = false;
+    IA_delay_seconds = 0;
   }
 }
