@@ -315,15 +315,15 @@ tr:hover .row-actions { opacity:1; }
       <button class="rice-info-btn" onclick="toggleRiceInfo()">O que é RICE ?</button>
       <div class="rice-tooltip" id="riceTooltip">
         <h4>RICE Scoring</h4>
-        <p style="color:var(--text-dim)">Um método pra decidir o que construir primeiro, baseado em 4 fatores:</p>
-        <div class="formula">(R × I × C) ÷ E = Score</div>
+        <p style="color:var(--text-dim)">Todos os fatores na mesma escala de 0 a 10. Score máximo = 40.</p>
+        <div class="formula">R + I + C + E = Score (0 a 40)</div>
         <dl>
-          <dt>R — Reach (Alcance)</dt><dd>Quantos leads/mês são impactados</dd>
-          <dt>I — Impact (Impacto)</dt><dd>Quanto muda a vida do lead (0.25 a 3)</dd>
-          <dt>C — Confidence (Confiança)</dt><dd>Quão certo você está da estimativa (0.5 a 1)</dd>
-          <dt>E — Effort (Esforço)</dt><dd>Semanas de trabalho necessárias</dd>
+          <dt>R — Reach (Alcance)</dt><dd>0 = ninguém · 10 = todos os leads</dd>
+          <dt>I — Impact (Impacto)</dt><dd>0 = não muda nada · 10 = impacto massivo</dd>
+          <dt>C — Confidence (Confiança)</dt><dd>0 = chute total · 10 = certeza absoluta</dd>
+          <dt>E — Facilidade</dt><dd>0 = muito difícil · 10 = muito fácil/rápido</dd>
         </dl>
-        <p style="color:var(--text-dim);margin-top:8px;font-size:11px">Score alto = fazer primeiro. <span style="color:var(--green)">Verde ≥100</span> · <span style="color:var(--yellow)">Amarelo ≥30</span> · <span style="color:var(--red)">Vermelho &lt;30</span></p>
+        <p style="color:var(--text-dim);margin-top:8px;font-size:11px">Score alto = fazer primeiro. <span style="color:var(--green)">Verde ≥30</span> · <span style="color:var(--yellow)">Amarelo ≥20</span> · <span style="color:var(--red)">Vermelho &lt;20</span></p>
       </div>
     </div>
   </div>
@@ -415,10 +415,10 @@ tr:hover .row-actions { opacity:1; }
           <th onclick="sortBy('module')" style="width:100px">Módulo <span class="sort-arrow"></span></th>
           <th onclick="sortBy('status')" style="width:100px">Status <span class="sort-arrow"></span></th>
           <th onclick="sortBy('rice_score')" style="width:70px">RICE <span class="sort-arrow">▼</span></th>
-          <th style="width:45px" title="Reach">R</th>
-          <th style="width:45px" title="Impact">I</th>
-          <th style="width:45px" title="Confidence">C</th>
-          <th style="width:45px" title="Effort">E</th>
+          <th style="width:45px" title="Reach 0-10">R</th>
+          <th style="width:45px" title="Impact 0-10">I</th>
+          <th style="width:45px" title="Confidence 0-10">C</th>
+          <th style="width:45px" title="Facilidade 0-10 (10=fácil)">E</th>
           <th onclick="sortBy('phase')" style="width:80px">Fase <span class="sort-arrow"></span></th>
           <th style="width:60px">Est.</th>
           <th style="width:50px"></th>
@@ -520,32 +520,43 @@ tr:hover .row-actions { opacity:1; }
         </select>
       </div>
       <div class="form-group">
-        <label>Reach (leads/mês)</label>
-        <input id="fReach" type="number" value="100" min="1">
+        <label>Reach — Alcance (0 a 10)</label>
+        <select id="fReach">
+          <option value="1">1 — Muito poucos</option><option value="2">2</option>
+          <option value="3">3 — Poucos</option><option value="4">4</option>
+          <option value="5" selected>5 — Médio</option><option value="6">6</option>
+          <option value="7">7 — Alto</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10 — Todos os leads</option>
+        </select>
       </div>
       <div class="form-group">
-        <label>Impact (0.25 a 3)</label>
+        <label>Impact — Impacto (0 a 10)</label>
         <select id="fImpact">
-          <option value="0.25">0.25 — Mínimo</option><option value="0.5">0.5 — Baixo</option>
-          <option value="1" selected>1 — Médio</option><option value="2">2 — Alto</option>
-          <option value="3">3 — Massivo</option>
+          <option value="1">1 — Mínimo</option><option value="2">2</option>
+          <option value="3">3 — Baixo</option><option value="4">4</option>
+          <option value="5" selected>5 — Médio</option><option value="6">6</option>
+          <option value="7">7 — Alto</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10 — Massivo</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Confidence (0.5 a 1.0)</label>
+        <label>Confidence — Confiança (0 a 10)</label>
         <select id="fConfidence">
-          <option value="0.5">0.5 — Chute</option>
-          <option value="0.8" selected>0.8 — Razoável</option>
-          <option value="1.0">1.0 — Certo</option>
+          <option value="1">1 — Chute total</option><option value="2">2</option>
+          <option value="3">3 — Pouca certeza</option><option value="4">4</option>
+          <option value="5" selected>5 — Razoável</option><option value="6">6</option>
+          <option value="7">7 — Confiante</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10 — Certeza absoluta</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Effort (semanas)</label>
+        <label>Facilidade — E (0 a 10, 10 = fácil)</label>
         <select id="fEffort">
-          <option value="0.5">0.5 sem</option><option value="1">1 sem</option>
-          <option value="2" selected>2 sem</option><option value="3">3 sem</option>
-          <option value="5">5 sem</option><option value="8">8 sem</option>
-          <option value="13">13 sem</option>
+          <option value="1">1 — Muito difícil (meses)</option><option value="2">2</option>
+          <option value="3">3 — Difícil (semanas)</option><option value="4">4</option>
+          <option value="5" selected>5 — Médio</option><option value="6">6</option>
+          <option value="7">7 — Simples (dias)</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10 — Trivial (horas)</option>
         </select>
       </div>
       <div class="form-group">
@@ -602,8 +613,8 @@ let screenshotFiles = [];
 
 // ── Helpers ──
 const esc = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
-const riceClass = s => s >= 100 ? 'high' : s >= 30 ? 'mid' : 'low';
-const calcRice = (r,i,c,e) => e > 0 ? Math.round((r*i*c)/e * 10) / 10 : 0;
+const riceClass = s => s >= 30 ? 'high' : s >= 20 ? 'mid' : 'low';
+const calcRice = (r,i,c,e) => Math.round((r + i + c + e) * 10) / 10;
 
 const TYPE_LABELS = { feat:'feat', fix:'fix', docs:'docs', refactor:'refactor', style:'style', test:'test', chore:'chore', perf:'perf', ci:'ci', build:'build', research:'research' };
 const STATUS_LABELS = { backlog:'Backlog', next:'Next', 'in-progress':'In Progress', review:'Review', done:'Done', blocked:'Blocked', cancelled:'Cancelled' };
@@ -782,10 +793,10 @@ function renderTable(items) {
         ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${i.status===k?'selected':''}>${v}</option>`).join('')}
       </select></td>
       <td><span class="rice-score ${riceClass(rice)}">${rice}</span></td>
-      <td><input class="rice-input" type="number" value="${i.reach||100}" data-id="${esc(i.item_id)}" data-field="reach" onchange="riceEdit(this)" min="1"></td>
-      <td><input class="rice-input" type="number" value="${i.impact||1}" data-id="${esc(i.item_id)}" data-field="impact" onchange="riceEdit(this)" step="0.25" min="0.25" max="3"></td>
-      <td><input class="rice-input" type="number" value="${i.confidence||0.8}" data-id="${esc(i.item_id)}" data-field="confidence" onchange="riceEdit(this)" step="0.1" min="0.5" max="1"></td>
-      <td><input class="rice-input" type="number" value="${i.effort||2}" data-id="${esc(i.item_id)}" data-field="effort" onchange="riceEdit(this)" step="0.5" min="0.5"></td>
+      <td><input class="rice-input" type="number" value="${i.reach??5}" data-id="${esc(i.item_id)}" data-field="reach" onchange="riceEdit(this)" min="0" max="10" step="1"></td>
+      <td><input class="rice-input" type="number" value="${i.impact??5}" data-id="${esc(i.item_id)}" data-field="impact" onchange="riceEdit(this)" min="0" max="10" step="1"></td>
+      <td><input class="rice-input" type="number" value="${i.confidence??5}" data-id="${esc(i.item_id)}" data-field="confidence" onchange="riceEdit(this)" min="0" max="10" step="1"></td>
+      <td><input class="rice-input" type="number" value="${i.effort??5}" data-id="${esc(i.item_id)}" data-field="effort" onchange="riceEdit(this)" min="0" max="10" step="1" title="Facilidade (10=fácil)"></td>
       <td><select class="cell-select" data-id="${esc(i.item_id)}" data-field="phase" onchange="selectEdit(this)" style="font-size:10px">
         ${PHASE_OPTIONS.map(p => `<option value="${p}" ${i.phase===p?'selected':''}>${p}</option>`).join('')}
       </select></td>

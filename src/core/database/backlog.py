@@ -49,14 +49,16 @@ def _save_backlog_json(items: list, path: str = None) -> bool:
 
 
 def _calc_rice(item: dict) -> float:
-    """Calcula RICE score localmente."""
-    r = item.get("reach", 100)
-    i = item.get("impact", 1.0)
-    c = item.get("confidence", 0.8)
-    e = item.get("effort", 2.0)
-    if e <= 0:
-        return 0
-    return round((r * i * c) / e, 1)
+    """
+    Calcula RICE score: R + I + C + E = 0 a 40.
+    Todos os fatores na mesma escala 0-10.
+    E (Effort) é invertido: 10 = fácil/rápido = prioridade alta.
+    """
+    r = max(0, min(10, item.get("reach", 5)))
+    i = max(0, min(10, item.get("impact", 5)))
+    c = max(0, min(10, item.get("confidence", 5)))
+    e = max(0, min(10, item.get("effort", 5)))
+    return round(r + i + c + e, 1)
 
 
 # ── CRUD Operations ───────────────────────────────────────────────────────────
@@ -347,125 +349,129 @@ def backlog_analytics() -> dict:
 
 
 def _get_seed_data() -> list:
-    """Dados iniciais do backlog baseados na análise técnica do projeto."""
+    """
+    Dados iniciais do backlog — escala unificada 0-10 para todos os fatores RICE.
+    R + I + C + E = score máximo 40.
+    Effort é invertido: 10 = fácil/rápido, 0 = muito difícil.
+    """
     seed = [
         {
             "item_id": "CLO-001", "title": "Follow-up Scheduler",
             "description": "Sistema de follow-up automático: 24h após primeiro contato, 3-5 dias sem resposta, 7-10 dias último contato. Precisa de background job (APScheduler ou Celery).",
             "item_type": "feat", "module": "core", "status": "backlog", "phase": "Phase 2",
-            "reach": 500, "impact": 3.0, "confidence": 0.8, "effort": 5.0,
+            "reach": 8, "impact": 10, "confidence": 7, "effort": 3,
             "estimate": "2w", "dependencies": "", "notes": "Prompt já define regras de timing", "sort_order": 0,
         },
         {
             "item_id": "CLO-002", "title": "Webhook Hotmart (Pagamento)",
             "description": "Receber webhook de confirmação de pagamento da Hotmart. Ativar Stage 6 (pós-venda) automaticamente.",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 2",
-            "reach": 200, "impact": 3.0, "confidence": 0.8, "effort": 3.0,
+            "reach": 6, "impact": 10, "confidence": 7, "effort": 5,
             "estimate": "1w", "dependencies": "", "notes": "Sem isso não detectamos conversão real", "sort_order": 1,
         },
         {
             "item_id": "CLO-003", "title": "Persistir Estágio do Funil",
             "description": "Garantir que stage extraído via [META] seja persistido na tabela leads em toda transição.",
             "item_type": "fix", "module": "database", "status": "backlog", "phase": "Phase 2",
-            "reach": 1000, "impact": 2.0, "confidence": 1.0, "effort": 2.0,
+            "reach": 10, "impact": 7, "confidence": 10, "effort": 7,
             "estimate": "3d", "dependencies": "", "notes": "Hoje extrai mas nem sempre salva", "sort_order": 2,
         },
         {
             "item_id": "CLO-004", "title": "Unificar Tabelas messages/conversations",
             "description": "Eliminar redundância entre tabelas. Migrar dados, atualizar queries.",
             "item_type": "refactor", "module": "database", "status": "backlog", "phase": "Phase 2",
-            "reach": 100, "impact": 1.0, "confidence": 0.8, "effort": 2.0,
+            "reach": 4, "impact": 5, "confidence": 7, "effort": 7,
             "estimate": "3d", "dependencies": "", "notes": "Criar migration SQL", "sort_order": 3,
         },
         {
             "item_id": "CLO-005", "title": "Dashboard Métricas de Conversão",
             "description": "Dashboard real-time: taxa de conversão por estágio, tempo médio, leads ativos vs perdidos.",
             "item_type": "feat", "module": "dashboard", "status": "backlog", "phase": "Phase 2",
-            "reach": 100, "impact": 2.0, "confidence": 0.8, "effort": 3.0,
+            "reach": 4, "impact": 7, "confidence": 7, "effort": 5,
             "estimate": "1w", "dependencies": "CLO-003", "notes": "Depende de CLO-003", "sort_order": 4,
         },
         {
             "item_id": "CLO-006", "title": "HubSpot Events Completos",
             "description": "Enviar eventos para HubSpot em todas as transições de estágio.",
             "item_type": "perf", "module": "integrations", "status": "backlog", "phase": "Phase 2",
-            "reach": 50, "impact": 1.0, "confidence": 0.8, "effort": 2.0,
+            "reach": 3, "impact": 5, "confidence": 7, "effort": 7,
             "estimate": "2d", "dependencies": "", "notes": "", "sort_order": 5,
         },
         {
             "item_id": "CLO-007", "title": "Monitorar Memory Leak (Cache TTL)",
             "description": "TTL cleanup implementado mas precisa de monitoramento em produção.",
             "item_type": "fix", "module": "core", "status": "next", "phase": "Phase 2",
-            "reach": 1000, "impact": 2.0, "confidence": 0.5, "effort": 1.0,
+            "reach": 10, "impact": 7, "confidence": 4, "effort": 9,
             "estimate": "1d", "dependencies": "", "notes": "Adicionar métricas de tamanho do cache", "sort_order": 6,
         },
         {
             "item_id": "CLO-008", "title": "Few-shot Examples no Prompt",
             "description": "Adicionar 3-5 exemplos de conversas reais bem-sucedidas ao system prompt.",
             "item_type": "perf", "module": "agent", "status": "backlog", "phase": "Phase 2",
-            "reach": 500, "impact": 2.0, "confidence": 0.5, "effort": 2.0,
+            "reach": 8, "impact": 7, "confidence": 4, "effort": 7,
             "estimate": "3d", "dependencies": "", "notes": "Medir impacto na qualidade", "sort_order": 7,
         },
         {
             "item_id": "CLO-009", "title": "A/B Testing de Prompts",
             "description": "Framework para testar variações de prompt. Medir conversão por variante.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 500, "impact": 2.0, "confidence": 0.5, "effort": 5.0,
+            "reach": 8, "impact": 7, "confidence": 4, "effort": 3,
             "estimate": "2w", "dependencies": "CLO-003", "notes": "", "sort_order": 8,
         },
         {
             "item_id": "CLO-010", "title": "Seleção Dinâmica de Oferta",
             "description": "Agente escolhe oferta baseado no perfil do lead.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 500, "impact": 2.0, "confidence": 0.5, "effort": 3.0,
+            "reach": 8, "impact": 7, "confidence": 4, "effort": 5,
             "estimate": "1w", "dependencies": "", "notes": "", "sort_order": 9,
         },
         {
             "item_id": "CLO-011", "title": "Desconto Dinâmico (até 10%)",
             "description": "Agente pode oferecer desconto progressivo: 5% após 2ª objeção.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 200, "impact": 2.0, "confidence": 0.5, "effort": 2.0,
+            "reach": 6, "impact": 7, "confidence": 4, "effort": 7,
             "estimate": "3d", "dependencies": "", "notes": "Precisa de regras claras e logging", "sort_order": 10,
         },
         {
             "item_id": "CLO-012", "title": "Integração Botmaker (Transfer Direto)",
             "description": "Transferir conversa para atendente humano via Botmaker API.",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 3",
-            "reach": 100, "impact": 1.0, "confidence": 0.5, "effort": 3.0,
+            "reach": 4, "impact": 5, "confidence": 4, "effort": 5,
             "estimate": "1w", "dependencies": "", "notes": "Config vars já existem", "sort_order": 11,
         },
         {
             "item_id": "CLO-013", "title": "Testes de Integração E2E",
             "description": "Testes end-to-end: simular lead completo.",
             "item_type": "test", "module": "devops", "status": "backlog", "phase": "Phase 3",
-            "reach": 50, "impact": 2.0, "confidence": 0.8, "effort": 3.0,
+            "reach": 3, "impact": 7, "confidence": 7, "effort": 5,
             "estimate": "1w", "dependencies": "", "notes": "Rodar no CI", "sort_order": 12,
         },
         {
             "item_id": "CLO-014", "title": "Rate Limiting por Sessão",
             "description": "Adicionar rate limiting por sessão para evitar abuse.",
             "item_type": "perf", "module": "core", "status": "backlog", "phase": "Phase 3",
-            "reach": 200, "impact": 1.0, "confidence": 0.8, "effort": 1.0,
+            "reach": 6, "impact": 5, "confidence": 7, "effort": 9,
             "estimate": "1d", "dependencies": "", "notes": "", "sort_order": 13,
         },
         {
             "item_id": "CLO-015", "title": "Multi-tenant (Outros Produtos)",
             "description": "Abstrair Closi AI para suportar múltiplos clientes.",
             "item_type": "feat", "module": "core", "status": "backlog", "phase": "Phase 4",
-            "reach": 50, "impact": 3.0, "confidence": 0.5, "effort": 13.0,
+            "reach": 3, "impact": 10, "confidence": 4, "effort": 1,
             "estimate": "6w", "dependencies": "", "notes": "Visão de longo prazo", "sort_order": 14,
         },
         {
             "item_id": "CLO-016", "title": "Voice Messages (Áudio WhatsApp)",
             "description": "Receber e transcrever áudios de WhatsApp (Whisper API).",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 4",
-            "reach": 200, "impact": 2.0, "confidence": 0.5, "effort": 8.0,
+            "reach": 6, "impact": 7, "confidence": 4, "effort": 2,
             "estimate": "3w", "dependencies": "", "notes": "Whisper API", "sort_order": 15,
         },
         {
             "item_id": "CLO-017", "title": "Agente Autônomo de Desenvolvimento",
             "description": "V2: agentes de IA consultam backlog e constroem features 24/7.",
             "item_type": "research", "module": "devops", "status": "backlog", "phase": "Phase 4",
-            "reach": 10, "impact": 3.0, "confidence": 0.5, "effort": 8.0,
+            "reach": 1, "impact": 10, "confidence": 4, "effort": 2,
             "estimate": "4w", "dependencies": "", "notes": "Requer guardrails", "sort_order": 16,
         },
     ]
