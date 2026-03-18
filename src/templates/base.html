@@ -196,6 +196,14 @@ body { background:var(--bg); color:var(--text); font-family:'Space Grotesk',sans
 
       <div class="nav-label" style="margin-top:14px">Sistema</div>
 
+      <a href="/dashboard/backlog" class="nav-item {% if active_page == 'backlog' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/>
+        </svg>
+        Backlog
+      </a>
+
       <a href="/dashboard/costs" class="nav-item {% if active_page == 'costs' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="18" y="3" width="4" height="18" rx="1"/>

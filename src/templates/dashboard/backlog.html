@@ -1,0 +1,832 @@
+{% extends "base.html" %}
+{% block title %}Backlog{% endblock %}
+
+{% block extra_styles %}
+<style>
+/* ── Backlog Page Layout ── */
+.backlog-page { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+
+/* ── Toolbar ── */
+.backlog-toolbar {
+  display:flex; align-items:center; gap:10px; padding:12px 24px;
+  border-bottom:1px solid var(--border); background:rgba(13,10,20,0.6);
+  flex-wrap:wrap;
+}
+.toolbar-search {
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  padding:7px 12px 7px 32px; border-radius:8px; font-size:12.5px;
+  font-family:'Space Grotesk',sans-serif; width:220px; transition:border-color 0.15s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b80a8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:10px center;
+}
+.toolbar-search:focus { outline:none; border-color:var(--purple); }
+.toolbar-filter {
+  background:var(--surface); border:1px solid var(--border); color:var(--text-dim);
+  padding:6px 10px; border-radius:8px; font-size:11.5px;
+  font-family:'Space Grotesk',sans-serif; cursor:pointer;
+}
+.toolbar-filter:focus { outline:none; border-color:var(--purple); }
+.toolbar-spacer { flex:1; }
+.view-toggle {
+  display:flex; background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; overflow:hidden;
+}
+.view-btn {
+  padding:6px 12px; font-size:11px; background:transparent; border:none;
+  color:var(--text-dim); cursor:pointer; font-family:'Space Grotesk',sans-serif;
+  transition:all 0.15s;
+}
+.view-btn.active { background:var(--purple); color:white; }
+.view-btn:hover:not(.active) { color:var(--text); }
+
+/* ── Stats Mini ── */
+.backlog-stats {
+  display:flex; gap:16px; padding:10px 24px;
+  border-bottom:1px solid var(--border); font-size:11px;
+  background:rgba(23,17,42,0.5);
+}
+.bs-item { display:flex; align-items:center; gap:5px; color:var(--text-dim); }
+.bs-num { font-weight:700; font-size:13px; }
+.bs-num.purple { color:var(--purple-light); }
+.bs-num.blue { color:#6ea8fe; }
+.bs-num.green { color:var(--green); }
+.bs-num.orange { color:var(--orange); }
+.bs-num.red { color:var(--red); }
+
+/* ── Table View ── */
+.backlog-scroll { flex:1; overflow:auto; padding:0 24px 24px; }
+.backlog-table { width:100%; border-collapse:collapse; font-size:12px; min-width:1100px; }
+.backlog-table th {
+  position:sticky; top:0; z-index:10;
+  text-align:left; padding:10px 8px; font-size:9px; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--text-dim);
+  border-bottom:1px solid var(--border); background:var(--bg);
+  cursor:pointer; user-select:none; white-space:nowrap;
+}
+.backlog-table th:hover { color:var(--purple-light); }
+.backlog-table th .sort-arrow { font-size:10px; margin-left:3px; opacity:0.5; }
+.backlog-table td { padding:8px; border-bottom:1px solid rgba(139,63,187,0.06); vertical-align:top; }
+.backlog-table tr:hover td { background:rgba(139,63,187,0.04); }
+.backlog-table tr.dragging { opacity:0.4; }
+.backlog-table tr.drag-over td { border-top:2px solid var(--purple-light); }
+
+/* ── Inline Edit ── */
+.editable { cursor:text; border-radius:4px; padding:2px 4px; transition:background 0.15s; min-height:18px; }
+.editable:hover { background:rgba(139,63,187,0.08); }
+.editable:focus { outline:none; background:rgba(139,63,187,0.12); }
+.cell-title { font-weight:500; color:var(--text); max-width:220px; }
+.cell-desc { color:var(--text-dim); font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── Badges ── */
+.type-badge {
+  font-size:9.5px; font-weight:600; padding:2px 7px; border-radius:6px;
+  text-transform:uppercase; letter-spacing:0.3px; display:inline-block;
+}
+.type-badge.feature     { background:rgba(139,63,187,0.15); color:var(--purple-light); }
+.type-badge.enhancement { background:rgba(110,168,254,0.15); color:#6ea8fe; }
+.type-badge.bugfix      { background:rgba(224,85,85,0.15); color:var(--red); }
+.type-badge.tech-debt   { background:rgba(224,195,64,0.15); color:var(--yellow); }
+.type-badge.infra       { background:rgba(139,128,168,0.15); color:var(--text-dim); }
+.type-badge.research    { background:rgba(76,175,128,0.15); color:var(--green); }
+
+.status-badge {
+  font-size:9.5px; font-weight:600; padding:2px 8px; border-radius:10px;
+  display:inline-block; white-space:nowrap;
+}
+.status-badge.backlog     { background:rgba(139,128,168,0.12); color:var(--text-dim); }
+.status-badge.next        { background:rgba(110,168,254,0.15); color:#6ea8fe; }
+.status-badge.in-progress { background:rgba(224,123,57,0.15); color:var(--orange); }
+.status-badge.review      { background:rgba(224,195,64,0.15); color:var(--yellow); }
+.status-badge.done        { background:rgba(76,175,128,0.15); color:var(--green); }
+.status-badge.blocked     { background:rgba(224,85,85,0.15); color:var(--red); }
+.status-badge.cancelled   { background:rgba(139,128,168,0.08); color:var(--text-dim); text-decoration:line-through; }
+
+.phase-tag {
+  font-size:9px; padding:1px 6px; border-radius:4px; opacity:0.7;
+  background:rgba(139,63,187,0.1); color:var(--purple-light);
+}
+
+.rice-score {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+  min-width:50px; text-align:center; display:inline-block;
+}
+.rice-score.high { color:var(--green); }
+.rice-score.mid  { color:var(--yellow); }
+.rice-score.low  { color:var(--red); }
+
+/* ── Cell select (dropdown inline) ── */
+.cell-select {
+  background:transparent; border:1px solid transparent; color:inherit;
+  font-size:inherit; font-family:inherit; cursor:pointer; padding:2px 4px;
+  border-radius:4px; appearance:none; -webkit-appearance:none;
+}
+.cell-select:hover { border-color:var(--border); }
+.cell-select:focus { outline:none; border-color:var(--purple); background:var(--surface); }
+
+/* ── RICE Inputs ── */
+.rice-input {
+  width:52px; background:transparent; border:1px solid transparent;
+  color:var(--text); font-size:12px; font-family:'Space Grotesk',sans-serif;
+  text-align:center; padding:2px 4px; border-radius:4px;
+}
+.rice-input:hover { border-color:var(--border); }
+.rice-input:focus { outline:none; border-color:var(--purple); background:var(--surface); }
+
+/* ── Actions ── */
+.row-actions { display:flex; gap:4px; opacity:0; transition:opacity 0.15s; }
+tr:hover .row-actions { opacity:1; }
+.action-btn {
+  width:24px; height:24px; border:none; border-radius:6px;
+  background:rgba(139,63,187,0.08); color:var(--text-dim);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:12px; transition:all 0.15s;
+}
+.action-btn:hover { background:rgba(139,63,187,0.2); color:var(--text); }
+.action-btn.delete:hover { background:rgba(224,85,85,0.2); color:var(--red); }
+
+/* ── Kanban View ── */
+.kanban-container { display:none; flex:1; overflow-x:auto; padding:16px 24px; gap:12px; }
+.kanban-container.active { display:flex; }
+.kanban-col {
+  min-width:240px; flex:1; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; display:flex; flex-direction:column; max-height:calc(100vh - 200px);
+}
+.kanban-col-header {
+  padding:12px 14px; font-size:11px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; color:var(--text-dim); border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.kanban-col-count {
+  background:rgba(139,63,187,0.15); color:var(--purple-light);
+  font-size:10px; padding:1px 7px; border-radius:10px;
+}
+.kanban-cards { flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:6px; }
+.kanban-card {
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:10px 12px; cursor:pointer; transition:all 0.15s;
+}
+.kanban-card:hover { border-color:var(--purple); transform:translateY(-1px); }
+.kanban-card-id { font-size:9px; color:var(--text-dim); font-weight:600; letter-spacing:0.5px; }
+.kanban-card-title { font-size:12.5px; font-weight:500; margin:4px 0; }
+.kanban-card-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
+.kanban-card-rice { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; }
+
+/* ── Add Item Modal ── */
+.add-modal { display:none; }
+.add-modal.show { display:block; }
+.add-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.add-form-grid .full-width { grid-column:1/-1; }
+.rice-preview {
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:12px; text-align:center; margin-top:8px;
+}
+.rice-preview-score { font-family:'Syne',sans-serif; font-weight:700; font-size:28px; color:var(--purple-light); }
+.rice-preview-label { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+/* ── Drag Handle ── */
+.drag-handle {
+  cursor:grab; opacity:0.3; transition:opacity 0.15s; padding:0 4px;
+  user-select:none; font-size:14px; color:var(--text-dim);
+}
+tr:hover .drag-handle { opacity:0.7; }
+.drag-handle:active { cursor:grabbing; }
+
+/* ── Expanded Row ── */
+.expanded-row { display:none; }
+.expanded-row.show { display:table-row; }
+.expanded-content {
+  background:var(--surface); border-radius:8px; padding:12px 16px;
+  margin:4px 0; font-size:12px; line-height:1.6;
+}
+.expanded-content .field-label {
+  font-size:9px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:3px; margin-top:10px;
+}
+.expanded-content .field-label:first-child { margin-top:0; }
+.expanded-content .field-value { color:var(--text); }
+.expanded-content textarea {
+  width:100%; background:var(--bg); border:1px solid var(--border);
+  color:var(--text); padding:8px; border-radius:6px; font-size:12px;
+  font-family:'Space Grotesk',sans-serif; resize:vertical; min-height:60px;
+}
+.expanded-content textarea:focus { outline:none; border-color:var(--purple); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── Header ── -->
+<div class="page-header">
+  <div class="page-title">
+    <h1>Backlog</h1>
+    <span class="page-badge purple">RICE</span>
+  </div>
+  <div class="page-actions">
+    <button class="btn-ghost" onclick="exportBacklog()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Exportar
+    </button>
+    <button class="btn-primary" onclick="showAddModal()">+ Novo Item</button>
+  </div>
+</div>
+
+<div class="backlog-page">
+  <!-- ── Stats ── -->
+  <div class="backlog-stats" id="backlogStats">
+    <div class="bs-item"><span class="bs-num purple" id="statTotal">0</span> Total</div>
+    <div class="bs-item"><span class="bs-num blue" id="statNext">0</span> Next</div>
+    <div class="bs-item"><span class="bs-num orange" id="statProgress">0</span> In Progress</div>
+    <div class="bs-item"><span class="bs-num green" id="statDone">0</span> Done</div>
+    <div class="bs-item"><span class="bs-num red" id="statBlocked">0</span> Blocked</div>
+    <div class="bs-item" style="margin-left:auto"><span class="bs-num purple" id="statEffort">0</span> semanas restantes</div>
+  </div>
+
+  <!-- ── Toolbar ── -->
+  <div class="backlog-toolbar">
+    <input type="text" class="toolbar-search" placeholder="Buscar..." oninput="filterBacklog()">
+    <select class="toolbar-filter" id="filterStatus" onchange="filterBacklog()">
+      <option value="">Todos Status</option>
+      <option value="backlog">Backlog</option>
+      <option value="next">Next</option>
+      <option value="in-progress">In Progress</option>
+      <option value="review">Review</option>
+      <option value="done">Done</option>
+      <option value="blocked">Blocked</option>
+    </select>
+    <select class="toolbar-filter" id="filterType" onchange="filterBacklog()">
+      <option value="">Todos Tipos</option>
+      <option value="feature">Feature</option>
+      <option value="enhancement">Enhancement</option>
+      <option value="bugfix">Bugfix</option>
+      <option value="tech-debt">Tech Debt</option>
+      <option value="infra">Infra</option>
+      <option value="research">Research</option>
+    </select>
+    <select class="toolbar-filter" id="filterPhase" onchange="filterBacklog()">
+      <option value="">Todas Fases</option>
+      <option value="Phase 2">Phase 2</option>
+      <option value="Phase 3">Phase 3</option>
+      <option value="Phase 4">Phase 4</option>
+    </select>
+    <select class="toolbar-filter" id="filterModule" onchange="filterBacklog()">
+      <option value="">Todos Módulos</option>
+      <option value="agent">Agent</option>
+      <option value="api">API</option>
+      <option value="core">Core</option>
+      <option value="database">Database</option>
+      <option value="dashboard">Dashboard</option>
+      <option value="integrations">Integrations</option>
+      <option value="data">Data</option>
+      <option value="devops">DevOps</option>
+    </select>
+    <div class="toolbar-spacer"></div>
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="setView('table',this)">Tabela</button>
+      <button class="view-btn" onclick="setView('kanban',this)">Kanban</button>
+    </div>
+  </div>
+
+  <!-- ── Table View ── -->
+  <div class="backlog-scroll" id="tableView">
+    <table class="backlog-table">
+      <thead>
+        <tr>
+          <th style="width:30px"></th>
+          <th onclick="sortBy('item_id')" style="width:70px">ID <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('title')">Título <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('item_type')" style="width:90px">Tipo <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('module')" style="width:100px">Módulo <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('status')" style="width:100px">Status <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('rice_score')" style="width:70px">RICE <span class="sort-arrow">▼</span></th>
+          <th style="width:45px" title="Reach">R</th>
+          <th style="width:45px" title="Impact">I</th>
+          <th style="width:45px" title="Confidence">C</th>
+          <th style="width:45px" title="Effort">E</th>
+          <th onclick="sortBy('phase')" style="width:80px">Fase <span class="sort-arrow"></span></th>
+          <th style="width:60px">Est.</th>
+          <th style="width:50px"></th>
+        </tr>
+      </thead>
+      <tbody id="backlogBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ── Kanban View ── -->
+  <div class="kanban-container" id="kanbanView"></div>
+</div>
+
+<!-- ── Add/Edit Modal ── -->
+<div class="modal-overlay add-modal" id="addModal" onclick="if(event.target===this)hideAddModal()">
+  <div class="modal-panel" style="max-width:620px">
+    <h3 id="modalTitle">Novo Item</h3>
+    <input type="hidden" id="editItemId">
+    <div class="add-form-grid">
+      <div class="form-group full-width">
+        <label>Título</label>
+        <input id="fTitle" placeholder="Ex: Implementar follow-up automático">
+      </div>
+      <div class="form-group full-width">
+        <label>Descrição</label>
+        <textarea id="fDesc" rows="2" placeholder="O que precisa ser feito e por quê..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="fType">
+          <option value="feature">Feature</option>
+          <option value="enhancement">Enhancement</option>
+          <option value="bugfix">Bugfix</option>
+          <option value="tech-debt">Tech Debt</option>
+          <option value="infra">Infra</option>
+          <option value="research">Research</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Módulo</label>
+        <select id="fModule">
+          <option value="core">Core</option>
+          <option value="agent">Agent</option>
+          <option value="api">API</option>
+          <option value="database">Database</option>
+          <option value="dashboard">Dashboard</option>
+          <option value="integrations">Integrations</option>
+          <option value="data">Data</option>
+          <option value="devops">DevOps</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="fStatus">
+          <option value="backlog">Backlog</option>
+          <option value="next">Next</option>
+          <option value="in-progress">In Progress</option>
+          <option value="review">Review</option>
+          <option value="done">Done</option>
+          <option value="blocked">Blocked</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fase</label>
+        <select id="fPhase">
+          <option value="Phase 2">Phase 2 (curto prazo)</option>
+          <option value="Phase 3">Phase 3 (médio prazo)</option>
+          <option value="Phase 4">Phase 4 (longo prazo)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Reach (leads/mês impactados)</label>
+        <input id="fReach" type="number" value="100" min="1">
+      </div>
+      <div class="form-group">
+        <label>Impact (0.25 a 3)</label>
+        <select id="fImpact">
+          <option value="0.25">0.25 — Mínimo</option>
+          <option value="0.5">0.5 — Baixo</option>
+          <option value="1" selected>1 — Médio</option>
+          <option value="2">2 — Alto</option>
+          <option value="3">3 — Massivo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Confidence (0.5 a 1.0)</label>
+        <select id="fConfidence">
+          <option value="0.5">0.5 — Chute</option>
+          <option value="0.8" selected>0.8 — Razoável</option>
+          <option value="1.0">1.0 — Certo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Effort (semanas)</label>
+        <select id="fEffort">
+          <option value="0.5">0.5 sem</option>
+          <option value="1">1 sem</option>
+          <option value="2" selected>2 sem</option>
+          <option value="3">3 sem</option>
+          <option value="5">5 sem</option>
+          <option value="8">8 sem</option>
+          <option value="13">13 sem</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Estimativa</label>
+        <input id="fEstimate" placeholder="Ex: 1w, 3d">
+      </div>
+      <div class="form-group">
+        <label>Dependências</label>
+        <input id="fDeps" placeholder="Ex: CRI-003, CRI-005">
+      </div>
+      <div class="form-group full-width">
+        <label>Notas</label>
+        <textarea id="fNotes" rows="2" placeholder="Contexto adicional, links, decisões..."></textarea>
+      </div>
+      <div class="full-width">
+        <div class="rice-preview">
+          <div class="rice-preview-score" id="ricePreview">0</div>
+          <div class="rice-preview-label">RICE Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-ghost" onclick="hideAddModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveItem()">Salvar</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── State ──
+let allItems = [];
+let currentSort = { key: 'rice_score', desc: true };
+let currentView = 'table';
+let dragSrcRow = null;
+
+// ── Helpers ──
+const esc = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
+const riceClass = s => s >= 100 ? 'high' : s >= 30 ? 'mid' : 'low';
+const calcRice = (r,i,c,e) => e > 0 ? Math.round((r*i*c)/e * 10) / 10 : 0;
+
+const TYPE_LABELS = { feature:'Feature', enhancement:'Enhancement', bugfix:'Bugfix', 'tech-debt':'Tech Debt', infra:'Infra', research:'Research' };
+const STATUS_LABELS = { backlog:'Backlog', next:'Next', 'in-progress':'In Progress', review:'Review', done:'Done', blocked:'Blocked', cancelled:'Cancelled' };
+const MODULE_LABELS = { agent:'Agent', api:'API', core:'Core', database:'Database', dashboard:'Dashboard', integrations:'Integrations', data:'Data', devops:'DevOps' };
+
+// ── Load ──
+async function loadBacklog() {
+  try {
+    const r = await fetch('/api/backlog');
+    const data = await r.json();
+    allItems = data.items || [];
+    renderAll();
+  } catch(e) { console.error('loadBacklog:', e); }
+}
+
+// ── Render All ──
+function renderAll() {
+  updateStats();
+  const filtered = getFilteredItems();
+  renderTable(filtered);
+  renderKanban(filtered);
+}
+
+// ── Stats ──
+function updateStats() {
+  const active = allItems.filter(i => i.status !== 'cancelled');
+  document.getElementById('statTotal').textContent = active.length;
+  document.getElementById('statNext').textContent = active.filter(i => i.status === 'next').length;
+  document.getElementById('statProgress').textContent = active.filter(i => i.status === 'in-progress').length;
+  document.getElementById('statDone').textContent = active.filter(i => i.status === 'done').length;
+  document.getElementById('statBlocked').textContent = active.filter(i => i.status === 'blocked').length;
+  const effort = active.filter(i => !['done','cancelled'].includes(i.status))
+    .reduce((s,i) => s + (i.effort || 0), 0);
+  document.getElementById('statEffort').textContent = Math.round(effort * 10) / 10;
+}
+
+// ── Filter ──
+function getFilteredItems() {
+  const q = document.querySelector('.toolbar-search').value.toLowerCase();
+  const st = document.getElementById('filterStatus').value;
+  const tp = document.getElementById('filterType').value;
+  const ph = document.getElementById('filterPhase').value;
+  const md = document.getElementById('filterModule').value;
+
+  let items = [...allItems];
+  if (q) items = items.filter(i => (i.title||'').toLowerCase().includes(q) || (i.description||'').toLowerCase().includes(q) || (i.item_id||'').toLowerCase().includes(q));
+  if (st) items = items.filter(i => i.status === st);
+  if (tp) items = items.filter(i => i.item_type === tp);
+  if (ph) items = items.filter(i => i.phase === ph);
+  if (md) items = items.filter(i => i.module === md);
+
+  // Sort
+  items.sort((a, b) => {
+    let va = a[currentSort.key] ?? '';
+    let vb = b[currentSort.key] ?? '';
+    if (typeof va === 'number' && typeof vb === 'number') return currentSort.desc ? vb - va : va - vb;
+    va = String(va).toLowerCase(); vb = String(vb).toLowerCase();
+    return currentSort.desc ? vb.localeCompare(va) : va.localeCompare(vb);
+  });
+  return items;
+}
+
+function filterBacklog() { renderAll(); }
+
+// ── Sort ──
+function sortBy(key) {
+  if (currentSort.key === key) currentSort.desc = !currentSort.desc;
+  else { currentSort.key = key; currentSort.desc = true; }
+  // Update arrows
+  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
+  event.target.closest('th')?.querySelector('.sort-arrow')?.
+    replaceWith(Object.assign(document.createElement('span'), {
+      className: 'sort-arrow', textContent: currentSort.desc ? '▼' : '▲'
+    }));
+  renderAll();
+}
+
+// ── Table Render ──
+function renderTable(items) {
+  const tbody = document.getElementById('backlogBody');
+  tbody.innerHTML = items.map(i => {
+    const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
+    return `
+    <tr draggable="true" data-id="${esc(i.item_id)}"
+        ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropRow(event)" ondragend="dragEnd(event)">
+      <td><span class="drag-handle">⠿</span></td>
+      <td><span style="font-size:10px;color:var(--text-dim);font-weight:600">${esc(i.item_id)}</span></td>
+      <td>
+        <div class="cell-title editable" contenteditable="true" data-id="${esc(i.item_id)}" data-field="title" onblur="inlineEdit(this)">${esc(i.title)}</div>
+        <div class="cell-desc" onclick="toggleExpand('${esc(i.item_id)}')" title="Clique para expandir">${esc(i.description)}</div>
+      </td>
+      <td><select class="cell-select" data-id="${esc(i.item_id)}" data-field="item_type" onchange="selectEdit(this)">
+        ${Object.entries(TYPE_LABELS).map(([k,v]) => `<option value="${k}" ${i.item_type===k?'selected':''}>${v}</option>`).join('')}
+      </select></td>
+      <td><select class="cell-select" data-id="${esc(i.item_id)}" data-field="module" onchange="selectEdit(this)">
+        ${Object.entries(MODULE_LABELS).map(([k,v]) => `<option value="${k}" ${i.module===k?'selected':''}>${v}</option>`).join('')}
+      </select></td>
+      <td><select class="cell-select" data-id="${esc(i.item_id)}" data-field="status" onchange="selectEdit(this)">
+        ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${i.status===k?'selected':''}>${v}</option>`).join('')}
+      </select></td>
+      <td><span class="rice-score ${riceClass(rice)}">${rice}</span></td>
+      <td><input class="rice-input" type="number" value="${i.reach||100}" data-id="${esc(i.item_id)}" data-field="reach" onchange="riceEdit(this)" min="1"></td>
+      <td><input class="rice-input" type="number" value="${i.impact||1}" data-id="${esc(i.item_id)}" data-field="impact" onchange="riceEdit(this)" step="0.25" min="0.25" max="3"></td>
+      <td><input class="rice-input" type="number" value="${i.confidence||0.8}" data-id="${esc(i.item_id)}" data-field="confidence" onchange="riceEdit(this)" step="0.1" min="0.5" max="1"></td>
+      <td><input class="rice-input" type="number" value="${i.effort||2}" data-id="${esc(i.item_id)}" data-field="effort" onchange="riceEdit(this)" step="0.5" min="0.5"></td>
+      <td><span class="phase-tag">${esc(i.phase||'Phase 2')}</span></td>
+      <td><span class="editable" contenteditable="true" data-id="${esc(i.item_id)}" data-field="estimate" onblur="inlineEdit(this)" style="font-size:11px">${esc(i.estimate||'')}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="action-btn" onclick="editItem('${esc(i.item_id)}')" title="Editar">✎</button>
+          <button class="action-btn delete" onclick="deleteItem('${esc(i.item_id)}')" title="Excluir">✕</button>
+        </div>
+      </td>
+    </tr>
+    <tr class="expanded-row" id="expand-${esc(i.item_id)}">
+      <td colspan="14">
+        <div class="expanded-content">
+          <div class="field-label">Descrição</div>
+          <textarea data-id="${esc(i.item_id)}" data-field="description" onblur="textareaEdit(this)">${esc(i.description||'')}</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+            <div>
+              <div class="field-label">Dependências</div>
+              <div class="field-value editable" contenteditable="true" data-id="${esc(i.item_id)}" data-field="dependencies" onblur="inlineEdit(this)">${esc(i.dependencies||'Nenhuma')}</div>
+            </div>
+            <div>
+              <div class="field-label">Notas</div>
+              <textarea data-id="${esc(i.item_id)}" data-field="notes" onblur="textareaEdit(this)" style="min-height:40px">${esc(i.notes||'')}</textarea>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Kanban Render ──
+function renderKanban(items) {
+  const cols = ['backlog','next','in-progress','review','done'];
+  const container = document.getElementById('kanbanView');
+  container.innerHTML = cols.map(status => {
+    const colItems = items.filter(i => i.status === status);
+    return `
+    <div class="kanban-col">
+      <div class="kanban-col-header">
+        ${STATUS_LABELS[status] || status}
+        <span class="kanban-col-count">${colItems.length}</span>
+      </div>
+      <div class="kanban-cards">
+        ${colItems.map(i => {
+          const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
+          return `
+          <div class="kanban-card" onclick="editItem('${esc(i.item_id)}')">
+            <div class="kanban-card-id">${esc(i.item_id)}</div>
+            <div class="kanban-card-title">${esc(i.title)}</div>
+            <div class="kanban-card-meta">
+              <span class="type-badge ${i.item_type}">${TYPE_LABELS[i.item_type]||i.item_type}</span>
+              <span class="kanban-card-rice ${riceClass(rice)}">${rice}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── View Toggle ──
+function setView(view, btn) {
+  currentView = view;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+  document.getElementById('kanbanView').classList.toggle('active', view === 'kanban');
+}
+
+// ── Expand Row ──
+function toggleExpand(itemId) {
+  const row = document.getElementById(`expand-${itemId}`);
+  if (row) row.classList.toggle('show');
+}
+
+// ── Inline Edits ──
+async function inlineEdit(el) {
+  const id = el.dataset.id, field = el.dataset.field;
+  const value = el.textContent.trim();
+  await updateField(id, field, value);
+}
+
+async function selectEdit(el) {
+  const id = el.dataset.id, field = el.dataset.field;
+  await updateField(id, field, el.value);
+  // Re-render to update badges
+  const item = allItems.find(i => i.item_id === id);
+  if (item) { item[field] = el.value; renderAll(); }
+}
+
+async function riceEdit(el) {
+  const id = el.dataset.id, field = el.dataset.field;
+  const value = parseFloat(el.value);
+  await updateField(id, field, value);
+  // Recalc RICE in UI
+  const item = allItems.find(i => i.item_id === id);
+  if (item) {
+    item[field] = value;
+    item.rice_score = calcRice(item.reach, item.impact, item.confidence, item.effort);
+    renderAll();
+  }
+}
+
+async function textareaEdit(el) {
+  const id = el.dataset.id, field = el.dataset.field;
+  await updateField(id, field, el.value);
+  const item = allItems.find(i => i.item_id === id);
+  if (item) item[field] = el.value;
+}
+
+async function updateField(itemId, field, value) {
+  try {
+    await fetch(`/api/backlog/${itemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [field]: value })
+    });
+  } catch(e) { console.error('updateField:', e); }
+}
+
+// ── Drag & Drop ──
+function dragStart(e) {
+  dragSrcRow = e.target.closest('tr');
+  dragSrcRow.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcRow.dataset.id);
+}
+function dragOver(e) {
+  e.preventDefault();
+  const row = e.target.closest('tr');
+  if (row && row !== dragSrcRow && !row.classList.contains('expanded-row')) {
+    document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+    row.classList.add('drag-over');
+  }
+}
+function dropRow(e) {
+  e.preventDefault();
+  const targetRow = e.target.closest('tr');
+  if (!targetRow || targetRow === dragSrcRow) return;
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+
+  const srcId = dragSrcRow.dataset.id;
+  const tgtId = targetRow.dataset.id;
+  const srcIdx = allItems.findIndex(i => i.item_id === srcId);
+  const tgtIdx = allItems.findIndex(i => i.item_id === tgtId);
+  if (srcIdx < 0 || tgtIdx < 0) return;
+
+  const [moved] = allItems.splice(srcIdx, 1);
+  allItems.splice(tgtIdx, 0, moved);
+  renderAll();
+
+  // Persist order
+  const ordered_ids = allItems.map(i => i.item_id);
+  fetch('/api/backlog/reorder', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ ordered_ids })
+  }).catch(e => console.error('reorder:', e));
+}
+function dragEnd(e) {
+  if (dragSrcRow) dragSrcRow.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  dragSrcRow = null;
+}
+
+// ── Modal ──
+function showAddModal(editId) {
+  const modal = document.getElementById('addModal');
+  modal.classList.add('show');
+  document.getElementById('editItemId').value = editId || '';
+  document.getElementById('modalTitle').textContent = editId ? `Editar ${editId}` : 'Novo Item';
+
+  if (editId) {
+    const item = allItems.find(i => i.item_id === editId);
+    if (item) {
+      document.getElementById('fTitle').value = item.title || '';
+      document.getElementById('fDesc').value = item.description || '';
+      document.getElementById('fType').value = item.item_type || 'feature';
+      document.getElementById('fModule').value = item.module || 'core';
+      document.getElementById('fStatus').value = item.status || 'backlog';
+      document.getElementById('fPhase').value = item.phase || 'Phase 2';
+      document.getElementById('fReach').value = item.reach || 100;
+      document.getElementById('fImpact').value = item.impact || 1;
+      document.getElementById('fConfidence').value = item.confidence || 0.8;
+      document.getElementById('fEffort').value = item.effort || 2;
+      document.getElementById('fEstimate').value = item.estimate || '';
+      document.getElementById('fDeps').value = item.dependencies || '';
+      document.getElementById('fNotes').value = item.notes || '';
+    }
+  } else {
+    ['fTitle','fDesc','fEstimate','fDeps','fNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fType').value = 'feature';
+    document.getElementById('fModule').value = 'core';
+    document.getElementById('fStatus').value = 'backlog';
+    document.getElementById('fPhase').value = 'Phase 2';
+    document.getElementById('fReach').value = 100;
+    document.getElementById('fImpact').value = '1';
+    document.getElementById('fConfidence').value = '0.8';
+    document.getElementById('fEffort').value = '2';
+  }
+  updateRicePreview();
+}
+function hideAddModal() { document.getElementById('addModal').classList.remove('show'); }
+function editItem(id) { showAddModal(id); }
+
+function updateRicePreview() {
+  const r = parseInt(document.getElementById('fReach').value) || 100;
+  const i = parseFloat(document.getElementById('fImpact').value) || 1;
+  const c = parseFloat(document.getElementById('fConfidence').value) || 0.8;
+  const e = parseFloat(document.getElementById('fEffort').value) || 2;
+  const score = calcRice(r, i, c, e);
+  const el = document.getElementById('ricePreview');
+  el.textContent = score;
+  el.className = `rice-preview-score ${riceClass(score)}`;
+}
+// Attach preview updaters
+['fReach','fImpact','fConfidence','fEffort'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateRicePreview);
+  document.getElementById(id)?.addEventListener('change', updateRicePreview);
+});
+
+async function saveItem() {
+  const editId = document.getElementById('editItemId').value;
+  const payload = {
+    title: document.getElementById('fTitle').value.trim(),
+    description: document.getElementById('fDesc').value,
+    item_type: document.getElementById('fType').value,
+    module: document.getElementById('fModule').value,
+    status: document.getElementById('fStatus').value,
+    phase: document.getElementById('fPhase').value,
+    reach: parseInt(document.getElementById('fReach').value) || 100,
+    impact: parseFloat(document.getElementById('fImpact').value) || 1,
+    confidence: parseFloat(document.getElementById('fConfidence').value) || 0.8,
+    effort: parseFloat(document.getElementById('fEffort').value) || 2,
+    estimate: document.getElementById('fEstimate').value,
+    dependencies: document.getElementById('fDeps').value,
+    notes: document.getElementById('fNotes').value,
+  };
+
+  if (!payload.title) { alert('Título obrigatório!'); return; }
+
+  try {
+    if (editId) {
+      await fetch(`/api/backlog/${editId}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      });
+    } else {
+      await fetch('/api/backlog', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      });
+    }
+    hideAddModal();
+    await loadBacklog();
+  } catch(e) { console.error('saveItem:', e); alert('Erro ao salvar!'); }
+}
+
+async function deleteItem(id) {
+  if (!confirm(`Remover ${id}?`)) return;
+  try {
+    await fetch(`/api/backlog/${id}`, { method: 'DELETE' });
+    await loadBacklog();
+  } catch(e) { console.error('deleteItem:', e); }
+}
+
+// ── Export ──
+function exportBacklog() {
+  const md = allItems.map(i => {
+    const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
+    return `### ${i.item_id} — ${i.title}\n**Tipo:** ${i.item_type} | **Módulo:** ${i.module} | **Status:** ${i.status} | **Fase:** ${i.phase}\n**RICE:** ${rice} (R:${i.reach} I:${i.impact} C:${i.confidence} E:${i.effort})\n${i.description || ''}\n${i.dependencies ? '**Deps:** ' + i.dependencies : ''}\n${i.notes ? '**Notas:** ' + i.notes : ''}\n`;
+  }).join('\n---\n\n');
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'criatons-backlog.md';
+  a.click();
+}
+
+// ── Init ──
+loadBacklog();
+</script>
+{% endblock %}

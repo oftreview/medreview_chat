@@ -14,6 +14,7 @@ def register_blueprints(app):
     from .analytics_api import bp as analytics_bp
     from .hubspot_api import bp as hubspot_bp
     from .health import bp as health_bp
+    from .backlog_api import bp as backlog_bp
 
     for bp in [
         dashboard_bp,
@@ -24,5 +25,6 @@ def register_blueprints(app):
         analytics_bp,
         hubspot_bp,
         health_bp,
+        backlog_bp,
     ]:
         app.register_blueprint(bp)

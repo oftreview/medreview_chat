@@ -37,6 +37,12 @@ def dashboard_analytics():
     return render_template("dashboard/analytics.html", active_page="analytics")
 
 
+@bp.route("/backlog")
+def dashboard_backlog():
+    """Product backlog management dashboard."""
+    return render_template("dashboard/backlog.html", active_page="backlog")
+
+
 @bp.route("/logs")
 def dashboard_logs():
     """System logs dashboard."""

@@ -13,6 +13,9 @@ from .corrections import (save_correction, load_corrections, increment_reinciden
                           _load_corrections_json, _save_corrections_json, _sync_json_to_supabase)
 from .analytics import (analytics_funnel, analytics_time_per_stage,
                         analytics_keywords, analytics_conversation_quality)
+from .backlog import (load_backlog, save_backlog_item, delete_backlog_item,
+                      get_next_item_id, reorder_backlog, backlog_analytics,
+                      seed_backlog_if_empty)
 
 __all__ = [
     # client
@@ -52,4 +55,12 @@ __all__ = [
     "analytics_time_per_stage",
     "analytics_keywords",
     "analytics_conversation_quality",
+    # backlog
+    "load_backlog",
+    "save_backlog_item",
+    "delete_backlog_item",
+    "get_next_item_id",
+    "reorder_backlog",
+    "backlog_analytics",
+    "seed_backlog_if_empty",
 ]
