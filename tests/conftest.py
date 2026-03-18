@@ -1,5 +1,5 @@
 """
-tests/conftest.py — Shared pytest fixtures for Criatons test suite.
+tests/conftest.py — Shared pytest fixtures for Closi AI test suite.
 
 Ensures the project root is in sys.path so `from src.*` imports work.
 """

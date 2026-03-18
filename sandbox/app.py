@@ -1064,7 +1064,7 @@ def api_hubspot_sync(user_id):
 @app.route("/api/hubspot/mapping", methods=["GET", "POST"])
 def api_hubspot_mapping():
     """
-    GET: retorna mapeamento atual de stages Criatons → HubSpot.
+    GET: retorna mapeamento atual de stages Closi AI → HubSpot.
     POST: atualiza mapeamento customizado.
     Payload: { "abertura": "qualifiedtobuy", "fechamento": "closedwon", ... }
     """
@@ -1120,5 +1120,5 @@ def health_memory():
 
 
 if __name__ == "__main__":
-    print(f"\n🟣 Criatons rodando em http://{HOST}:{PORT}\n")
+    print(f"\n🟣 Closi AI rodando em http://{HOST}:{PORT}\n")
     app.run(host=HOST, debug=DEBUG, port=PORT)

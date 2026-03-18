@@ -1,5 +1,5 @@
 """
-core/security.py — Camada de segurança do Criatons.
+core/security.py — Camada de segurança do Closi AI.
 
 Funções:
   sanitize_input()          — limpa e valida a entrada do usuário

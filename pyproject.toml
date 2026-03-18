@@ -1,5 +1,5 @@
 [project]
-name = "criatons"
+name = "closi-ai"
 version = "1.0.0"
 description = "Agente autônomo de vendas via WhatsApp para MedReview"
 requires-python = ">=3.11"

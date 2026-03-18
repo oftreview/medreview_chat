@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS backlog_items (
     id              BIGSERIAL PRIMARY KEY,
-    item_id         TEXT UNIQUE NOT NULL,           -- ex: CRI-001
+    item_id         TEXT UNIQUE NOT NULL,           -- ex: CLO-001
     title           TEXT NOT NULL,
     description     TEXT DEFAULT '',
     item_type       TEXT DEFAULT 'feature'
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS backlog_items (
 
     -- Detalhes
     estimate        TEXT DEFAULT '',                 -- ex: "2d", "1w"
-    dependencies    TEXT DEFAULT '',                 -- ex: "CRI-003, CRI-005"
+    dependencies    TEXT DEFAULT '',                 -- ex: "CLO-003, CLO-005"
     notes           TEXT DEFAULT '',
     sort_order      INTEGER DEFAULT 0,              -- para drag & drop
 

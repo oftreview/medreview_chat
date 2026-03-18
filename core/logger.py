@@ -1,5 +1,5 @@
 """
-core/logger.py — Logger de segurança e conversas do Criatons.
+core/logger.py — Logger de segurança e conversas do Closi AI.
 
 Registra eventos de segurança em logs/security.log (formato JSON-lines).
 Nunca armazena dados PII diretamente — usa hash do user_id.
@@ -27,7 +27,7 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 
 # ── Logger de segurança (arquivo JSON-lines) ──────────────────────────────────
 
-_security_logger = logging.getLogger("criatons.security")
+_security_logger = logging.getLogger("closi-ai.security")
 _security_logger.setLevel(logging.INFO)
 
 if not _security_logger.handlers:
@@ -38,7 +38,7 @@ if not _security_logger.handlers:
 
 # ── Logger de conversas ───────────────────────────────────────────────────────
 
-_conv_logger = logging.getLogger("criatons.conversation")
+_conv_logger = logging.getLogger("closi-ai.conversation")
 _conv_logger.setLevel(logging.INFO)
 
 if not _conv_logger.handlers:

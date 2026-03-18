@@ -49,7 +49,7 @@ def api_hubspot_sync(user_id):
 @bp.route("/api/hubspot/mapping", methods=["GET", "POST"])
 def api_hubspot_mapping():
     """
-    GET: Return current stage mapping (Criatons → HubSpot).
+    GET: Return current stage mapping (Closi AI → HubSpot).
     POST: Update custom mapping.
     Payload: { "abertura": "qualifiedtobuy", "fechamento": "closedwon", ... }
     """

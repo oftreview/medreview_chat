@@ -1,4 +1,4 @@
-# Criatons — Plano de Refatoração Completa
+# Closi AI — Plano de Refatoração Completa
 
 > **STATUS: CONCLUÍDO** — Todos os 5 steps executados em 17/03/2026.
 > Código legado (`sandbox/`, `core/`, `agents/`) ainda existe para referência mas não é mais usado.
@@ -42,7 +42,7 @@ Mistura: conexão Supabase, CRUD de conversas, lead metadata, escalações, corr
 ## Estrutura Final Proposta
 
 ```
-criatons/
+closi-ai/
 ├── README.md                       # Overview profissional
 ├── .env.example                    # Todas as env vars documentadas
 ├── .gitignore
@@ -244,11 +244,11 @@ A camada de polimento para a apresentação. Nenhum código muda.
 | # | Tarefa | Detalhe |
 |---|--------|---------|
 | 5.1 | Reescrever `README.md` | Overview profissional: o que é, stack, arquitetura (diagrama ASCII), como rodar, como deployar |
-| 5.2 | Criar `docs/architecture.md` | Diagrama de fluxo: Lead → WhatsApp → Z-API → Criatons → Claude → resposta |
+| 5.2 | Criar `docs/architecture.md` | Diagrama de fluxo: Lead → WhatsApp → Z-API → Closi AI → Claude → resposta |
 | 5.3 | Criar `docs/api-reference.md` | Tabela com todos os 25+ endpoints: método, path, descrição, auth, payload |
 | 5.4 | Mover `docs/botmaker-integration-guide.md` → `docs/botmaker-integration.md` | Nome mais limpo |
 | 5.5 | Criar `docs/deploy-guide.md` | Substituir o `.docx` antigo por markdown |
-| 5.6 | Limpar arquivos legados | Remover `ANALISE_TECNICA_CRIATONS.md`, `resumo-criatons.md`, `guia-deploy-railway.docx`, `supabase_schema.sql` (substituído pelas migrations), `PLANO_REFATORACAO.md` |
+| 5.6 | Limpar arquivos legados | Remover `ANALISE_TECNICA_CLOSI_AI.md`, `resumo-closi-ai.md`, `guia-deploy-railway.docx`, `supabase_schema.sql` (substituído pelas migrations), `PLANO_REFATORACAO.md` |
 
 **Resultado:** Repo limpo. Qualquer dev abre o README e entende o projeto em 2 minutos. Endpoints documentados. Arquivos legados removidos.
 

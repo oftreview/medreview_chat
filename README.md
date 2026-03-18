@@ -1,8 +1,8 @@
-# Criatons
+# Closi AI
 
 Agente autônomo de vendas no WhatsApp para a **MedReview** — plataforma de preparação para provas de residência médica.
 
-O Criatons recebe mensagens de leads via WhatsApp (Z-API) e formulários web, conduz conversas de vendas consultivas usando Claude (Anthropic) e sincroniza dados com HubSpot CRM.
+O Closi AI recebe mensagens de leads via WhatsApp (Z-API) e formulários web, conduz conversas de vendas consultivas usando Claude (Anthropic) e sincroniza dados com HubSpot CRM.
 
 ## Arquitetura
 
@@ -39,7 +39,7 @@ Para mais detalhes, veja `docs/architecture.md`.
 
 ```bash
 # 1. Clone e entre no diretório
-git clone <repo-url> && cd criatons
+git clone <repo-url> && cd closi-ai
 
 # 2. Crie o virtualenv
 python3.12 -m venv .venv && source .venv/bin/activate
@@ -95,7 +95,7 @@ Veja `.env.example` para a lista completa com descrições. As principais:
 ## Estrutura do Projeto
 
 ```
-criatons/
+closi-ai/
 ├── src/                  # Código-fonte principal
 ├── data/                 # Dados estáticos do produto (JSON)
 ├── tests/                # Testes pytest
@@ -111,4 +111,4 @@ criatons/
 
 ## Licença
 
-Projeto proprietário — MedReview / Criatons.
+Projeto proprietário — MedReview / Closi AI.

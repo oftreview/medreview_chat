@@ -1,5 +1,5 @@
 -- ============================================================
--- Criatons — Schema Supabase
+-- Closi AI — Schema Supabase
 -- Execute no SQL Editor do Supabase (supabase.com → SQL Editor)
 -- ============================================================
 

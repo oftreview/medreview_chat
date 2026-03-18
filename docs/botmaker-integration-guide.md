@@ -1,4 +1,4 @@
-# Integração Botmaker ↔ Criatons
+# Integração Botmaker ↔ Closi AI
 
 ## Endpoint
 
@@ -65,7 +65,7 @@ A IA retorna HTTP 200 mesmo em falha interna para não travar o fluxo da Botmake
 
 | HTTP | Causa | Ação |
 |------|-------|------|
-| 401  | Token inválido ou ausente | Verifique `CRIATONS_TOKEN` |
+| 401  | Token inválido ou ausente | Verifique `CLOSI_AI_TOKEN` |
 | 400  | `user_id` ou `message` vazio | Verifique variáveis do fluxo |
 | 429  | Rate limit excedido | Aguarde e reenvie |
 

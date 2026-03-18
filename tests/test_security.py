@@ -1,5 +1,5 @@
 """
-tests/test_security.py — Testes adversariais de segurança do Criatons (pytest).
+tests/test_security.py — Testes adversariais de segurança do Closi AI (pytest).
 
 Roda sem dependências externas (não precisa de Claude ou Supabase).
 Testa: sanitize_input, check_injection_patterns, filter_output, rate_limiter, hash_user_id.

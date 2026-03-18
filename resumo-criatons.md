@@ -1,4 +1,4 @@
-# CRIATONS — Resumo Executivo do Projeto
+# CLOSI AI — Resumo Executivo do Projeto
 
 ## O que é
 
@@ -9,7 +9,7 @@ Agente de vendas autônomo por WhatsApp para a MedReview (preparatório para Res
 ## Arquitetura
 
 ```
-Lead (WhatsApp) → Botmaker → POST /chat → Criatons (Flask + Claude) → resposta → Botmaker → Lead
+Lead (WhatsApp) → Botmaker → POST /chat → Closi AI (Flask + Claude) → resposta → Botmaker → Lead
 ```
 
 **Stack:** Python 3 + Flask + Gunicorn (gevent) | Deploy: Railway | DB: Supabase (opcional)
@@ -82,7 +82,7 @@ Lead (WhatsApp) → Botmaker → POST /chat → Criatons (Flask + Claude) → re
 1. Botmaker recebe mensagem do lead no WhatsApp
 2. Nó "Executar código" roda o script `botmaker-integration.js`
 3. Script faz POST para `https://web-production-63ae4.up.railway.app/chat`
-4. Criatons processa e retorna resposta
+4. Closi AI processa e retorna resposta
 5. Botmaker envia resposta ao lead
 
 ### Payload de entrada
@@ -96,7 +96,7 @@ Lead (WhatsApp) → Botmaker → POST /chat → Criatons (Flask + Claude) → re
 
 ### Headers
 ```
-Authorization: Bearer {CRIATONS_TOKEN}
+Authorization: Bearer {CLOSI_AI_TOKEN}
 Content-Type: application/json
 ```
 
@@ -122,7 +122,7 @@ Content-Type: application/json
 ## Arquivos do Projeto
 
 ```
-criatons/
+closi-ai/
 ├── sandbox/app.py              ← Servidor Flask (API principal)
 ├── agents/sales/agent.py       ← Classe do agente de vendas
 ├── agents/sales/prompts/       ← Prompts do Claude (system + stages)

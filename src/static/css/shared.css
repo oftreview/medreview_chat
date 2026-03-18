@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Criatons — Shared CSS Components
+   Closi AI — Shared CSS Components
    Estilos reutilizáveis extraídos das páginas do dashboard.
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Stat / Summary Cards ─────────────────────────────────────────
    Usados em: corrections, costs, analytics
    Aplicar classe .stats-row no container e .stat-card em cada card.
-   Variantes de cor: .stat-card.purple, .green, .orange, .red       */
+   Variantes de cor: .stat-card.primary, .green, .orange, .red       */
 
 .stats-row {
   display: grid;
@@ -22,7 +22,7 @@
   padding: 16px 18px;
   transition: border-color 0.2s;
 }
-.stat-card:hover { border-color: var(--purple); }
+.stat-card:hover { border-color: var(--primary); }
 
 .stat-card .card-label {
   font-size: 10px;
@@ -44,14 +44,16 @@
   margin-top: 4px;
 }
 
-/* Cor padrão (purple) */
-.stat-card .card-value { color: var(--purple-light); }
+/* Cor padrão (primary/blue) */
+.stat-card .card-value { color: var(--primary-light); }
 
 /* Variantes de cor */
 .stat-card.green  .card-value { color: var(--green); }
 .stat-card.orange .card-value { color: var(--orange); }
 .stat-card.red    .card-value { color: var(--red); }
-.stat-card.purple .card-value { color: var(--purple-light); }
+.stat-card.primary .card-value { color: var(--primary-light); }
+/* backward compat */
+.stat-card.purple .card-value { color: var(--primary-light); }
 
 
 /* ── Tables ───────────────────────────────────────────────────────
@@ -76,17 +78,17 @@
 }
 .data-table td {
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(139,63,187,0.06);
+  border-bottom: 1px solid rgba(37,99,235,0.06);
   color: var(--text);
 }
 .data-table tr:hover td {
-  background: rgba(139,63,187,0.04);
+  background: rgba(37,99,235,0.04);
 }
 
 
 /* ── Section Title ────────────────────────────────────────────────
    Usado em: costs, analytics
-   Padrão: <div class="section-title"><span class="dot purple"></span> Texto</div> */
+   Padrão: <div class="section-title"><span class="dot primary"></span> Texto</div> */
 
 .section-title {
   font-size: 12px;
@@ -103,7 +105,8 @@
   width: 8px; height: 8px;
   border-radius: 50%;
 }
-.section-title .dot.purple { background: var(--purple-light); }
+.section-title .dot.primary { background: var(--primary-light); }
+.section-title .dot.purple { background: var(--primary-light); }
 .section-title .dot.green  { background: var(--green); }
 .section-title .dot.orange { background: var(--orange); }
 
@@ -119,9 +122,9 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.sev-badge.critica { background: rgba(224,85,85,0.15); color: var(--red); }
-.sev-badge.alta    { background: rgba(224,195,64,0.15); color: var(--yellow); }
-.sev-badge.media   { background: rgba(139,63,187,0.15); color: var(--purple-light); }
+.sev-badge.critica { background: rgba(239,68,68,0.15); color: var(--red); }
+.sev-badge.alta    { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.sev-badge.media   { background: rgba(37,99,235,0.15); color: var(--primary-light); }
 
 .status-pill {
   font-size: 10px;
@@ -129,9 +132,9 @@
   padding: 2px 8px;
   border-radius: 10px;
 }
-.status-pill.ativa    { background: rgba(224,85,85,0.12); color: var(--red); }
-.status-pill.resolvida { background: rgba(76,175,128,0.12); color: var(--green); }
-.status-pill.arquivada { background: rgba(139,128,168,0.12); color: var(--text-dim); }
+.status-pill.ativa    { background: rgba(239,68,68,0.12); color: var(--red); }
+.status-pill.resolvida { background: rgba(16,185,129,0.12); color: var(--green); }
+.status-pill.arquivada { background: rgba(100,116,139,0.12); color: var(--text-dim); }
 
 
 /* ── Score Bars ───────────────────────────────────────────────────
@@ -147,7 +150,7 @@
 .score-bar-track {
   flex: 1;
   height: 6px;
-  background: rgba(139,63,187,0.1);
+  background: rgba(37,99,235,0.1);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -175,7 +178,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(139,63,187,0.06);
+  border-bottom: 1px solid rgba(37,99,235,0.06);
 }
 .config-row:last-child { border-bottom: none; }
 .config-label { font-size: 12px; color: var(--text-dim); }
@@ -218,7 +221,7 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--purple);
+  border-color: var(--primary);
 }
 
 .form-actions {
@@ -278,7 +281,7 @@
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 
 /* ── Responsive Helpers ───────────────────────────────────────────

@@ -1,4 +1,4 @@
-# API Reference — Criatons
+# API Reference — Closi AI
 
 Base URL: `https://web-production-63ae4.up.railway.app`
 

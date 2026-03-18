@@ -110,7 +110,7 @@ def api_backlog_delete(item_id):
 def api_backlog_reorder():
     """
     Reordena itens do backlog.
-    Payload: { "ordered_ids": ["CRI-003", "CRI-001", ...] }
+    Payload: { "ordered_ids": ["CLO-003", "CLO-001", ...] }
     """
     data = request.get_json(silent=True) or {}
     ordered_ids = data.get("ordered_ids", [])

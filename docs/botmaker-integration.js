@@ -1,5 +1,5 @@
 /**
- * CRIATONS — Integração Botmaker ↔ IA (v2)
+ * CLOSI AI — Integração Botmaker ↔ IA (v2)
  * ==========================================
  * Cole este código no nó "Executar código" (Node.js) da Botmaker.
  *
@@ -8,38 +8,38 @@
  *   contact       — objeto do contato Botmaker (contém whatsApp, phone, name, etc.)
  *
  * VARIÁVEL DE SAÍDA (disponível nos nós seguintes):
- *   IA_response   — resposta gerada pelo agente Criatons (string)
+ *   IA_response   — resposta gerada pelo agente Closi AI (string)
  *   IA_status     — status da resposta: "success" | "error" (string)
  *
  * CONFIGURAÇÃO:
  *   1. No Railway, defina API_SECRET_TOKEN nas variáveis de ambiente
- *   2. Substitua CRIATONS_TOKEN abaixo pelo mesmo token
+ *   2. Substitua CLOSI_AI_TOKEN abaixo pelo mesmo token
  *      (ou configure como variável de ambiente na Botmaker se disponível)
- *   3. Ajuste CRIATONS_URL se o domínio do Railway mudar
+ *   3. Ajuste CLOSI_AI_URL se o domínio do Railway mudar
  *
  * COMO FUNCIONA:
- *   Botmaker recebe msg do WhatsApp → este nó envia para o Criatons →
- *   Criatons processa com Claude (com debounce de 10s) → retorna resposta →
+ *   Botmaker recebe msg do WhatsApp → este nó envia para o Closi AI →
+ *   Closi AI processa com Claude (com debounce de 10s) → retorna resposta →
  *   IA_response fica disponível para o próximo nó enviar ao lead.
  */
 
 // ── Configuração ──────────────────────────────────────────────────────────────
 
-const CRIATONS_URL   = "https://web-production-63ae4.up.railway.app/chat";
-const CRIATONS_TOKEN = process.env.CRIATONS_TOKEN || "SEU_API_SECRET_TOKEN_AQUI";
+const CLOSI_AI_URL   = "https://web-production-63ae4.up.railway.app/chat";
+const CLOSI_AI_TOKEN = process.env.CLOSI_AI_TOKEN || "SEU_API_SECRET_TOKEN_AQUI";
 
 // Timeout: debounce (10s) + Claude (~5s) + margem (10s) = 25s
-// Em caso de retry interno do Criatons, pode chegar a 30s
+// Em caso de retry interno do Closi AI, pode chegar a 30s
 const TIMEOUT_MS = 30000;
 
 // Mensagem exibida ao lead quando a IA falha
 const FALLBACK_MSG = "Estou com uma instabilidade agora, em breve um consultor vai te atender.";
 
-// ── Função principal: envia mensagem para o Criatons ─────────────────────────
+// ── Função principal: envia mensagem para o Closi AI ─────────────────────────
 
-async function askCriatons(userId, message) {
+async function askClosiAI(userId, message) {
   const https = require("https");
-  const url   = new URL(CRIATONS_URL);
+  const url   = new URL(CLOSI_AI_URL);
 
   const payload = {
     user_id:  String(userId),
@@ -56,7 +56,7 @@ async function askCriatons(userId, message) {
       method:   "POST",
       headers: {
         "Content-Type":  "application/json",
-        "Authorization": `Bearer ${CRIATONS_TOKEN}`,
+        "Authorization": `Bearer ${CLOSI_AI_TOKEN}`,
         "Content-Length": Buffer.byteLength(body),
       },
       timeout: TIMEOUT_MS,
@@ -68,7 +68,7 @@ async function askCriatons(userId, message) {
       res.on("end", () => {
         // ── Tratar erros HTTP antes de parsear ────────────────────────
         if (res.statusCode === 401) {
-          reject(new Error("[AUTH] Token inválido — verifique CRIATONS_TOKEN"));
+          reject(new Error("[AUTH] Token inválido — verifique CLOSI_AI_TOKEN"));
           return;
         }
         if (res.statusCode === 429) {
@@ -85,7 +85,7 @@ async function askCriatons(userId, message) {
           const parsed = JSON.parse(data);
           if (parsed.status === "error" || !parsed.response) {
             // IA retornou fallback interno (Claude falhou, Supabase off, etc.)
-            // Ainda usa a resposta — é o fallback amigável do Criatons
+            // Ainda usa a resposta — é o fallback amigável do Closi AI
             resolve(parsed.response || FALLBACK_MSG);
           } else {
             resolve(parsed.response);
@@ -119,20 +119,20 @@ const contato = contact?.whatsApp || contact?.phone || user_id || "";
 const mensagem = user_message || "";
 
 if (!contato) {
-  console.error("[Criatons] Erro: não foi possível identificar o contato (sem whatsApp/phone/user_id)");
+  console.error("[Closi AI] Erro: não foi possível identificar o contato (sem whatsApp/phone/user_id)");
   IA_response = FALLBACK_MSG;
   IA_status = "error";
 } else if (!mensagem) {
-  console.error("[Criatons] Erro: mensagem vazia (user_message não definido)");
+  console.error("[Closi AI] Erro: mensagem vazia (user_message não definido)");
   IA_response = FALLBACK_MSG;
   IA_status = "error";
 } else {
   try {
-    IA_response = await askCriatons(contato, mensagem);
+    IA_response = await askClosiAI(contato, mensagem);
     IA_status = "success";
-    console.log("[Criatons] Resposta recebida para contato:", contato.substring(0, 6) + "***");
+    console.log("[Closi AI] Resposta recebida para contato:", contato.substring(0, 6) + "***");
   } catch (err) {
-    console.error("[Criatons] Erro:", err.message);
+    console.error("[Closi AI] Erro:", err.message);
     IA_response = FALLBACK_MSG;
     IA_status = "error";
   }

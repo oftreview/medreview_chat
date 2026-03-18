@@ -1,5 +1,5 @@
 """
-gunicorn.conf.py — Gunicorn configuration for Criatons.
+gunicorn.conf.py — Gunicorn configuration for Closi AI.
 
 Ensures gevent monkey patching happens before any application imports.
 Gunicorn's gevent worker class handles monkey patching automatically,

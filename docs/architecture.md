@@ -1,12 +1,12 @@
-# Arquitetura — Criatons
+# Arquitetura — Closi AI
 
 ## Visão Geral
 
-O Criatons é um agente de vendas autônomo que opera no WhatsApp. Ele recebe mensagens de leads, gera respostas usando Claude (Anthropic), e gerencia o pipeline de vendas no HubSpot.
+O Closi AI é um agente de vendas autônomo que opera no WhatsApp. Ele recebe mensagens de leads, gera respostas usando Claude (Anthropic), e gerencia o pipeline de vendas no HubSpot.
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  WhatsApp    │────▶│   Criatons   │────▶│   Supabase   │
+│  WhatsApp    │────▶│   Closi AI   │────▶│   Supabase   │
 │  (Z-API)     │◀────│   (Flask)    │     │  (PostgreSQL)│
 └──────────────┘     └──────┬───────┘     └──────────────┘
                             │

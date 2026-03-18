@@ -1,5 +1,5 @@
 """
-src/config.py — Configuração centralizada do Criatons.
+src/config.py — Configuração centralizada do Closi AI.
 
 Todas as variáveis de ambiente são lidas aqui e exportadas como constantes.
 Nenhum outro módulo deve chamar os.getenv() diretamente.

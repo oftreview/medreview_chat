@@ -1,4 +1,4 @@
-# Análise Técnica Completa — Criatons
+# Análise Técnica Completa — Closi AI
 
 **Data:** 14 de março de 2026
 **Escopo:** Diagnóstico, priorização e roadmap para agente de vendas WhatsApp autônomo

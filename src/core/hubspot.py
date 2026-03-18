@@ -1,7 +1,7 @@
 """
-Módulo de integração HubSpot — Fase 3 (Criatons → HubSpot).
+Módulo de integração HubSpot — Fase 3 (Closi AI → HubSpot).
 
-Direção: unidirecional (Criatons → HubSpot).
+Direção: unidirecional (Closi AI → HubSpot).
 O agente envia dados para o HubSpot conforme interage com leads.
 
 Mapeamento:
@@ -24,7 +24,7 @@ from src.config import HUBSPOT_ACCESS_TOKEN, HUBSPOT_PIPELINE_ID, HUBSPOT_ENABLE
 # Base URL da API v3 do HubSpot
 _BASE = "https://api.hubapi.com"
 
-# Mapeamento: funnel_stage (Criatons) → deal stage ID (HubSpot)
+# Mapeamento: funnel_stage (Closi AI) → deal stage ID (HubSpot)
 # O usuário pode customizar via /api/hubspot/mapping ou variável de ambiente
 # Por padrão usa nomes descritivos — precisam ser mapeados ao pipeline real
 _DEFAULT_STAGE_MAP = {
