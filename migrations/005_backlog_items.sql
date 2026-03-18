@@ -8,14 +8,14 @@ CREATE TABLE IF NOT EXISTS backlog_items (
     item_id         TEXT UNIQUE NOT NULL,           -- ex: CLO-001
     title           TEXT NOT NULL,
     description     TEXT DEFAULT '',
-    item_type       TEXT DEFAULT 'feature'
-        CHECK (item_type IN ('feature','enhancement','bugfix','tech-debt','infra','research')),
+    item_type       TEXT DEFAULT 'feat'
+        CHECK (item_type IN ('feat','fix','docs','refactor','style','test','chore','perf','ci','build','research')),
     module          TEXT DEFAULT 'core'
         CHECK (module IN ('agent','api','core','database','dashboard','integrations','data','devops')),
     status          TEXT DEFAULT 'backlog'
         CHECK (status IN ('backlog','next','in-progress','review','done','blocked','cancelled')),
     phase           TEXT DEFAULT 'Phase 2'
-        CHECK (phase IN ('MVP','Phase 2','Phase 3','Phase 4')),
+        CHECK (phase IN ('Phase 1','Phase 2','Phase 3','Phase 4','Phase 5','Phase 6','Phase 7','Phase 8','Phase 9','Phase 10')),
 
     -- RICE scoring
     reach           INTEGER DEFAULT 100,
