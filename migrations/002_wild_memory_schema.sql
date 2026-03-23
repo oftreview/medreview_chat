@@ -71,15 +71,32 @@ CREATE TABLE IF NOT EXISTS observations (
     invalidated_at TIMESTAMPTZ,
     invalidated_by UUID REFERENCES observations(id),
 
-    -- Full-text search (UP18)
-    search_vector tsvector GENERATED ALWAYS AS (
-        setweight(to_tsvector('portuguese', content), 'A')
-        || setweight(to_tsvector('simple', array_to_string(entities, ' ')), 'B')
-    ) STORED,
+    -- Full-text search (UP18) — uses trigger instead of GENERATED
+    -- (to_tsvector('portuguese', ...) is not immutable)
+    search_vector tsvector,
 
     created_at TIMESTAMPTZ DEFAULT now(),
     last_accessed TIMESTAMPTZ DEFAULT now()
 );
+
+-- Trigger function to maintain search_vector
+CREATE OR REPLACE FUNCTION observations_search_vector_update()
+RETURNS trigger AS $$
+BEGIN
+    NEW.search_vector :=
+        setweight(to_tsvector('portuguese', COALESCE(NEW.content, '')), 'A')
+        || setweight(to_tsvector('simple', array_to_string(COALESCE(NEW.entities, '{}'), ' ')), 'B');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger on INSERT and UPDATE
+DROP TRIGGER IF EXISTS trg_observations_search_vector ON observations;
+CREATE TRIGGER trg_observations_search_vector
+    BEFORE INSERT OR UPDATE OF content, entities
+    ON observations
+    FOR EACH ROW
+    EXECUTE FUNCTION observations_search_vector_update();
 
 -- Indexes for observations
 CREATE INDEX IF NOT EXISTS idx_obs_agent_user ON observations(agent_id, user_id);
