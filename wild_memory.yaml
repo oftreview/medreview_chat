@@ -1,0 +1,147 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Wild Memory — Configuração para Closi-AI (MedReview)
+# ══════════════════════════════════════════════════════════════════════════════
+# As credenciais de Supabase são lidas automaticamente das env vars:
+#   WILD_MEMORY_SUPABASE_URL (ou SUPABASE_URL)
+#   WILD_MEMORY_SUPABASE_KEY (ou SUPABASE_KEY)
+#   ANTHROPIC_API_KEY
+#   OPENAI_API_KEY
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Supabase (mesmo projeto do Closi-AI) ─────────────────────────────────────
+# Credenciais carregadas via env vars — NÃO colocar aqui
+supabase:
+  url: ""
+  key: ""
+
+# ── Modelos LLM ──────────────────────────────────────────────────────────────
+# Premium: usado APENAS para conversa direta com lead
+# Economy: usado para distillation, goal detection, reflection, conflicts (~73% economia)
+models:
+  premium:
+    provider: anthropic
+    model: claude-sonnet-4-20250514
+    cost_per_1m_input: 3.0
+    cost_per_1m_output: 15.0
+  economy:
+    provider: anthropic
+    model: claude-haiku-4-5-20251001
+    cost_per_1m_input: 0.80
+    cost_per_1m_output: 4.0
+
+# ── Embeddings ───────────────────────────────────────────────────────────────
+embedding:
+  provider: openai
+  model: text-embedding-3-small
+  dimensions: 1536
+
+# ── Identidade do Agente (Salmon) ────────────────────────────────────────────
+imprint_path: memory/imprint.yaml
+procedures_dir: memory/procedures
+memory_dir: memory
+
+# ── Decay / Esquecimento (Ant) ───────────────────────────────────────────────
+# 2% de decay diário — memórias não acessadas perdem relevância
+decay:
+  daily_rate: 0.02
+  stale_threshold: 0.3       # abaixo disso → marcado como stale
+  archive_threshold: 0.1     # abaixo disso → arquivado
+  protected_types:
+    - decision
+    - correction
+  protected_min_importance: 7
+
+# ── TTL por tipo de observation ──────────────────────────────────────────────
+ttl_defaults:
+  decision: 180    # decisões duram 6 meses
+  preference: 90   # preferências duram 3 meses
+  fact: 365        # fatos duram 1 ano
+  goal: 30         # objetivos duram 1 mês
+  correction: 365  # correções duram 1 ano
+  feedback: 60     # feedback dura 2 meses
+  insight: 180     # insights duram 6 meses
+
+# ── Semantic Cache (Elephant) ────────────────────────────────────────────────
+# Cacheia respostas para perguntas semanticamente similares (FAQs)
+cache:
+  enabled: true
+  similarity_threshold: 0.93   # 93% de similaridade para hit
+  ttl_hours: 72                # cache expira em 3 dias
+  personal_keywords:           # queries com essas palavras NUNCA são cacheadas
+    - meu
+    - minha
+    - cancelar
+    - reembolso
+    - problema
+    - erro
+    - nome
+    - telefone
+
+# ── Retrieval Weights (Elephant) ─────────────────────────────────────────────
+# Pesos dos 5 sinais de retrieval (soma = 1.0)
+retrieval_weights:
+  semantic: 0.30       # similaridade semântica via embedding
+  entity_match: 0.20   # entidades mencionadas na query
+  fts_keyword: 0.15    # full-text search por keywords
+  recency: 0.15        # mensagens mais recentes
+  decay: 0.12          # score de decay (uso frequente)
+  emotion: 0.08        # valência emocional
+
+# ── Distillation Gate (Bee) ──────────────────────────────────────────────────
+# Filtra mensagens triviais ANTES de gastar tokens com distillation
+gate:
+  min_chars: 40
+  trivial_patterns:
+    - "^(ok|ta|tá|sim|nao|não|entendi|beleza|blz|vlw)$"
+    - "^(obrigad[oa]|valeu|tmj|show|top|massa)$"
+    - "^(pode ser|bora|vamo[s]?|fecho[u]?)$"
+    - "^\\s*$"
+  signal_keywords:
+    - decidi
+    - escolhi
+    - quero
+    - prefiro
+    - mudei
+    - cancelar
+    - preço
+    - quanto
+    - valor
+    - desconto
+    - parcela
+    - prova
+    - residência
+    - especialidade
+
+# ── Briefing Cache ───────────────────────────────────────────────────────────
+briefing_cache:
+  max_turns_without_rebuild: 4   # rebuilda briefing a cada 4 turns
+
+# ── Goal Cache ───────────────────────────────────────────────────────────────
+goal_cache:
+  max_turns: 4
+  change_signals:
+    - na verdade
+    - mudando de
+    - outra coisa
+    - sobre outro
+    - aproveitando
+    - alias
+    - aliás
+    - mudei de ideia
+    - na real
+
+# ── Checkpoint ───────────────────────────────────────────────────────────────
+checkpoint:
+  interval_messages: 5   # salva estado a cada 5 mensagens
+
+# ── Session Log ──────────────────────────────────────────────────────────────
+session_log:
+  ttl_days: 14   # logs brutos expiram em 14 dias
+
+# ── Conflict Resolution ─────────────────────────────────────────────────────
+conflict:
+  similarity_threshold: 0.85   # acima disso → possível conflito
+
+# ── Context Window ───────────────────────────────────────────────────────────
+max_context_tokens: 150000
+compress_threshold: 0.7   # comprime quando atinge 70% do max
