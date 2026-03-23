@@ -216,6 +216,8 @@ class WildMemoryShadow:
                     pass
 
             # ── Step 3: Distillation (async → sync bridge) ──
+            # gevent monkey-patches threading, so we need to handle
+            # the case where an event loop may already be running.
             import asyncio
 
             async def _distill():
@@ -230,12 +232,20 @@ class WildMemoryShadow:
                     conflict_resolver=wm.conflict_resolver,
                 )
 
-            # Run async distillation in a new event loop
-            loop = asyncio.new_event_loop()
+            # Try to use existing loop, fallback to new one
             try:
-                loop.run_until_complete(_distill())
-            finally:
-                loop.close()
+                loop = asyncio.get_running_loop()
+                # Loop already running (gevent context) — schedule as task
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                    pool.submit(self._run_async_in_new_loop, _distill).result(timeout=30)
+            except RuntimeError:
+                # No running loop — safe to create one
+                loop = asyncio.new_event_loop()
+                try:
+                    loop.run_until_complete(_distill())
+                finally:
+                    loop.close()
 
             duration_ms = (time.time() - start) * 1000
             self.metrics.record_distillation(duration_ms)
@@ -251,6 +261,16 @@ class WildMemoryShadow:
         except Exception as e:
             self.metrics.record_error(f"process: {e}")
             print(f"[WILD SHADOW] Erro no processamento: {e}", flush=True)
+
+    @staticmethod
+    def _run_async_in_new_loop(coro_fn):
+        """Run an async coroutine in a brand new event loop (separate thread)."""
+        import asyncio
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(coro_fn())
+        finally:
+            loop.close()
 
     def get_status(self) -> dict:
         """Retorna status completo do shadow mode para health check."""
