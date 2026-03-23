@@ -58,6 +58,14 @@ def health_memory():
     )
 
 
+@bp.route("/health/wild-memory", methods=["GET"])
+def health_wild_memory():
+    """Wild Memory shadow mode status and metrics."""
+    from src.core.wild_memory_shadow import shadow
+    status = shadow.get_status()
+    return jsonify(status), 200
+
+
 @bp.route("/api/metrics", methods=["GET"])
 def api_metrics():
     """Return API usage metrics (tokens, costs, cache)."""

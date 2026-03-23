@@ -10,6 +10,7 @@ import os
 import re
 from src.core.llm import call_claude
 from src.core.memory import ConversationMemory
+from src.core.wild_memory_shadow import shadow as _wild_shadow
 
 # ── Configuração de truncamento de histórico ─────────────────────────────────
 KEEP_FIRST = 4
@@ -212,6 +213,9 @@ class SalesAgent:
 
         # Salva a resposta LIMPA (sem tag e sem [META]) no histórico
         self.memory.add(session_id, "assistant", response_text)
+
+        # ── Wild Memory Shadow (Fase 2): observa sem alterar resposta ─────
+        _wild_shadow.observe(session_id, user_message, response_text)
 
         if escalate:
             self.memory.set_status(session_id, "escalated")
