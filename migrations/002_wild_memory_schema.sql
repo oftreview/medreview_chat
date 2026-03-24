@@ -382,7 +382,7 @@ CREATE OR REPLACE FUNCTION retrieve_observations(
     created_at TIMESTAMPTZ,
     emotional_valence TEXT,
     emotional_intensity SMALLINT,
-    combined_score REAL
+    combined_score DOUBLE PRECISION
 ) AS $$
 BEGIN
     RETURN QUERY
