@@ -56,10 +56,19 @@
 /* ── Layout: Submenu + Content ───────────────────────────────── */
 .wm-layout {
   display: flex;
-  height: 100%;
+  height: 100vh;
+  width: 100%;
   background: var(--wm-bg);
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--wm-text);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* When embedded inside a host layout (e.g. Closi-AI .content-area) */
+.content-area .wm-layout {
+  height: 100%;
 }
 
 /* ── Submenu (left sidebar inside Wild Memory) ───────────────── */

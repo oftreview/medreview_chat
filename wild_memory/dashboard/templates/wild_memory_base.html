@@ -3,66 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Wild Memory v3.0{% endblock %}</title>
+    <title>{% block wm_title %}Wild Memory v3.0{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('wild_memory_dashboard.static', filename='wild_memory.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="wm-container">
-        <!-- Left Sidebar Navigation -->
+    <div class="wm-layout">
+        <!-- Wild Memory Submenu -->
         <aside class="wm-submenu">
             <div class="wm-submenu-header">
-                🧠 Wild Memory v3.0
+                <div class="wm-submenu-title">🧠 Wild Memory</div>
+                <div class="wm-submenu-version">v3.0</div>
             </div>
 
             <div class="wm-submenu-section">
-                <div class="wm-submenu-section-title">CAMADAS</div>
-                <nav class="wm-submenu-nav">
+                <div class="wm-submenu-label">CAMADAS</div>
+                <nav>
                     <a href="/wild-memory"
-                       class="wm-submenu-item {% if active_page == 'overview' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'overview' %}active{% endif %}"
                        data-layer="overview">
-                        🧠 Overview
+                        <span class="wm-nav-emoji">🧠</span> Overview
                     </a>
                     <a href="/wild-memory/salmon"
-                       class="wm-submenu-item {% if active_page == 'salmon' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'salmon' %}active{% endif %}"
                        data-layer="salmon">
-                        🐟 Salmão
+                        <span class="wm-nav-emoji">🐟</span> Salmão
                     </a>
                     <a href="/wild-memory/bee"
-                       class="wm-submenu-item {% if active_page == 'bee' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'bee' %}active{% endif %}"
                        data-layer="bee">
-                        🐝 Abelha
+                        <span class="wm-nav-emoji">🐝</span> Abelha
                     </a>
                     <a href="/wild-memory/elephant"
-                       class="wm-submenu-item {% if active_page == 'elephant' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'elephant' %}active{% endif %}"
                        data-layer="elephant">
-                        🐘 Elefante
+                        <span class="wm-nav-emoji">🐘</span> Elefante
                     </a>
                     <a href="/wild-memory/dolphin"
-                       class="wm-submenu-item {% if active_page == 'dolphin' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'dolphin' %}active{% endif %}"
                        data-layer="dolphin">
-                        🐬 Golfinho
+                        <span class="wm-nav-emoji">🐬</span> Golfinho
                     </a>
                     <a href="/wild-memory/ant"
-                       class="wm-submenu-item {% if active_page == 'ant' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'ant' %}active{% endif %}"
                        data-layer="ant">
-                        🐜 Formiga
+                        <span class="wm-nav-emoji">🐜</span> Formiga
                     </a>
                     <a href="/wild-memory/chameleon"
-                       class="wm-submenu-item {% if active_page == 'chameleon' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'chameleon' %}active{% endif %}"
                        data-layer="chameleon">
-                        🦎 Camaleão
+                        <span class="wm-nav-emoji">🦎</span> Camaleão
                     </a>
                 </nav>
             </div>
 
             <div class="wm-submenu-section">
-                <div class="wm-submenu-section-title">SISTEMA</div>
-                <nav class="wm-submenu-nav">
+                <div class="wm-submenu-label">SISTEMA</div>
+                <nav>
                     <a href="/wild-memory/setup"
-                       class="wm-submenu-item {% if active_page == 'setup' %}active{% endif %}"
+                       class="wm-nav-item {% if active_page == 'setup' %}active{% endif %}"
                        data-layer="setup">
-                        ⚙️ Setup
+                        <span class="wm-nav-emoji">⚙️</span> Setup
                     </a>
                 </nav>
             </div>
@@ -70,11 +71,11 @@
 
         <!-- Main Content Area -->
         <main class="wm-content">
-            {% block content %}{% endblock %}
+            {% block wm_content %}{% endblock %}
         </main>
     </div>
 
     <script src="{{ url_for('wild_memory_dashboard.static', filename='wild_memory.js') }}"></script>
-    {% block scripts %}{% endblock %}
+    {% block wm_scripts %}{% endblock %}
 </body>
 </html>
