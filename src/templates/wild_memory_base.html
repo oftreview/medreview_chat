@@ -3,7 +3,7 @@
 {% block title %}Wild Memory · {% block wm_title %}Dashboard{% endblock %}{% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('wild_memory_dashboard.static', filename='wild_memory.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='wild_memory/wild_memory.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
@@ -77,6 +77,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('wild_memory_dashboard.static', filename='wild_memory.js') }}"></script>
+<script src="{{ url_for('static', filename='wild_memory/wild_memory.js') }}"></script>
 {% block wm_scripts %}{% endblock %}
 {% endblock %}
