@@ -278,11 +278,16 @@ def chat():
                     "channel": channel,
                     "user_id": user_id,
                     "_waiters": 0,
+                    "_waiter_seq": 0,       # Sequência incremental de waiters
+                    "_primary_waiter": 0,   # Qual waiter é o primário (último a resetar timer)
                 }
 
             state = _chat_state[session_id]
             state["messages"].append(message)
             state["_waiters"] = state.get("_waiters", 0) + 1
+            state["_waiter_seq"] = state.get("_waiter_seq", 0) + 1
+            my_waiter_id = state["_waiter_seq"]
+            state["_primary_waiter"] = my_waiter_id  # Último a entrar é o primário
             if user_id != session_id:
                 state["user_id"] = user_id
 
@@ -309,10 +314,27 @@ def chat():
         with _chat_lock:
             state = _chat_state.get(session_id, {})
             result = state.get("result")
-            if result:
+            is_primary = (my_waiter_id == state.get("_primary_waiter", 0))
+            # Decrement waiters and cleanup when last one exits
+            if state:
                 state["_waiters"] = state.get("_waiters", 1) - 1
                 if state["_waiters"] <= 0:
                     _chat_state.pop(session_id, None)
+
+        # Only the primary waiter (last request that reset the timer) gets the real response.
+        # Earlier waiters get a "debounced" status so Botmaker ignores them.
+        if not is_primary:
+            print(
+                f"[DEBOUNCE] Waiter secundário descartado session={hash_user_id(session_id)} waiter={my_waiter_id}",
+                flush=True,
+            )
+            return jsonify({
+                "session_id": session_id,
+                "response": "",
+                "responses": [],
+                "user_id": user_id,
+                "status": "debounced",
+            })
 
         if triggered and result:
             return jsonify(result)

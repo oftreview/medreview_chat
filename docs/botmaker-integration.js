@@ -91,6 +91,17 @@ async function askClosiAI(userId, message) {
         try {
           const parsed = JSON.parse(data);
 
+          // Requisição duplicada (debounce): outra req já levou a resposta
+          if (parsed.status === "debounced") {
+            resolve({
+              response:      "",
+              responses:     [],
+              status:        "debounced",
+              delaySeconds:  0,
+            });
+            return;
+          }
+
           // Sessão escalada: lead está em atendimento humano, IA pausada
           if (parsed.status === "escalated_session") {
             resolve({
@@ -177,13 +188,18 @@ if (!contato) {
     IA_has_multipart = result.responses.length > 1;
     IA_delay_seconds = result.delaySeconds;
 
-    console.log(
-      "[Closi AI] OK |",
-      "contato:", contato.substring(0, 6) + "***",
-      "| status:", result.status,
-      "| partes:", result.responses.length,
-      "| delay:", result.delaySeconds + "s"
-    );
+    // Requisição debounced: não enviar nada ao lead
+    if (result.status === "debounced") {
+      console.log("[Closi AI] DEBOUNCED | contato:", contato.substring(0, 6) + "*** | ignorando resposta duplicada");
+    } else {
+      console.log(
+        "[Closi AI] OK |",
+        "contato:", contato.substring(0, 6) + "***",
+        "| status:", result.status,
+        "| partes:", result.responses.length,
+        "| delay:", result.delaySeconds + "s"
+      );
+    }
   } catch (err) {
     console.error("[Closi AI] Erro:", err.message);
     IA_response      = FALLBACK_MSG;

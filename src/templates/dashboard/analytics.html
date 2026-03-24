@@ -224,12 +224,11 @@ async function loadSummary() {
 
     // Total leads
     const funnel = d.funnel || {};
-    const stages = funnel.stages || [];
-    const totalLeads = stages.reduce((s, st) => s + (st.count || 0), 0);
+    const totalLeads = funnel.total_leads || 0;
     document.getElementById('cardLeads').textContent = totalLeads;
 
     // Conversion rate
-    const rate = funnel.conversion_rate || 0;
+    const rate = funnel.conversion_rate_pct || 0;
     document.getElementById('cardConversion').textContent = fmtPct(rate);
     document.getElementById('cardConversionSub').textContent = `do total de ${totalLeads} leads`;
 
@@ -240,8 +239,8 @@ async function loadSummary() {
 
     // Corrections 7d
     const c = d.corrections_7d || {};
-    const totalCorr = (c.by_severity || []).reduce((s, x) => s + (x.count || 0), 0);
-    const reincident = (c.reincident_count || 0);
+    const totalCorr = c.total_active || 0;
+    const reincident = c.reincidences_last_period || 0;
     document.getElementById('cardErrors').textContent = totalCorr;
     document.getElementById('cardErrorsSub').textContent = reincident > 0 ? `${reincident} reincidentes` : 'sem reincidencias';
   } catch(e) {
@@ -253,7 +252,7 @@ async function loadFunnel() {
   try {
     const res = await fetch('/api/analytics/funnel');
     const d = await res.json();
-    const stages = d.stages || [];
+    const stages = d.funnel || [];
     if (!stages.length) {
       document.getElementById('funnelPanel').innerHTML = '<div class="loading-text">Nenhum lead no funil ainda</div>';
       return;
@@ -261,13 +260,16 @@ async function loadFunnel() {
     const maxCount = Math.max(...stages.map(s => s.count || 0), 1);
     let html = '';
     const stageLabels = {
-      'novo': 'Novo',
-      'qualificando': 'Qualificando',
-      'interessado': 'Interessado',
-      'negociando': 'Negociando',
-      'convertido': 'Convertido',
-      'perdido': 'Perdido',
+      'abertura': 'Abertura',
+      'qualificacao': 'Qualificacao',
+      'diagnostico': 'Diagnostico',
+      'apresentacao': 'Apresentacao',
+      'objecao': 'Objecao',
+      'negociacao': 'Negociacao',
+      'fechamento': 'Fechamento',
+      'pos_venda': 'Pos-Venda',
       'desqualificado': 'Desqualificado',
+      'escalado': 'Escalado',
     };
     stages.forEach(s => {
       const pct = maxCount > 0 ? ((s.count || 0) / maxCount * 100) : 0;
@@ -278,7 +280,7 @@ async function loadFunnel() {
           <div class="funnel-bar" style="width:${pct}%"></div>
           <div class="funnel-count">${s.count || 0}</div>
         </div>
-        <div class="funnel-pct">${fmtPct(s.percentage)}</div>
+        <div class="funnel-pct">${fmtPct(s.pct)}</div>
       </div>`;
     });
     document.getElementById('funnelPanel').innerHTML = html;
@@ -317,14 +319,17 @@ async function loadQuality() {
       document.getElementById('qualityBody').innerHTML = '<tr><td colspan="6" class="loading-text">Nenhuma conversa analisada</td></tr>';
       return;
     }
-    document.getElementById('qualityBody').innerHTML = convs.slice(0, 20).map(c => `<tr>
+    document.getElementById('qualityBody').innerHTML = convs.slice(0, 20).map(c => {
+      const b = c.breakdown || {};
+      return `<tr>
       <td>${maskPhone(c.user_id)}</td>
-      <td>${scoreBar(c.quality_score)}</td>
-      <td>${scoreBar(c.engagement)}</td>
-      <td>${scoreBar(c.depth)}</td>
-      <td>${scoreBar(c.balance)}</td>
-      <td>${scoreBar(c.progress)}</td>
-    </tr>`).join('');
+      <td>${scoreBar(c.score)}</td>
+      <td>${scoreBar(b.engagement)}</td>
+      <td>${scoreBar(b.depth)}</td>
+      <td>${scoreBar(b.balance)}</td>
+      <td>${scoreBar(b.progress)}</td>
+    </tr>`;
+    }).join('');
   } catch(e) {
     console.error('Erro quality:', e);
     document.getElementById('qualityBody').innerHTML = '<tr><td colspan="6" class="loading-text">Erro ao carregar qualidade</td></tr>';
