@@ -211,7 +211,7 @@ class TestSalesAgentIntegrationPhase3(unittest.TestCase):
         self.assertIn("_wild_shadow.observe(", source)
 
     def test_agent_minimal_changes(self):
-        """SalesAgent deve ter exatamente 4 linhas wild: 2 imports + 1 observe + 1 context."""
+        """SalesAgent deve ter exatamente 6 linhas wild: 3 imports + observe + get_context + on_session_end."""
         source = _read_file("src/agent/sales_agent.py")
         wild_refs = [
             line.strip() for line in source.split("\n")
@@ -219,12 +219,10 @@ class TestSalesAgentIntegrationPhase3(unittest.TestCase):
             and not line.strip().startswith("#")
             and line.strip()  # skip empty
         ]
-        # 2 imports + 1 observe + 1 get_context + 1 memory_briefing assignment = 5
-        # But memory_briefing var name doesn't contain "wild"
-        # So: import shadow, import context, observe(), get_context() = 4
+        # 3 imports (shadow, context, lifecycle) + observe() + get_context() + on_session_end() = 6
         self.assertEqual(
-            len(wild_refs), 4,
-            f"Esperado 4 referências a wild no agente, encontrado {len(wild_refs)}: {wild_refs}"
+            len(wild_refs), 6,
+            f"Esperado 6 referências a wild no agente, encontrado {len(wild_refs)}: {wild_refs}"
         )
 
 

@@ -14,6 +14,7 @@ Fluxo:
 import os
 from src.core import database
 from src.config import SUPERVISOR_PHONE, BOTMAKER_API_KEY, BOTMAKER_TEAM_ID
+from src.core.wild_memory_lifecycle import lifecycle as _wild_lifecycle
 
 
 # ── Formatação do brief para WhatsApp ─────────────────────────────────────────
@@ -145,6 +146,13 @@ def handle_escalation(lead_phone: str, agent_memory, lead_name: str = "Lead",
             hubspot.sync_escalation(lead_phone, brief)
     except Exception as e:
         print(f"[ESCALATION HUBSPOT WARN] Sync falhou: {e}", flush=True)
+
+    # 6. Wild Memory: registra feedback signal + distilação completa (Fase 4)
+    _wild_lifecycle.on_escalation(
+        session_id=session_id or lead_phone,
+        user_id=lead_phone,
+        metadata=brief.get("lead_data", {}),
+    )
 
 
 def resolve_escalation(lead_phone: str, agent_memory, resolution: str = None) -> None:

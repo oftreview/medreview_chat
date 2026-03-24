@@ -60,12 +60,40 @@ def health_memory():
 
 @bp.route("/health/wild-memory", methods=["GET"])
 def health_wild_memory():
-    """Wild Memory shadow mode + context injection status and metrics."""
+    """Wild Memory complete status: shadow + context + lifecycle."""
     from src.core.wild_memory_shadow import shadow
     from src.core.wild_memory_context import context_injector
+    from src.core.wild_memory_lifecycle import lifecycle
     status = shadow.get_status()
     status["context_injection"] = context_injector.get_status()
+    status["lifecycle"] = lifecycle.get_status()
+    try:
+        from src.core.scheduler import get_status as scheduler_status
+        status["scheduler"] = scheduler_status()
+    except Exception:
+        status["scheduler"] = {"enabled": False, "reason": "import_error"}
     return jsonify(status), 200
+
+
+@bp.route("/api/wild-memory/cron", methods=["POST"])
+def wild_memory_cron():
+    """
+    Manutenção diária do Wild Memory.
+    Roda: decay → stale marking → cache cleanup → session cleanup.
+    Chamar via Railway cron job ou manualmente.
+    Requer auth (mesmo token da API).
+    """
+    from src.core.wild_memory_lifecycle import lifecycle
+    from src.config import API_SECRET_TOKEN
+
+    # Auth check
+    if API_SECRET_TOKEN:
+        auth = request.headers.get("Authorization", "")
+        if auth != f"Bearer {API_SECRET_TOKEN}":
+            return jsonify({"error": "Unauthorized"}), 401
+
+    results = lifecycle.run_daily_maintenance()
+    return jsonify(results), 200
 
 
 @bp.route("/api/metrics", methods=["GET"])

@@ -12,6 +12,7 @@ from src.core.llm import call_claude
 from src.core.memory import ConversationMemory
 from src.core.wild_memory_shadow import shadow as _wild_shadow
 from src.core.wild_memory_context import context_injector as _wild_context
+from src.core.wild_memory_lifecycle import lifecycle as _wild_lifecycle
 
 # ── Configuração de truncamento de histórico ─────────────────────────────────
 KEEP_FIRST = 4
@@ -274,7 +275,10 @@ class SalesAgent:
         }
 
     def reset(self, session_id: str = None):
+        # ── Wild Memory Lifecycle (Fase 4): distila antes de limpar ───────
         if session_id:
+            messages = self.memory.get(session_id)
+            _wild_lifecycle.on_session_end(session_id, session_id, reason="reset", messages=messages)
             self._lead_data.pop(session_id, None)
         else:
             self._lead_data = {}

@@ -31,6 +31,13 @@ def create_app():
     from src.api import register_blueprints
     register_blueprints(app)
 
+    # Start background scheduler (Wild Memory daily maintenance)
+    try:
+        from src.core.scheduler import init_scheduler
+        init_scheduler(app)
+    except Exception:
+        pass
+
     # Root redirect
     @app.route("/")
     def index():
