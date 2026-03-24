@@ -60,9 +60,11 @@ def health_memory():
 
 @bp.route("/health/wild-memory", methods=["GET"])
 def health_wild_memory():
-    """Wild Memory shadow mode status and metrics."""
+    """Wild Memory shadow mode + context injection status and metrics."""
     from src.core.wild_memory_shadow import shadow
+    from src.core.wild_memory_context import context_injector
     status = shadow.get_status()
+    status["context_injection"] = context_injector.get_status()
     return jsonify(status), 200
 
 

@@ -331,17 +331,17 @@ class TestOriginalFilesIntegrity(unittest.TestCase):
         self.assertNotIn("wild_memory", source)
         self.assertNotIn("shadow", source)
 
-    def test_sales_agent_only_2_changes(self):
-        """SalesAgent deve ter exatamente 2 adições: 1 import + 1 observe()."""
+    def test_sales_agent_shadow_present(self):
+        """SalesAgent deve ter shadow import + observe()."""
         source = self._read("src/agent/sales_agent.py")
-        wild_refs = [
+        shadow_refs = [
             line for line in source.split("\n")
-            if "wild" in line.lower() and not line.strip().startswith("#")
+            if "_wild_shadow" in line and not line.strip().startswith("#")
         ]
-        # Deve ter exatamente 2 linhas com "wild": import + observe
+        # Deve ter exatamente 2 linhas com shadow: import + observe
         self.assertEqual(
-            len(wild_refs), 2,
-            f"Esperado 2 referências a wild no agente, encontrado {len(wild_refs)}: {wild_refs}"
+            len(shadow_refs), 2,
+            f"Esperado 2 referências a _wild_shadow no agente, encontrado {len(shadow_refs)}: {shadow_refs}"
         )
 
 

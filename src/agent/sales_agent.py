@@ -11,6 +11,7 @@ import re
 from src.core.llm import call_claude
 from src.core.memory import ConversationMemory
 from src.core.wild_memory_shadow import shadow as _wild_shadow
+from src.core.wild_memory_context import context_injector as _wild_context
 
 # ── Configuração de truncamento de histórico ─────────────────────────────────
 KEEP_FIRST = 4
@@ -163,7 +164,10 @@ class SalesAgent:
         full_history = self.memory.get(session_id)
         truncated = _truncate_history(full_history)
 
-        response_text = call_claude(self.system_prompt, truncated)
+        # ── Wild Memory Context (Fase 3): injeta briefing sem quebrar cache ──
+        memory_briefing = _wild_context.get_context(session_id, user_message)
+
+        response_text = call_claude(self.system_prompt, truncated, memory_context=memory_briefing)
 
         # ── Extrair metadados [META] ───────────────────────────────────────
         response_text, metadata = _extract_metadata(response_text)

@@ -21,7 +21,7 @@ RETRY_BASE_DELAY = 1.0          # segundos — delay inicial (dobra a cada tenta
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 529}
 
 
-def call_claude(system_prompt: str, messages: list) -> str:
+def call_claude(system_prompt: str, messages: list, memory_context: str = None) -> str:
     """
     Chama a Claude API com Prompt Caching habilitado.
 
@@ -40,6 +40,9 @@ def call_claude(system_prompt: str, messages: list) -> str:
     Args:
         system_prompt: Contexto completo do agente (product_info, objections, etc.)
         messages: Histórico da conversa [{"role": "user/assistant", "content": "..."}]
+        memory_context: (Fase 3) Briefing do Wild Memory — injetado como bloco
+            dinâmico DEPOIS do system prompt cacheado. Não afeta o cache.
+            Se None, comportamento é idêntico ao original.
 
     Returns:
         Texto da resposta do Claude.
@@ -50,7 +53,10 @@ def call_claude(system_prompt: str, messages: list) -> str:
     last_error = None
 
     # System prompt formatado para Prompt Caching:
-    # Um bloco de texto com cache_control marca o conteúdo como cacheável.
+    # Bloco 1: prompt principal (cacheado — ~30K tokens, reusado entre sessões)
+    # Bloco 2: memory_context (dinâmico por sessão, NÃO cacheado)
+    # O cache da Anthropic funciona por prefix matching, então o bloco 1
+    # continua tendo cache HIT mesmo com o bloco 2 variando.
     system_with_cache = [
         {
             "type": "text",
@@ -58,6 +64,12 @@ def call_claude(system_prompt: str, messages: list) -> str:
             "cache_control": {"type": "ephemeral"},
         }
     ]
+
+    if memory_context:
+        system_with_cache.append({
+            "type": "text",
+            "text": memory_context,
+        })
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
