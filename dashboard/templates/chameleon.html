@@ -1,0 +1,332 @@
+{% extends "wild_memory_base.html" %}
+
+{% block content %}
+<div class="wm-page">
+  <!-- Page Header -->
+  <div class="wm-page-header">
+    <div class="wm-page-header-content">
+      <h1 class="wm-page-title">🦎 Camaleão — Adaptação</h1>
+      <p class="wm-page-subtitle">Aprendendo com cada resultado</p>
+    </div>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="wm-cards wm-cards-3" id="metricCards">
+    <div class="wm-card wm-card-loading">
+      <div class="wm-skeleton wm-skeleton-text"></div>
+    </div>
+    <div class="wm-card wm-card-loading">
+      <div class="wm-skeleton wm-skeleton-text"></div>
+    </div>
+    <div class="wm-card wm-card-loading">
+      <div class="wm-skeleton wm-skeleton-text"></div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="wm-grid wm-grid-1">
+    <!-- Feedback Signals Chart -->
+    <div class="wm-panel" id="feedbackSignalsPanel">
+      <div class="wm-panel-header">
+        <h2 class="wm-panel-title">Sinais de Feedback</h2>
+        <div class="wm-loading wm-loading-spinner"></div>
+      </div>
+      <div class="wm-panel-content">
+        <div class="wm-chart-container">
+          <canvas id="feedbackChart" style="max-height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two Column Grid -->
+  <div class="wm-grid wm-grid-2">
+    <!-- Feedback History -->
+    <div class="wm-grid-col">
+      <div class="wm-panel" id="feedbackPanel">
+        <div class="wm-panel-header">
+          <h2 class="wm-panel-title">Histórico de Feedback</h2>
+          <div class="wm-loading wm-loading-spinner"></div>
+        </div>
+        <div class="wm-panel-content">
+          <div class="wm-table-wrapper" id="feedbackTable">
+            <table class="wm-table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Recompensa</th>
+                  <th>Usuário</th>
+                  <th>Sessão</th>
+                  <th>Fonte</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="wm-table-row-loading">
+                  <td colspan="6">
+                    <div class="wm-skeleton wm-skeleton-text"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wm-empty-state" id="feedbackEmpty" style="display: none;">
+            <p class="wm-empty-state-text">Nenhum feedback encontrado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Procedures Panel -->
+    <div class="wm-grid-col">
+      <div class="wm-panel" id="proceduresPanel">
+        <div class="wm-panel-header">
+          <h2 class="wm-panel-title">Procedimentos</h2>
+          <div class="wm-loading wm-loading-spinner"></div>
+        </div>
+        <div class="wm-panel-content">
+          <div class="wm-table-wrapper" id="proceduresTable">
+            <table class="wm-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Performance</th>
+                  <th>Execuções</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="wm-table-row-loading">
+                  <td colspan="5">
+                    <div class="wm-skeleton wm-skeleton-text"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wm-empty-state" id="proceduresEmpty" style="display: none;">
+            <p class="wm-empty-state-text">Nenhum procedimento configurado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  let feedbackChart = null;
+
+  // Load metric cards
+  async function loadMetrics() {
+    try {
+      const lifecycle = await WM.get('/api/status');
+      const feedback = await WM.get('/api/feedback/summary');
+
+      const totalFeedback = feedback.total_count || 0;
+      const avgReward = feedback.avg_reward !== undefined ? feedback.avg_reward.toFixed(2) : '0.00';
+      const escalations = feedback.escalations || 0;
+
+      const metrics = [
+        { label: 'Total de Feedback', value: totalFeedback, icon: '💬', accent: 'chameleon' },
+        { label: 'Recompensa Média', value: avgReward, icon: '⭐', accent: 'chameleon' },
+        { label: 'Escalonamentos', value: escalations, icon: '🚀', accent: 'chameleon' }
+      ];
+
+      const container = document.getElementById('metricCards');
+      container.innerHTML = metrics.map((m, i) => `
+        <div class="wm-card wm-card-accent-${m.accent}" data-index="${i}">
+          <div class="wm-card-icon">${m.icon}</div>
+          <div class="wm-card-content">
+            <div class="wm-card-label">${m.label}</div>
+            <div class="wm-card-value">${m.value}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch (error) {
+      console.error('Error loading metrics:', error);
+    }
+  }
+
+  // Load feedback signals chart
+  async function loadFeedbackChart() {
+    try {
+      const data = await WM.get('/api/feedback/summary');
+
+      const signals = data.signals || [];
+      const labels = signals.map(s => formatSignalType(s.type));
+      const counts = signals.map(s => s.count || 0);
+
+      // Determine colors based on reward
+      const colors = signals.map(s => {
+        const reward = s.reward || 0;
+        return reward > 0 ? 'rgba(34, 197, 94, 0.7)' : 'rgba(239, 68, 68, 0.7)';
+      });
+
+      const ctx = document.getElementById('feedbackChart');
+      if (feedbackChart) {
+        feedbackChart.destroy();
+      }
+
+      feedbackChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Sinais de Feedback',
+            data: counts,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace('0.7', '1')),
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            },
+            y: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }
+          }
+        }
+      });
+
+      document.getElementById('feedbackSignalsPanel').classList.remove('wm-panel-loading');
+    } catch (error) {
+      console.error('Error loading feedback chart:', error);
+    }
+  }
+
+  // Load feedback history
+  async function loadFeedback() {
+    try {
+      const data = await WM.get('/api/feedback');
+      const feedbacks = data.feedback || [];
+
+      const tbody = document.querySelector('#feedbackTable tbody');
+
+      if (feedbacks.length === 0) {
+        document.getElementById('feedbackEmpty').style.display = 'block';
+        tbody.innerHTML = '';
+      } else {
+        document.getElementById('feedbackEmpty').style.display = 'none';
+        tbody.innerHTML = feedbacks.map(f => {
+          const rewardClass = (f.reward || 0) > 0 ? 'wm-text-success' : 'wm-text-danger';
+          const rewardSign = (f.reward || 0) > 0 ? '+' : '';
+          return `
+            <tr class="wm-table-row">
+              <td>${WM.renderTag(f.type)}</td>
+              <td><span class="${rewardClass}">${rewardSign}${(f.reward || 0).toFixed(2)}</span></td>
+              <td class="wm-table-cell-text">${f.user_id || '-'}</td>
+              <td class="wm-table-cell-text">${f.session_id ? f.session_id.substring(0, 8) : '-'}</td>
+              <td>${f.source || '-'}</td>
+              <td>${new Date(f.created_at).toLocaleString('pt-BR', {
+                year: '2-digit', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+              })}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('feedbackPanel').classList.remove('wm-panel-loading');
+    } catch (error) {
+      console.error('Error loading feedback:', error);
+    }
+  }
+
+  // Load procedures
+  async function loadProcedures() {
+    try {
+      const data = await WM.get('/api/procedures');
+      const procedures = data.procedures || [];
+
+      const tbody = document.querySelector('#proceduresTable tbody');
+
+      if (procedures.length === 0) {
+        document.getElementById('proceduresEmpty').style.display = 'block';
+        tbody.innerHTML = '';
+      } else {
+        document.getElementById('proceduresEmpty').style.display = 'none';
+        tbody.innerHTML = procedures.map(p => {
+          const perfScore = p.performance_score || 0;
+          const status = p.status || 'active';
+          const statusTag = status === 'active' ? '🟢 Ativo' : '🔴 Inativo';
+          return `
+            <tr class="wm-table-row">
+              <td><strong>${p.name}</strong></td>
+              <td class="wm-table-cell-text">${truncate(p.description || '', 40)}</td>
+              <td>${WM.renderDecayBar(perfScore)}</td>
+              <td>${WM.formatNumber(p.execution_count || 0)}</td>
+              <td>${WM.renderTag(statusTag)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('proceduresPanel').classList.remove('wm-panel-loading');
+    } catch (error) {
+      console.error('Error loading procedures:', error);
+    }
+  }
+
+  // Utility functions
+  function formatSignalType(type) {
+    const map = {
+      'conversion': '✓ Conversão',
+      'abandonment': '✗ Abandono',
+      'handoff_request': '🤝 Handoff',
+      'correction': '✏️ Correção',
+      'escalation': '🚀 Escalonamento',
+      'timeout': '⏱️ Timeout',
+      'error': '❌ Erro'
+    };
+    return map[type] || type;
+  }
+
+  function truncate(str, length) {
+    if (!str) return '';
+    return str.length > length ? str.substring(0, length) + '…' : str;
+  }
+
+  // Initial load
+  loadMetrics();
+  loadFeedbackChart();
+  loadFeedback();
+  loadProcedures();
+
+  // Poll for updates every 30 seconds
+  setInterval(() => {
+    loadMetrics();
+    loadFeedback();
+  }, 30000);
+})();
+</script>
+{% endblock %}

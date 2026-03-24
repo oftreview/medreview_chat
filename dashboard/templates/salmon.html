@@ -1,0 +1,225 @@
+{% extends "wild_memory_base.html" %}
+
+{% block title %}Wild Memory — Salmão (Identidade){% endblock %}
+
+{% block content %}
+<div class="wm-page">
+    <!-- Page Header -->
+    <div class="wm-page-header">
+        <div class="wm-page-title">
+            <h1>🐟 Salmão — Identidade</h1>
+            <p class="wm-page-subtitle">A essência permanente do agente</p>
+        </div>
+    </div>
+
+    <!-- Imprint Panel -->
+    <div class="wm-panel wm-panel-large">
+        <div class="wm-panel-header">
+            <h2>Imprint do Agente</h2>
+        </div>
+        <div class="wm-panel-content">
+            <div id="imprint-container" class="wm-loading">
+                <div class="wm-spinner"></div>
+                <p>Loading imprint data...</p>
+            </div>
+        </div>
+        <div class="wm-panel-footer">
+            <span class="wm-file-path" id="imprint-path">—</span>
+        </div>
+    </div>
+
+    <!-- Entity Categories (NER) Panel -->
+    <div class="wm-panel wm-panel-large">
+        <div class="wm-panel-header">
+            <h2>Domínio NER</h2>
+            <p class="wm-panel-subtitle">Named Entity Recognition Categories</p>
+        </div>
+        <div class="wm-panel-content">
+            <div id="ner-container" class="wm-ner-grid wm-loading">
+                <div class="wm-spinner"></div>
+                <p>Loading entity categories...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize Salmon page
+document.addEventListener('DOMContentLoaded', function() {
+    loadImprintData();
+    loadNERData();
+});
+
+function loadImprintData() {
+    WM.get('imprint', function(data) {
+        if (data && data.imprint) {
+            renderImprint(data.imprint, data.file_path);
+        } else {
+            document.getElementById('imprint-container').innerHTML =
+                '<p class="wm-empty-state">No imprint data available</p>';
+        }
+    }, function(error) {
+        document.getElementById('imprint-container').innerHTML =
+            '<p class="wm-error-state">Failed to load imprint data</p>';
+        console.error('Imprint load error:', error);
+    });
+}
+
+function renderImprint(imprint, filePath) {
+    const container = document.getElementById('imprint-container');
+    let html = '';
+
+    // Role Section
+    if (imprint.role) {
+        html += `
+            <div class="wm-imprint-section">
+                <div class="wm-imprint-role">
+                    <h3>Role</h3>
+                    <p class="wm-imprint-role-text">${escapeHtml(imprint.role)}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Values Section
+    if (imprint.values && Array.isArray(imprint.values) && imprint.values.length > 0) {
+        const valuesList = imprint.values
+            .map(v => `<li>${escapeHtml(v)}</li>`)
+            .join('');
+        html += `
+            <div class="wm-imprint-section">
+                <h3>Values</h3>
+                <ul class="wm-imprint-list">${valuesList}</ul>
+            </div>
+        `;
+    }
+
+    // Constraints Section
+    if (imprint.constraints && Array.isArray(imprint.constraints) && imprint.constraints.length > 0) {
+        const constraintsList = imprint.constraints
+            .map(c => `<li>${escapeHtml(c)}</li>`)
+            .join('');
+        html += `
+            <div class="wm-imprint-section">
+                <h3>Constraints</h3>
+                <ul class="wm-imprint-list">${constraintsList}</ul>
+            </div>
+        `;
+    }
+
+    // Tone of Voice Section
+    if (imprint.tone_of_voice) {
+        html += `
+            <div class="wm-imprint-section">
+                <h3>Tone of Voice</h3>
+                <p class="wm-imprint-text">${escapeHtml(imprint.tone_of_voice)}</p>
+            </div>
+        `;
+    }
+
+    // Permissions Section
+    if (imprint.permissions && typeof imprint.permissions === 'object') {
+        const permsList = Object.entries(imprint.permissions)
+            .map(([key, value]) => `
+                <div class="wm-imprint-pair">
+                    <span class="wm-imprint-key">${escapeHtml(key)}</span>
+                    <span class="wm-imprint-value">${escapeHtml(String(value))}</span>
+                </div>
+            `)
+            .join('');
+        html += `
+            <div class="wm-imprint-section">
+                <h3>Permissions</h3>
+                <div class="wm-imprint-pairs">${permsList}</div>
+            </div>
+        `;
+    }
+
+    // Org Context Section
+    if (imprint.org_context && typeof imprint.org_context === 'object') {
+        const orgJson = JSON.stringify(imprint.org_context, null, 2);
+        html += `
+            <div class="wm-imprint-section">
+                <h3>Org Context</h3>
+                <pre class="wm-json-block"><code>${escapeHtml(orgJson)}</code></pre>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+
+    // Update file path footer
+    if (filePath) {
+        document.getElementById('imprint-path').textContent = filePath;
+    }
+}
+
+function loadNERData() {
+    WM.get('ner', function(data) {
+        if (data && data.categories) {
+            renderNERCategories(data.categories);
+        } else {
+            document.getElementById('ner-container').innerHTML =
+                '<p class="wm-empty-state">No NER categories defined</p>';
+        }
+    }, function(error) {
+        document.getElementById('ner-container').innerHTML =
+            '<p class="wm-empty-state">No NER categories defined</p>';
+        console.error('NER load error:', error);
+    });
+}
+
+function renderNERCategories(categories) {
+    const container = document.getElementById('ner-container');
+
+    if (!categories || Object.keys(categories).length === 0) {
+        container.innerHTML = '<p class="wm-empty-state">No NER categories defined</p>';
+        return;
+    }
+
+    const categoryColors = {
+        'PERSON': '#FF6B6B',
+        'ORG': '#4ECDC4',
+        'GPE': '#45B7D1',
+        'LOCATION': '#96CEB4',
+        'DATE': '#FFEAA7',
+        'TIME': '#DDA15E',
+        'MONEY': '#BC6C25',
+        'PERCENT': '#D4A574',
+        'FACILITY': '#95B8D1',
+        'PRODUCT': '#B39DDB',
+        'EVENT': '#F8B195',
+        'LANGUAGE': '#AA96DA'
+    };
+
+    let html = '';
+    Object.entries(categories).forEach(([category, description]) => {
+        const color = categoryColors[category] || '#9CA3AF';
+        html += `
+            <div class="wm-ner-category">
+                <div class="wm-ner-color" style="background-color: ${color};"></div>
+                <div class="wm-ner-info">
+                    <div class="wm-ner-name">${escapeHtml(category)}</div>
+                    <div class="wm-ner-desc">${escapeHtml(description || 'No description')}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,360 @@
+{% extends "wild_memory_base.html" %}
+
+{% block title %}🐘 Elefante — Wild Memory v3.0{% endblock %}
+
+{% block content %}
+<div class="wm-page-header">
+    <div class="wm-page-emoji">🐘</div>
+    <div>
+        <div class="wm-page-title">Elefante — Retrieval</div>
+        <div class="wm-page-subtitle">A informação certa, no momento certo</div>
+    </div>
+</div>
+
+<!-- Metric Cards -->
+<div class="wm-cards wm-cards-4" id="elephant-metrics">
+    <div class="wm-loading"><div class="wm-spinner"></div></div>
+</div>
+
+<!-- Retrieval Playground -->
+<div class="wm-panel">
+    <div class="wm-panel-title">🎮 Playground de Retrieval</div>
+
+    <div class="wm-playground">
+        <input type="text" class="wm-input" id="query-input" placeholder="Digite sua query..." style="flex: 1;">
+        <input type="text" class="wm-input" id="userid-input" placeholder="User ID" style="max-width: 120px;">
+        <button class="wm-btn primary" id="search-btn">Buscar</button>
+    </div>
+
+    <div id="results-container" style="margin-top: 14px;">
+        <!-- Results will be rendered here -->
+    </div>
+</div>
+
+<!-- Two Column Layout: Citation Trails + Semantic Cache -->
+<div class="wm-cols">
+    <!-- Citation Trails -->
+    <div class="wm-panel">
+        <div class="wm-panel-title">📋 Citation Trails</div>
+        <div class="wm-table-wrap">
+            <table class="wm-table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Message Idx</th>
+                        <th>N Sources</th>
+                        <th>Avg Score</th>
+                        <th>Criado</th>
+                    </tr>
+                </thead>
+                <tbody id="citations-tbody">
+                    <tr><td colspan="5" style="text-align: center; padding: 20px;">
+                        <div class="wm-spinner" style="margin: 0 auto;"></div> Carregando...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Semantic Cache -->
+    <div class="wm-panel">
+        <div class="wm-panel-title">💾 Semantic Cache</div>
+
+        <div id="cache-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <div style="padding: 12px; background: var(--wm-surface2); border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">Total Entries</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--wm-elephant);" id="cache-total">—</div>
+            </div>
+            <div style="padding: 12px; background: var(--wm-surface2); border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">Active</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--wm-elephant);" id="cache-active">—</div>
+            </div>
+            <div style="padding: 12px; background: var(--wm-surface2); border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">Cache Hits</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--wm-elephant);" id="cache-hits">—</div>
+            </div>
+            <div style="padding: 12px; background: var(--wm-surface2); border-radius: 8px;">
+                <div style="font-size: 10px; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">Hit Rate</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--wm-elephant);" id="cache-hitrate">—</div>
+            </div>
+        </div>
+
+        <div class="wm-chart-container">
+            <canvas id="cache-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // ── State Management ─────────────────────────────────────────────
+    const state = {
+        query: '',
+        userId: '',
+        results: [],
+        citations: [],
+        cacheStats: null,
+    };
+
+    // ── DOM Elements ─────────────────────────────────────────────────
+    const metricsEl = WM.$('#elephant-metrics');
+    const queryInputEl = WM.$('#query-input');
+    const useridInputEl = WM.$('#userid-input');
+    const searchBtnEl = WM.$('#search-btn');
+    const resultsContainerEl = WM.$('#results-container');
+    const citationsTbodyEl = WM.$('#citations-tbody');
+    const cacheTotalEl = WM.$('#cache-total');
+    const cacheActiveEl = WM.$('#cache-active');
+    const cacheHitsEl = WM.$('#cache-hits');
+    const cacheHitrateEl = WM.$('#cache-hitrate');
+
+    // ── Load Metrics from /api/status ────────────────────────────────
+    async function loadMetrics() {
+        const data = await WM.get('status');
+        if (!data) return;
+
+        const metrics = data.context_injection_metrics || {};
+        const cards = [
+            {
+                label: 'Total Hits',
+                value: WM.formatNumber(metrics.total_hits || 0),
+            },
+            {
+                label: 'Total Misses',
+                value: WM.formatNumber(metrics.total_misses || 0),
+            },
+            {
+                label: 'Timeouts',
+                value: WM.formatNumber(metrics.timeouts || 0),
+            },
+            {
+                label: 'Avg Retrieval',
+                value: WM.formatMs(metrics.avg_retrieval_ms || 0),
+            },
+        ];
+
+        metricsEl.innerHTML = cards.map(c => `
+            <div class="wm-card elephant">
+                <div class="wm-card-header">
+                    <span class="wm-card-label">${c.label}</span>
+                </div>
+                <div class="wm-card-value">${c.value}</div>
+            </div>
+        `).join('');
+    }
+
+    // ── Load Citations ───────────────────────────────────────────────
+    async function loadCitations() {
+        const data = await WM.get('citations');
+        if (!data || !data.citations) return;
+
+        state.citations = data.citations;
+        renderCitations();
+    }
+
+    // ── Render Citations Table ───────────────────────────────────────
+    function renderCitations() {
+        if (state.citations.length === 0) {
+            citationsTbodyEl.innerHTML = WM.renderEmpty('📝', 'Nenhuma citação ainda');
+            return;
+        }
+
+        const rows = state.citations.slice(0, 20).map(c => `
+            <tr>
+                <td style="font-size: 11px; font-family: monospace;">${WM.escapeHtml(c.session_id?.substring(0, 8) || '—')}</td>
+                <td>${c.message_index || '—'}</td>
+                <td>${c.n_sources || 0}</td>
+                <td>${WM.formatScore(c.avg_score || 0, 3)}</td>
+                <td style="font-size: 11px; color: var(--wm-text-dim);">
+                    ${WM.formatTime(c.created_at || '')}
+                </td>
+            </tr>
+        `).join('');
+
+        citationsTbodyEl.innerHTML = rows;
+    }
+
+    // ── Load Cache Stats ─────────────────────────────────────────────
+    async function loadCacheStats() {
+        const data = await WM.get('cache');
+        if (!data) return;
+
+        state.cacheStats = data;
+        renderCacheStats();
+    }
+
+    // ── Render Cache Stats ───────────────────────────────────────────
+    function renderCacheStats() {
+        const stats = state.cacheStats || {};
+        const total = stats.total_entries || 0;
+        const active = stats.active_entries || 0;
+        const hits = stats.cache_hits || 0;
+        const accesses = stats.total_accesses || 1;
+        const hitRate = ((hits / accesses) * 100).toFixed(1);
+
+        cacheTotalEl.textContent = WM.formatNumber(total);
+        cacheActiveEl.textContent = WM.formatNumber(active);
+        cacheHitsEl.textContent = WM.formatNumber(hits);
+        cacheHitrateEl.textContent = hitRate + '%';
+
+        // Create cache chart
+        const chartData = {
+            labels: ['Active', 'Inactive', 'Expired'],
+            datasets: [
+                {
+                    label: 'Cache Distribution',
+                    data: [
+                        stats.active_entries || 0,
+                        (stats.total_entries || 0) - (stats.active_entries || 0),
+                        stats.expired_entries || 0,
+                    ],
+                    backgroundColor: ['#06b6d4', '#64748b', '#ef4444'],
+                    borderColor: ['#06b6d4', '#64748b', '#ef4444'],
+                    borderWidth: 1,
+                },
+            ],
+        };
+
+        WM.createChart('cache-chart', {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                },
+            },
+        });
+    }
+
+    // ── Handle Search ────────────────────────────────────────────────
+    searchBtnEl.addEventListener('click', async () => {
+        state.query = queryInputEl.value.trim();
+        state.userId = useridInputEl.value.trim();
+
+        if (!state.query) {
+            resultsContainerEl.innerHTML = WM.renderEmpty('🔍', 'Digite uma query para buscar');
+            return;
+        }
+
+        resultsContainerEl.innerHTML = WM.renderLoading();
+
+        const params = new URLSearchParams({
+            query: state.query,
+            ...(state.userId && { user_id: state.userId }),
+        });
+
+        const data = await WM.get(`playground/retrieve?${params.toString()}`);
+        if (!data) {
+            resultsContainerEl.innerHTML = WM.renderEmpty('❌', 'Erro ao buscar');
+            return;
+        }
+
+        state.results = data.observations || [];
+        renderResults();
+    });
+
+    // ── Render Results ───────────────────────────────────────────────
+    function renderResults() {
+        if (state.results.length === 0) {
+            resultsContainerEl.innerHTML = WM.renderEmpty('🚫', 'Nenhum resultado encontrado');
+            return;
+        }
+
+        const html = `
+            <div style="max-height: 400px; overflow-y: auto;">
+                ${state.results.map((obs, idx) => `
+                    <div style="padding: 12px; background: var(--wm-surface2); border-radius: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <span style="font-weight: 600;">#${idx + 1}</span>
+                            ${WM.renderTypeTag(obs.type || 'unknown')}
+                            ${WM.renderStatusTag(obs.status || 'active')}
+                            <span style="font-size: 11px; color: var(--wm-text-dim); margin-left: auto;">
+                                Score: ${WM.formatScore(obs.combined_score || 0, 3)}
+                            </span>
+                        </div>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; line-height: 1.4;">
+                            ${WM.escapeHtml(obs.content || '')}
+                        </p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${WM.renderEntityTags(obs.entities || [])}
+                        </div>
+                        ${obs.combined_score !== undefined ? `
+                            <div style="margin-top: 8px;">
+                                ${WM.renderDecayBar(obs.combined_score)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        resultsContainerEl.innerHTML = html;
+    }
+
+    // ── Initialize ───────────────────────────────────────────────────
+    function init() {
+        loadMetrics();
+        loadCitations();
+        loadCacheStats();
+
+        // Poll metrics, citations, and cache every 30 seconds
+        WM.poll('status', data => {
+            if (data.context_injection_metrics) {
+                const metrics = data.context_injection_metrics;
+                const cards = [
+                    {
+                        label: 'Total Hits',
+                        value: WM.formatNumber(metrics.total_hits || 0),
+                    },
+                    {
+                        label: 'Total Misses',
+                        value: WM.formatNumber(metrics.total_misses || 0),
+                    },
+                    {
+                        label: 'Timeouts',
+                        value: WM.formatNumber(metrics.timeouts || 0),
+                    },
+                    {
+                        label: 'Avg Retrieval',
+                        value: WM.formatMs(metrics.avg_retrieval_ms || 0),
+                    },
+                ];
+
+                metricsEl.innerHTML = cards.map(c => `
+                    <div class="wm-card elephant">
+                        <div class="wm-card-header">
+                            <span class="wm-card-label">${c.label}</span>
+                        </div>
+                        <div class="wm-card-value">${c.value}</div>
+                    </div>
+                `).join('');
+            }
+        }, 30000);
+
+        WM.poll('citations', data => {
+            if (data.citations) {
+                state.citations = data.citations;
+                renderCitations();
+            }
+        }, 30000);
+
+        WM.poll('cache', data => {
+            state.cacheStats = data;
+            renderCacheStats();
+        }, 30000);
+
+        // Allow Enter key to search
+        queryInputEl.addEventListener('keypress', e => {
+            if (e.key === 'Enter') searchBtnEl.click();
+        });
+    }
+
+    init();
+})();
+</script>
+{% endblock %}

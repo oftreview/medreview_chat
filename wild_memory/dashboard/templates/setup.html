@@ -1,0 +1,325 @@
+{% extends "wild_memory_base.html" %}
+
+{% block content %}
+<div class="wm-page">
+  <!-- Page Header -->
+  <div class="wm-page-header">
+    <div class="wm-page-header-content">
+      <h1 class="wm-page-title">⚙️ Setup & Configuração</h1>
+      <p class="wm-page-subtitle">Validar conexões e configurar o Wild Memory</p>
+      <button class="wm-button wm-button-secondary" id="healthCheckBtn" style="margin-top: 1rem;">
+        <span class="wm-button-label">Executar Health Check</span>
+        <span class="wm-button-icon">🔍</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="wm-grid wm-grid-1">
+    <!-- Health Check Panel -->
+    <div class="wm-panel" id="healthCheckPanel">
+      <div class="wm-panel-header">
+        <h2 class="wm-panel-title">Health Check</h2>
+        <div class="wm-loading wm-loading-spinner"></div>
+      </div>
+      <div class="wm-panel-content">
+        <!-- Checklist -->
+        <div class="wm-section">
+          <h3 class="wm-section-title">Conexões e Dependências</h3>
+          <div class="wm-checklist" id="connectionsChecklist">
+            <div class="wm-loading-pulse">
+              <div class="wm-skeleton wm-skeleton-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tables Status -->
+        <div class="wm-section" style="margin-top: 2rem;">
+          <h3 class="wm-section-title">Tabelas do Banco de Dados</h3>
+          <div class="wm-table-wrapper" id="tablesTable">
+            <table class="wm-table">
+              <thead>
+                <tr>
+                  <th>Tabela</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="wm-table-row-loading">
+                  <td colspan="2">
+                    <div class="wm-skeleton wm-skeleton-text"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RPCs Status -->
+        <div class="wm-section" style="margin-top: 2rem;">
+          <h3 class="wm-section-title">Funções RPC</h3>
+          <div class="wm-table-wrapper" id="rpcsTable">
+            <table class="wm-table">
+              <thead>
+                <tr>
+                  <th>RPC</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="wm-table-row-loading">
+                  <td colspan="2">
+                    <div class="wm-skeleton wm-skeleton-text"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Environment Variables Panel -->
+    <div class="wm-panel" id="envVarsPanel">
+      <div class="wm-panel-header">
+        <h2 class="wm-panel-title">Variáveis de Ambiente</h2>
+      </div>
+      <div class="wm-panel-content">
+        <div class="wm-table-wrapper" id="envVarsTable">
+          <table class="wm-table">
+            <thead>
+              <tr>
+                <th>Variável</th>
+                <th>Definida</th>
+                <th>Valor</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="wm-table-row-loading">
+                <td colspan="4">
+                  <div class="wm-skeleton wm-skeleton-text"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Integration Guide -->
+    <div class="wm-panel" id="guidePanel">
+      <div class="wm-panel-header">
+        <h2 class="wm-panel-title">Guia de Integração Rápida</h2>
+      </div>
+      <div class="wm-panel-content">
+        <div class="wm-section">
+          <h3 class="wm-section-title">Passo 1: Instalar</h3>
+          <p class="wm-section-description">Instale o Wild Memory via pip ou copie o diretório para seu projeto:</p>
+          <pre class="wm-code"><code>pip install wild-memory
+# ou
+cp -r wild-memory/ seu_projeto/</code></pre>
+        </div>
+
+        <div class="wm-section" style="margin-top: 1.5rem;">
+          <h3 class="wm-section-title">Passo 2: Registrar</h3>
+          <p class="wm-section-description">Inicialize o Wild Memory em seu aplicativo:</p>
+          <pre class="wm-code"><code>from wild_memory import WildMemory
+
+wm = WildMemory(
+    supabase_url="sua_url",
+    supabase_key="sua_chave"
+)
+wm.initialize()</code></pre>
+        </div>
+
+        <div class="wm-section" style="margin-top: 1.5rem;">
+          <h3 class="wm-section-title">Passo 3: Adicionar Link na Barra Lateral</h3>
+          <p class="wm-section-description">Adicione um link HTML no seu aplicativo:</p>
+          <pre class="wm-code"><code>&lt;a href="/wild-memory/dashboard"&gt;🧠 Wild Memory&lt;/a&gt;</code></pre>
+        </div>
+
+        <div class="wm-section" style="margin-top: 1.5rem;">
+          <h3 class="wm-section-title">Passo 4: Adaptador Customizado</h3>
+          <p class="wm-section-description">Crie um adaptador personalizado para seu domínio:</p>
+          <pre class="wm-code"><code>from wild_memory import Adapter
+
+class MeuAdaptador(Adapter):
+    def extract_entities(self, texto):
+        # Implementar extração de entidades
+        return entities
+
+    def score_relevance(self, obs, contexto):
+        # Implementar pontuação
+        return score
+
+wm.register_adapter(MeuAdaptador())</code></pre>
+        </div>
+
+        <div class="wm-section" style="margin-top: 1.5rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-left: 3px solid rgba(34, 197, 94, 0.5); border-radius: 4px;">
+          <p style="margin: 0; color: rgba(255, 255, 255, 0.9);">
+            <strong>💡 Dica:</strong> Consulte a <a href="https://github.com/seu-usuario/wild-memory" style="color: rgba(34, 197, 94, 0.8); text-decoration: underline;">documentação completa</a> para recursos avançados e exemplos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  'use strict';
+
+  // Run health check
+  async function runHealthCheck() {
+    const btn = document.getElementById('healthCheckBtn');
+    const originalLabel = btn.querySelector('.wm-button-label').textContent;
+
+    btn.disabled = true;
+    btn.classList.add('wm-button-loading');
+    btn.querySelector('.wm-button-label').textContent = 'Verificando...';
+
+    try {
+      await loadHealthCheck();
+
+      btn.querySelector('.wm-button-label').textContent = '✓ Verificado';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('wm-button-loading');
+        btn.querySelector('.wm-button-label').textContent = originalLabel;
+      }, 1500);
+    } catch (error) {
+      console.error('Health check error:', error);
+      btn.querySelector('.wm-button-label').textContent = '❌ Erro';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('wm-button-loading');
+        btn.querySelector('.wm-button-label').textContent = originalLabel;
+      }, 2000);
+    }
+  }
+
+  // Load health check data
+  async function loadHealthCheck() {
+    try {
+      const data = await WM.get('/api/health-check');
+
+      loadConnections(data);
+      loadTables(data);
+      loadRPCs(data);
+      loadEnvVars(data);
+
+      document.getElementById('healthCheckPanel').classList.remove('wm-panel-loading');
+    } catch (error) {
+      console.error('Error loading health check:', error);
+    }
+  }
+
+  // Load connections checklist
+  function loadConnections(data) {
+    const checks = [
+      { name: 'Supabase Conectado', status: data.supabase_connected },
+      { name: 'OpenAI Conectado', status: data.openai_connected },
+      { name: 'Arquivo Imprint', status: data.imprint_file_exists },
+      { name: 'Arquivo Config', status: data.config_file_exists },
+      { name: 'Domain NER', status: data.domain_ner_available }
+    ];
+
+    const html = checks.map(check => `
+      <div class="wm-checklist-item">
+        <span class="wm-checklist-icon">${check.status ? '✅' : '❌'}</span>
+        <span class="wm-checklist-label">${check.name}</span>
+        <span class="wm-checklist-status">${check.status ? 'OK' : 'Falha'}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('connectionsChecklist').innerHTML = html;
+  }
+
+  // Load tables status
+  function loadTables(data) {
+    const tables = data.tables || [];
+
+    const tbody = document.querySelector('#tablesTable tbody');
+    if (tables.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 2rem;">Nenhuma informação disponível</td></tr>';
+    } else {
+      tbody.innerHTML = tables.map(table => `
+        <tr class="wm-table-row">
+          <td><code>${table.name}</code></td>
+          <td>
+            <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+              <span style="color: ${table.exists ? 'rgba(34, 197, 94, 1)' : 'rgba(239, 68, 68, 1)'};">
+                ${table.exists ? '✅' : '❌'}
+              </span>
+              ${table.exists ? 'Existe' : 'Falta'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // Load RPCs status
+  function loadRPCs(data) {
+    const rpcs = data.rpcs || [];
+
+    const tbody = document.querySelector('#rpcsTable tbody');
+    if (rpcs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 2rem;">Nenhuma informação disponível</td></tr>';
+    } else {
+      tbody.innerHTML = rpcs.map(rpc => `
+        <tr class="wm-table-row">
+          <td><code>${rpc.name}</code></td>
+          <td>
+            <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+              <span style="color: ${rpc.exists ? 'rgba(34, 197, 94, 1)' : 'rgba(239, 68, 68, 1)'};">
+                ${rpc.exists ? '✅' : '❌'}
+              </span>
+              ${rpc.exists ? 'Existe' : 'Falta'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // Load environment variables
+  function loadEnvVars(data) {
+    const envVars = [
+      { name: 'SUPABASE_URL', key: 'supabase_url', desc: 'URL do projeto Supabase' },
+      { name: 'SUPABASE_KEY', key: 'supabase_key', desc: 'Chave de acesso Supabase' },
+      { name: 'OPENAI_API_KEY', key: 'openai_api_key', desc: 'Chave de API OpenAI' },
+      { name: 'DOMAIN_IMPRINT_FILE', key: 'imprint_file', desc: 'Caminho do arquivo imprint' },
+      { name: 'WM_CONFIG_FILE', key: 'config_file', desc: 'Caminho do arquivo de config' },
+      { name: 'MAINTENANCE_SCHEDULE', key: 'maintenance_schedule', desc: 'Agenda de manutenção (cron)' }
+    ];
+
+    const tbody = document.querySelector('#envVarsTable tbody');
+    tbody.innerHTML = envVars.map(envVar => {
+      const isSet = data[envVar.key] !== undefined && data[envVar.key] !== null;
+      const value = isSet ? '••••••••' : 'Não configurada';
+      const status = isSet ? '✅' : '⚠️';
+
+      return `
+        <tr class="wm-table-row">
+          <td><code>${envVar.name}</code></td>
+          <td><span style="color: ${isSet ? 'rgba(34, 197, 94, 1)' : 'rgba(234, 179, 8, 1)'};">${status}</span></td>
+          <td><code style="color: rgba(255, 255, 255, 0.5);">${value}</code></td>
+          <td class="wm-table-cell-text">${envVar.desc}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Event listeners
+  document.getElementById('healthCheckBtn').addEventListener('click', runHealthCheck);
+
+  // Initial load
+  loadHealthCheck();
+})();
+</script>
+{% endblock %}

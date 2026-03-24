@@ -1,0 +1,362 @@
+{% extends "wild_memory_base.html" %}
+
+{% block title %}🐬 Golfinho — Wild Memory v3.0{% endblock %}
+
+{% block content %}
+<div class="wm-page-header">
+    <div class="wm-page-emoji">🐬</div>
+    <div>
+        <div class="wm-page-title">Golfinho — Conexões</div>
+        <div class="wm-page-subtitle">Quem se relaciona com quem</div>
+    </div>
+</div>
+
+<!-- Metric Cards -->
+<div class="wm-cards wm-cards-3" id="dolphin-metrics">
+    <div class="wm-loading"><div class="wm-spinner"></div></div>
+</div>
+
+<!-- Entity Graph Visualization -->
+<div class="wm-panel">
+    <div class="wm-panel-title">🌐 Grafo de Entidades</div>
+
+    <div id="entity-graph" class="wm-graph-container"></div>
+
+    <!-- Entity Details Panel (appears below graph) -->
+    <div id="entity-details" style="margin-top: 16px; padding: 12px; background: var(--wm-surface2); border-radius: 8px; display: none;">
+        <div id="entity-details-content"></div>
+    </div>
+</div>
+
+<!-- Entity List -->
+<div class="wm-panel">
+    <div class="wm-panel-title">📇 Lista de Entidades</div>
+    <div class="wm-table-wrap">
+        <table class="wm-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Display Name</th>
+                    <th>Tipo</th>
+                    <th>Atributos</th>
+                    <th>Atualizado</th>
+                </tr>
+            </thead>
+            <tbody id="entities-tbody">
+                <tr><td colspan="5" style="text-align: center; padding: 40px;">
+                    <div class="wm-spinner" style="margin: 0 auto;"></div> Carregando entidades...
+                </td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/vis-network.min.js"></script>
+<script>
+(function() {
+    // ── State Management ─────────────────────────────────────────────
+    const state = {
+        entities: [],
+        edges: [],
+        network: null,
+        selectedNode: null,
+    };
+
+    // ── DOM Elements.─────────────────────────────────────────────────
+    const metricsEl = WM.$('#dolphin-metrics');
+    const graphEl = WM.$('#entity-graph');
+    const detailsEl = WM.$('#entity-details');
+    const detailsContentEl = WM.$('#entity-details-content');
+    const entitiesTbodyEl = WM.$('#entities-tbody');
+
+    // ── Entity Type Colors ───────────────────────────────────────────
+    const ENTITY_COLORS = {
+        person: '#3b82f6',
+        product: '#10b981',
+        concept: '#a855f7',
+        organization: '#ef4444',
+        event: '#f59e0b',
+        tool: '#06b6d4',
+        project: '#ec4899',
+    };
+
+    // ── Load Entities ────────────────────────────────────────────────
+    async function loadEntities() {
+        const data = await WM.get('entities');
+        if (!data || !data.entities) return;
+
+        state.entities = data.entities;
+        renderEntitiesTable();
+        updateMetrics();
+    }
+
+    // ── Load Edges ───────────────────────────────────────────────────
+    async function loadEdges() {
+        const data = await WM.get('edges');
+        if (!data || !data.edges) return;
+
+        state.edges = data.edges;
+        renderGraph();
+    }
+
+    // ── Update Metrics ───────────────────────────────────────────────
+    function updateMetrics() {
+        // Count unique entity types
+        const types = new Set(state.entities.map(e => e.entity_type || 'unknown'));
+        const typeCount = types.size;
+
+        const metrics = [
+            {
+                label: 'Total Entities',
+                value: WM.formatNumber(state.entities.length),
+            },
+            {
+                label: 'Total Edges',
+                value: WM.formatNumber(state.edges.length),
+            },
+            {
+                label: 'Entity Types',
+                value: typeCount,
+            },
+        ];
+
+        metricsEl.innerHTML = metrics.map(m => `
+            <div class="wm-card dolphin">
+                <div class="wm-card-header">
+                    <span class="wm-card-label">${m.label}</span>
+                </div>
+                <div class="wm-card-value">${m.value}</div>
+            </div>
+        `).join('');
+    }
+
+    // ── Render Entities Table ────────────────────────────────────────
+    function renderEntitiesTable() {
+        if (state.entities.length === 0) {
+            entitiesTbodyEl.innerHTML = WM.renderEmpty('🌱', 'Nenhuma entidade ainda');
+            return;
+        }
+
+        const rows = state.entities.map(ent => {
+            const attrsCount = Object.keys(ent.attributes || {}).length;
+            return `
+                <tr>
+                    <td style="font-size: 11px; font-family: monospace;">${WM.escapeHtml(ent.id || '—')}</td>
+                    <td style="font-weight: 500;">${WM.escapeHtml(ent.display_name || ent.id || '—')}</td>
+                    <td>${WM.renderTag(ent.entity_type || 'unknown', 'entity')}</td>
+                    <td>${attrsCount}</td>
+                    <td style="font-size: 11px; color: var(--wm-text-dim);">
+                        ${WM.formatTime(ent.updated_at || '')}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        entitiesTbodyEl.innerHTML = rows;
+    }
+
+    // ── Render Graph with vis.js ─────────────────────────────────────
+    function renderGraph() {
+        if (state.entities.length === 0) {
+            graphEl.innerHTML = WM.renderEmpty('🚫', 'Nenhuma entidade para visualizar');
+            return;
+        }
+
+        // Create nodes from entities
+        const nodes = new vis.DataSet(state.entities.map(ent => ({
+            id: ent.id,
+            label: ent.display_name || ent.id,
+            title: `${ent.entity_type || 'unknown'}\n${ent.display_name || ent.id}`,
+            color: ENTITY_COLORS[ent.entity_type] || '#64748b',
+            font: { size: 12, color: 'white', weight: 'bold' },
+            shape: 'dot',
+            size: 25,
+            borderWidth: 2,
+            borderWidthSelected: 4,
+        })));
+
+        // Create edges from edge data
+        const edges = new vis.DataSet(state.edges.map(edge => ({
+            from: edge.source_id,
+            to: edge.target_id,
+            label: edge.predicate || 'related',
+            title: edge.predicate || 'related',
+            font: { size: 10, color: '#64748b' },
+            color: { color: 'rgba(100,116,139,0.3)', highlight: '#06b6d4' },
+            arrows: 'to',
+            smooth: { type: 'continuous' },
+        })));
+
+        // Create vis network
+        const data = { nodes, edges };
+        const options = {
+            physics: {
+                enabled: true,
+                stabilization: {
+                    iterations: 200,
+                },
+                barnesHut: {
+                    gravitationalConstant: -26000,
+                    centralGravity: 0.3,
+                    springLength: 200,
+                },
+            },
+            interaction: {
+                navigationButtons: true,
+                keyboard: true,
+                zoomView: true,
+                dragView: true,
+            },
+            nodes: {
+                widthConstraint: { maximum: 200 },
+            },
+        };
+
+        state.network = new vis.Network(graphEl, data, options);
+
+        // Handle node click
+        state.network.on('selectNode', event => {
+            const nodeId = event.nodes[0];
+            if (!nodeId) return;
+
+            state.selectedNode = state.entities.find(e => e.id === nodeId);
+            showEntityDetails(state.selectedNode);
+        });
+
+        state.network.on('deselectNode', () => {
+            state.selectedNode = null;
+            WM.hide('#entity-details');
+        });
+    }
+
+    // ── Show Entity Details ──────────────────────────────────────────
+    function showEntityDetails(entity) {
+        if (!entity) {
+            WM.hide('#entity-details');
+            return;
+        }
+
+        // Find related edges
+        const incomingEdges = state.edges.filter(e => e.target_id === entity.id);
+        const outgoingEdges = state.edges.filter(e => e.source_id === entity.id);
+
+        let html = `
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                    ${WM.escapeHtml(entity.display_name || entity.id)}
+                </div>
+                ${WM.renderTag(entity.entity_type || 'unknown', 'entity')}
+            </div>
+        `;
+
+        // Show attributes if any
+        const attrs = entity.attributes || {};
+        if (Object.keys(attrs).length > 0) {
+            html += `
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">
+                        Atributos
+                    </div>
+                    <div style="font-size: 11px;">
+                        ${Object.entries(attrs).map(([key, val]) => `
+                            <div style="color: var(--wm-text-dim);">
+                                <strong>${WM.escapeHtml(key)}:</strong> ${WM.escapeHtml(String(val))}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show related entities
+        if (outgoingEdges.length > 0) {
+            html += `
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">
+                        Conecta Para
+                    </div>
+                    <div style="font-size: 11px;">
+                        ${outgoingEdges.slice(0, 5).map(edge => {
+                            const target = state.entities.find(e => e.id === edge.target_id);
+                            return `
+                                <div style="color: var(--wm-text-dim); margin-bottom: 3px;">
+                                    <strong>${edge.predicate || 'related'}:</strong>
+                                    ${WM.escapeHtml(target?.display_name || target?.id || 'unknown')}
+                                </div>
+                            `;
+                        }).join('')}
+                        ${outgoingEdges.length > 5 ? `<div style="color: var(--wm-text-dim);">+${outgoingEdges.length - 5} mais</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show incoming edges
+        if (incomingEdges.length > 0) {
+            html += `
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--wm-text-dim); text-transform: uppercase; margin-bottom: 4px;">
+                        Conectado De
+                    </div>
+                    <div style="font-size: 11px;">
+                        ${incomingEdges.slice(0, 5).map(edge => {
+                            const source = state.entities.find(e => e.id === edge.source_id);
+                            return `
+                                <div style="color: var(--wm-text-dim); margin-bottom: 3px;">
+                                    ${WM.escapeHtml(source?.display_name || source?.id || 'unknown')}
+                                    <strong>${edge.predicate || 'related'}</strong>
+                                </div>
+                            `;
+                        }).join('')}
+                        ${incomingEdges.length > 5 ? `<div style="color: var(--wm-text-dim);">+${incomingEdges.length - 5} mais</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show related observations
+        html += `
+            <div style="font-size: 11px; color: var(--wm-text-dim);">
+                <strong>ID:</strong> <code style="background: var(--wm-bg); padding: 2px 4px; border-radius: 4px;">${WM.escapeHtml(entity.id)}</code>
+            </div>
+        `;
+
+        detailsContentEl.innerHTML = html;
+        WM.show('#entity-details');
+    }
+
+    // ── Initialize ───────────────────────────────────────────────────
+    async function init() {
+        await loadEntities();
+        await loadEdges();
+
+        // Poll for updates every 60 seconds
+        WM.poll('entities', data => {
+            if (data.entities) {
+                state.entities = data.entities;
+                renderEntitiesTable();
+                updateMetrics();
+                if (state.selectedNode) {
+                    state.selectedNode = state.entities.find(e => e.id === state.selectedNode.id);
+                    if (state.selectedNode) {
+                        showEntityDetails(state.selectedNode);
+                    }
+                }
+            }
+        }, 60000);
+
+        WM.poll('edges', data => {
+            if (data.edges) {
+                state.edges = data.edges;
+                renderGraph();
+            }
+        }, 60000);
+    }
+
+    init();
+})();
+</script>
+{% endblock %}

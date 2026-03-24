@@ -38,6 +38,15 @@ def create_app():
     except Exception:
         pass
 
+    # Register Wild Memory Dashboard
+    try:
+        from wild_memory.dashboard import register_dashboard
+        from src.core.wild_memory_adapter import ClosiAdapter
+        register_dashboard(app, adapter=ClosiAdapter())
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"[Wild Memory Dashboard] Failed to register: {e}")
+
     # Root redirect
     @app.route("/")
     def index():

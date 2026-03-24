@@ -1,0 +1,298 @@
+{% extends "wild_memory_base.html" %}
+
+{% block title %}🐝 Abelha — Wild Memory v3.0{% endblock %}
+
+{% block content %}
+<div class="wm-page-header">
+    <div class="wm-page-emoji">🐝</div>
+    <div>
+        <div class="wm-page-title">Abelha — Observações</div>
+        <div class="wm-page-subtitle">Conhecimento destilado das conversas</div>
+    </div>
+</div>
+
+<!-- Metric Cards -->
+<div class="wm-cards wm-cards-4" id="bee-metrics">
+    <div class="wm-loading"><div class="wm-spinner"></div></div>
+</div>
+
+<!-- Filters & Actions Bar -->
+<div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+    <div class="wm-filters" id="bee-filters">
+        <select class="wm-select" id="type-filter">
+            <option value="">— Todos os Tipos —</option>
+            <option value="decision">decision</option>
+            <option value="preference">preference</option>
+            <option value="fact">fact</option>
+            <option value="goal">goal</option>
+            <option value="correction">correction</option>
+            <option value="feedback">feedback</option>
+            <option value="insight">insight</option>
+        </select>
+
+        <select class="wm-select" id="status-filter">
+            <option value="">— Todos Status —</option>
+            <option value="active">active</option>
+            <option value="stale">stale</option>
+            <option value="archived">archived</option>
+        </select>
+
+        <input type="text" class="wm-input" id="userid-filter" placeholder="User ID" style="max-width: 150px;">
+
+        <button class="wm-btn primary" id="apply-filters">Aplicar Filtros</button>
+    </div>
+
+    <button class="wm-btn" id="force-distill-btn" style="margin-left: auto;">
+        ⚡ Forçar Distillation
+    </button>
+</div>
+
+<!-- Observations Table -->
+<div class="wm-panel">
+    <div class="wm-panel-title">Observações Recentes</div>
+    <div class="wm-table-wrap">
+        <table class="wm-table">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Conteúdo</th>
+                    <th>Entidades</th>
+                    <th>Importância</th>
+                    <th>Decay</th>
+                    <th>Status</th>
+                    <th>Criado</th>
+                </tr>
+            </thead>
+            <tbody id="observations-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 40px;">
+                    <div class="wm-spinner" style="margin: 0 auto;"></div> Carregando observações...
+                </td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 14px; text-align: center;">
+        <button class="wm-btn" id="load-more-btn" style="display: none;">
+            Carregar Mais
+        </button>
+        <div id="no-more-msg" style="color: var(--wm-text-dim); font-size: 12px; display: none;">
+            Nenhuma observação adicional
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // ── State Management ─────────────────────────────────────────────
+    const state = {
+        page: 0,
+        pageSize: 25,
+        filters: {
+            type: '',
+            status: '',
+            userId: '',
+        },
+        observations: [],
+        hasMore: true,
+        loading: false,
+    };
+
+    // ── DOM Elements ─────────────────────────────────────────────────
+    const metricsEl = WM.$('#bee-metrics');
+    const typeFilterEl = WM.$('#type-filter');
+    const statusFilterEl = WM.$('#status-filter');
+    const useridFilterEl = WM.$('#userid-filter');
+    const applyFiltersBtnEl = WM.$('#apply-filters');
+    const forceDistillBtnEl = WM.$('#force-distill-btn');
+    const tbodyEl = WM.$('#observations-tbody');
+    const loadMoreBtnEl = WM.$('#load-more-btn');
+    const noMoreMsgEl = WM.$('#no-more-msg');
+
+    // ── Load Metrics from /api/status ────────────────────────────────
+    async function loadMetrics() {
+        const data = await WM.get('status');
+        if (!data) return;
+
+        const metrics = data.shadow_metrics || {};
+        const cards = [
+            {
+                label: 'Total Observed',
+                value: WM.formatNumber(metrics.total_observed || 0),
+            },
+            {
+                label: 'Total Distilled',
+                value: WM.formatNumber(metrics.total_distilled || 0),
+            },
+            {
+                label: 'Total Skipped',
+                value: WM.formatNumber(metrics.total_skipped || 0),
+            },
+            {
+                label: 'Avg Distill Time',
+                value: WM.formatMs(metrics.avg_distill_time_ms || 0),
+            },
+        ];
+
+        metricsEl.innerHTML = cards.map(c => `
+            <div class="wm-card bee">
+                <div class="wm-card-header">
+                    <span class="wm-card-label">${c.label}</span>
+                </div>
+                <div class="wm-card-value">${c.value}</div>
+            </div>
+        `).join('');
+    }
+
+    // ── Load Observations ────────────────────────────────────────────
+    async function loadObservations(append = false) {
+        if (state.loading || !state.hasMore) return;
+        state.loading = true;
+
+        const params = new URLSearchParams({
+            page: state.page,
+            limit: state.pageSize,
+            ...(state.filters.type && { type: state.filters.type }),
+            ...(state.filters.status && { status: state.filters.status }),
+            ...(state.filters.userId && { user_id: state.filters.userId }),
+        });
+
+        const data = await WM.get(`observations?${params.toString()}`);
+        state.loading = false;
+
+        if (!data || !data.observations) {
+            WM.hide('#load-more-btn');
+            WM.show('#no-more-msg');
+            return;
+        }
+
+        if (data.observations.length < state.pageSize) {
+            state.hasMore = false;
+            WM.hide('#load-more-btn');
+            if (data.observations.length === 0 && state.page === 0) {
+                tbodyEl.innerHTML = WM.renderEmpty('🌱', 'Nenhuma observação ainda');
+            } else {
+                WM.show('#no-more-msg');
+            }
+        } else {
+            state.hasMore = true;
+            WM.show('#load-more-btn');
+            WM.hide('#no-more-msg');
+        }
+
+        if (!append) {
+            state.observations = data.observations;
+            tbodyEl.innerHTML = '';
+        } else {
+            state.observations.push(...data.observations);
+        }
+
+        renderObservations();
+    }
+
+    // ── Render Observations Table ────────────────────────────────────
+    function renderObservations() {
+        if (state.observations.length === 0) {
+            tbodyEl.innerHTML = WM.renderEmpty('🌱', 'Nenhuma observação encontrada');
+            return;
+        }
+
+        const rows = state.observations.map(obs => `
+            <tr>
+                <td>${WM.renderTypeTag(obs.type || 'unknown')}</td>
+                <td>
+                    <div class="wm-cell-content" title="${WM.escapeHtml(obs.content || '')}">
+                        ${WM.escapeHtml((obs.content || '').substring(0, 60))}${(obs.content || '').length > 60 ? '...' : ''}
+                    </div>
+                </td>
+                <td>${WM.renderEntityTags(obs.entities || [])}</td>
+                <td>${WM.renderImportanceBar(obs.importance || 5, 10)}</td>
+                <td>${WM.renderDecayBar(obs.decay_score || 0.5)}</td>
+                <td>${WM.renderStatusTag(obs.status || 'active')}</td>
+                <td style="font-size: 11px; color: var(--wm-text-dim);">
+                    ${WM.formatTime(obs.created_at || '')}
+                </td>
+            </tr>
+        `).join('');
+
+        tbodyEl.innerHTML = rows;
+    }
+
+    // ── Event Handlers ───────────────────────────────────────────────
+    applyFiltersBtnEl.addEventListener('click', () => {
+        state.filters.type = typeFilterEl.value;
+        state.filters.status = statusFilterEl.value;
+        state.filters.userId = useridFilterEl.value;
+        state.page = 0;
+        state.hasMore = true;
+        state.observations = [];
+        loadObservations(false);
+    });
+
+    loadMoreBtnEl.addEventListener('click', () => {
+        state.page++;
+        loadObservations(true);
+    });
+
+    forceDistillBtnEl.addEventListener('click', async () => {
+        forceDistillBtnEl.disabled = true;
+        forceDistillBtnEl.textContent = '⏳ Distillando...';
+        const result = await WM.post('maintenance', { action: 'distill' });
+        forceDistillBtnEl.disabled = false;
+        forceDistillBtnEl.textContent = '⚡ Forçar Distillation';
+
+        if (result) {
+            // Reload metrics and observations
+            loadMetrics();
+            state.page = 0;
+            state.observations = [];
+            loadObservations(false);
+        }
+    });
+
+    // ── Initialize ───────────────────────────────────────────────────
+    function init() {
+        loadMetrics();
+        loadObservations(false);
+
+        // Poll metrics every 30 seconds
+        WM.poll('status', data => {
+            if (data.shadow_metrics) {
+                const metrics = data.shadow_metrics;
+                const cards = [
+                    {
+                        label: 'Total Observed',
+                        value: WM.formatNumber(metrics.total_observed || 0),
+                    },
+                    {
+                        label: 'Total Distilled',
+                        value: WM.formatNumber(metrics.total_distilled || 0),
+                    },
+                    {
+                        label: 'Total Skipped',
+                        value: WM.formatNumber(metrics.total_skipped || 0),
+                    },
+                    {
+                        label: 'Avg Distill Time',
+                        value: WM.formatMs(metrics.avg_distill_time_ms || 0),
+                    },
+                ];
+
+                metricsEl.innerHTML = cards.map(c => `
+                    <div class="wm-card bee">
+                        <div class="wm-card-header">
+                            <span class="wm-card-label">${c.label}</span>
+                        </div>
+                        <div class="wm-card-value">${c.value}</div>
+                    </div>
+                `).join('');
+            }
+        }, 30000);
+    }
+
+    init();
+})();
+</script>
+{% endblock %}
