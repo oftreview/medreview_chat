@@ -36,7 +36,7 @@ bp = Blueprint(
     url_prefix="/wild-memory",
     template_folder=_TEMPLATE_DIR,
     static_folder=_STATIC_DIR,
-    static_url_path="/wild-memory/static",
+    static_url_path="static",
 )
 
 
