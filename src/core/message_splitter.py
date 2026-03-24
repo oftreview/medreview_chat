@@ -14,6 +14,7 @@ Uso:
 
 import re
 
+
 # ── Configuração ────────────────────────────────────────────────────────────
 MAX_CHARS = 300       # Limite de caracteres por mensagem
 MAX_MESSAGES = 3      # Máximo de mensagens por resposta

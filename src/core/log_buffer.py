@@ -8,6 +8,10 @@ import threading
 import time
 import re
 from collections import deque
+from datetime import datetime, timezone, timedelta
+
+# Fuso horário de Brasília (UTC-3)
+_BRT = timezone(timedelta(hours=-3))
 
 _lock = threading.Lock()
 _buffer = deque(maxlen=2000)
@@ -35,7 +39,7 @@ def _classify(msg: str) -> str:
 def add_log(message: str):
     """Adiciona uma entrada de log ao buffer."""
     global _counter
-    now = time.strftime("%H:%M:%S")
+    now = datetime.now(_BRT).strftime("%H:%M:%S")
     tag = _classify(message)
 
     with _lock:
