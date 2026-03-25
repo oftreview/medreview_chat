@@ -43,9 +43,8 @@ class ClosiAdapter(WildMemoryAdapter):
 
     def get_domain_config(self):
         try:
-            from wild_memory.medreview_domain import MedReviewDomain
-            domain = MedReviewDomain()
-            return domain.get_ner_entities() if hasattr(domain, "get_ner_entities") else None
+            from wild_memory.medreview_domain import MEDREVIEW_DOMAIN_ENTITIES
+            return MEDREVIEW_DOMAIN_ENTITIES
         except Exception:
             return None
 

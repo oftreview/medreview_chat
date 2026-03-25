@@ -205,7 +205,9 @@ register_dashboard(app, adapter=MeuAdapter())</code></pre>
   function formatDate(v) {
     if (!v) return 'Nunca';
     try {
-      return new Date(v).toLocaleString('pt-BR', {
+      // Python time.time() returns seconds; JS Date expects milliseconds
+      const ts = (typeof v === 'number' && v < 1e12) ? v * 1000 : v;
+      return new Date(ts).toLocaleString('pt-BR', {
         day:'2-digit', month:'2-digit', year:'2-digit',
         hour:'2-digit', minute:'2-digit'
       });
