@@ -6,28 +6,29 @@
 <div class="wm-page">
     <!-- Page Header -->
     <div class="wm-page-header">
-        <div class="wm-page-title">
-            <h1>🧠 Painel Geral</h1>
-            <p class="wm-page-subtitle">Visão completa de todas as camadas do Wild Memory</p>
+        <div class="wm-page-emoji">🧠</div>
+        <div>
+            <div class="wm-page-title">Painel Geral</div>
+            <div class="wm-page-subtitle">Visão completa de todas as camadas do Wild Memory</div>
         </div>
     </div>
 
     <!-- Health Pulse Bar -->
     <div class="wm-health-pulse">
         <div class="wm-health-item">
-            <div class="wm-health-indicator shadow" id="health-shadow"></div>
+            <div class="wm-health-indicator" id="health-shadow"></div>
             <span class="wm-health-label">Shadow</span>
         </div>
         <div class="wm-health-item">
-            <div class="wm-health-indicator context" id="health-context"></div>
+            <div class="wm-health-indicator" id="health-context"></div>
             <span class="wm-health-label">Context</span>
         </div>
         <div class="wm-health-item">
-            <div class="wm-health-indicator lifecycle" id="health-lifecycle"></div>
+            <div class="wm-health-indicator" id="health-lifecycle"></div>
             <span class="wm-health-label">Lifecycle</span>
         </div>
         <div class="wm-health-item">
-            <div class="wm-health-indicator scheduler" id="health-scheduler"></div>
+            <div class="wm-health-indicator" id="health-scheduler"></div>
             <span class="wm-health-label">Scheduler</span>
         </div>
     </div>
@@ -39,7 +40,7 @@
             <div class="wm-card-title">Salmão</div>
             <div class="wm-card-label">Identidade</div>
             <div class="wm-card-value" id="card-salmon-value">—</div>
-            <div class="wm-card-sublabel">imprint version</div>
+            <div class="wm-card-sublabel">imprint</div>
         </a>
 
         <a href="/wild-memory/bee" class="wm-card wm-card-bee">
@@ -71,7 +72,7 @@
             <div class="wm-card-title">Formiga</div>
             <div class="wm-card-label">Decay</div>
             <div class="wm-card-value" id="card-ant-value">—</div>
-            <div class="wm-card-sublabel">active observations</div>
+            <div class="wm-card-sublabel">reflections</div>
         </a>
 
         <a href="/wild-memory/chameleon" class="wm-card wm-card-chameleon">
@@ -88,13 +89,13 @@
         <!-- Activity Feed Panel -->
         <div class="wm-panel">
             <div class="wm-panel-header">
-                <h2>📊 Activity Feed</h2>
+                <h2 class="wm-panel-title">📊 Activity Feed</h2>
             </div>
             <div class="wm-panel-content">
                 <div class="wm-activity-feed" id="activity-feed">
                     <div class="wm-loading">
                         <div class="wm-spinner"></div>
-                        <p>Loading activity...</p>
+                        <span>Carregando atividade...</span>
                     </div>
                 </div>
             </div>
@@ -103,7 +104,7 @@
         <!-- Quick Metrics Panel -->
         <div class="wm-panel">
             <div class="wm-panel-header">
-                <h2>📈 Quick Metrics</h2>
+                <h2 class="wm-panel-title">📈 Quick Metrics</h2>
             </div>
             <div class="wm-panel-content">
                 <div class="wm-metrics-grid">
@@ -118,14 +119,14 @@
                         <div class="wm-metric-unit">ms</div>
                     </div>
                     <div class="wm-metric">
-                        <div class="wm-metric-label">Error Count</div>
-                        <div class="wm-metric-value" id="metric-errors">—</div>
-                        <div class="wm-metric-unit">today</div>
+                        <div class="wm-metric-label">Timeouts</div>
+                        <div class="wm-metric-value" id="metric-timeouts">—</div>
+                        <div class="wm-metric-unit">context injection</div>
                     </div>
                     <div class="wm-metric">
-                        <div class="wm-metric-label">System Health</div>
-                        <div class="wm-metric-value" id="metric-health">—</div>
-                        <div class="wm-metric-unit">%</div>
+                        <div class="wm-metric-label">Scheduler</div>
+                        <div class="wm-metric-value" id="metric-scheduler">—</div>
+                        <div class="wm-metric-unit">status</div>
                     </div>
                 </div>
             </div>
@@ -136,156 +137,159 @@
 
 {% block wm_scripts %}
 <script>
-// Initialize Overview page
-document.addEventListener('DOMContentLoaded', function() {
-    // Load initial data
-    loadOverviewData();
+(function() {
+  'use strict';
 
-    // Poll for updates every 5 seconds
-    setInterval(loadOverviewData, 5000);
-});
+  // ── Load data from both endpoints ──
+  async function loadAll() {
+    await Promise.all([loadStatus(), loadActivity()]);
+  }
 
-function loadOverviewData() {
-    // Load system status and health
-    WM.poll('status', function(data) {
-        if (data.status === 'ok' && data.health) {
-            updateHealthPulse(data.health);
-            updateHeroCards(data);
-            updateQuickMetrics(data);
-        }
-    });
+  // ── System status (from /health/wild-memory — the working endpoint) ──
+  async function loadStatus() {
+    try {
+      const resp = await fetch('/health/wild-memory');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      updateHealthPulse(data);
+      updateQuickMetrics(data);
+    } catch (err) {
+      console.warn('[Overview] Status error:', err.message);
+    }
+  }
 
-    // Load activity feed
-    WM.get('activity', function(data) {
-        if (data && data.events) {
-            updateActivityFeed(data.events);
-        }
-    });
-}
+  // ── Dashboard API status (from /wild-memory/api/status) ──
+  async function loadDashboardStatus() {
+    try {
+      const data = await WM.get('status');
+      if (data) updateHeroCards(data);
+    } catch (err) {
+      console.warn('[Overview] Dashboard status error:', err.message);
+    }
+  }
 
-function updateHealthPulse(health) {
-    const indicators = {
-        'shadow': document.getElementById('health-shadow'),
-        'context': document.getElementById('health-context'),
-        'lifecycle': document.getElementById('health-lifecycle'),
-        'scheduler': document.getElementById('health-scheduler')
+  // ── Activity feed ──
+  async function loadActivity() {
+    try {
+      const data = await WM.get('activity');
+      if (data && data.events) {
+        updateActivityFeed(data.events);
+      } else {
+        document.getElementById('activity-feed').innerHTML =
+          '<div class="wm-empty"><div class="wm-empty-emoji">📭</div><div class="wm-empty-text">Nenhuma atividade ainda</div></div>';
+      }
+    } catch (err) {
+      console.warn('[Overview] Activity error:', err.message);
+      document.getElementById('activity-feed').innerHTML =
+        '<div class="wm-empty"><div class="wm-empty-emoji">⚠️</div><div class="wm-empty-text">Erro ao carregar atividade</div></div>';
+    }
+  }
+
+  function updateHealthPulse(data) {
+    const mapping = {
+      'health-shadow': data.active,
+      'health-context': data.context_injection?.active,
+      'health-lifecycle': data.lifecycle?.active,
+      'health-scheduler': data.scheduler?.running,
     };
 
-    Object.keys(indicators).forEach(key => {
-        const indicator = indicators[key];
-        if (health[key]) {
-            indicator.classList.add('healthy');
-            indicator.classList.remove('unhealthy');
-        } else {
-            indicator.classList.add('unhealthy');
-            indicator.classList.remove('healthy');
-        }
+    Object.entries(mapping).forEach(([id, active]) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('healthy', 'unhealthy');
+        el.classList.add(active ? 'healthy' : 'unhealthy');
+      }
     });
-}
+  }
 
-function updateHeroCards(data) {
-    // Salmon - Imprint version
-    if (data.imprint && data.imprint.version) {
-        document.getElementById('card-salmon-value').textContent = data.imprint.version;
-    }
-
+  function updateHeroCards(data) {
     // Bee - Total observations
-    if (data.bee_metrics && data.bee_metrics.total_observations !== undefined) {
-        document.getElementById('card-bee-value').textContent =
-            formatNumber(data.bee_metrics.total_observations);
+    if (data.total_observations !== undefined) {
+      document.getElementById('card-bee-value').textContent =
+        WM.formatNumber(data.total_observations);
     }
 
     // Elephant - Context hits
-    if (data.elephant_metrics && data.elephant_metrics.total_hits !== undefined) {
-        document.getElementById('card-elephant-value').textContent =
-            formatNumber(data.elephant_metrics.total_hits);
+    const ctxHits = data.context_injection?.metrics?.total_hits;
+    if (ctxHits !== undefined) {
+      document.getElementById('card-elephant-value').textContent =
+        WM.formatNumber(ctxHits);
     }
 
     // Dolphin - Total entities
-    if (data.dolphin_metrics && data.dolphin_metrics.total_entities !== undefined) {
-        document.getElementById('card-dolphin-value').textContent =
-            formatNumber(data.dolphin_metrics.total_entities);
+    if (data.total_entities !== undefined) {
+      document.getElementById('card-dolphin-value').textContent =
+        WM.formatNumber(data.total_entities);
     }
 
-    // Ant - Active observations
-    if (data.ant_metrics && data.ant_metrics.active_count !== undefined) {
-        document.getElementById('card-ant-value').textContent =
-            formatNumber(data.ant_metrics.active_count);
+    // Ant - Reflections
+    if (data.total_reflections !== undefined) {
+      document.getElementById('card-ant-value').textContent =
+        WM.formatNumber(data.total_reflections);
     }
 
     // Chameleon - Total feedback
-    if (data.chameleon_metrics && data.chameleon_metrics.total_feedback !== undefined) {
-        document.getElementById('card-chameleon-value').textContent =
-            formatNumber(data.chameleon_metrics.total_feedback);
+    if (data.total_feedback !== undefined) {
+      document.getElementById('card-chameleon-value').textContent =
+        WM.formatNumber(data.total_feedback);
     }
-}
 
-function updateQuickMetrics(data) {
-    if (data.metrics) {
-        const m = data.metrics;
-
-        if (m.avg_retrieval_ms !== undefined) {
-            document.getElementById('metric-retrieval').textContent =
-                Math.round(m.avg_retrieval_ms);
-        }
-
-        if (m.avg_distill_ms !== undefined) {
-            document.getElementById('metric-distill').textContent =
-                Math.round(m.avg_distill_ms);
-        }
-
-        if (m.error_count !== undefined) {
-            document.getElementById('metric-errors').textContent =
-                formatNumber(m.error_count);
-        }
-
-        if (m.health_percent !== undefined) {
-            document.getElementById('metric-health').textContent =
-                Math.round(m.health_percent);
-        }
+    // Salmon - check shadow status
+    const shadowEnabled = data.shadow?.enabled;
+    if (shadowEnabled !== undefined) {
+      document.getElementById('card-salmon-value').textContent =
+        shadowEnabled ? 'Ativo' : 'Config';
     }
-}
+  }
 
-function updateActivityFeed(events) {
+  function updateQuickMetrics(data) {
+    const shadow = data.metrics || {};
+    const ctx = data.context_injection?.metrics || {};
+    const sched = data.scheduler || {};
+
+    const retrieval = document.getElementById('metric-retrieval');
+    if (retrieval) retrieval.textContent = ctx.avg_retrieval_ms ? Math.round(ctx.avg_retrieval_ms) : '0';
+
+    const distill = document.getElementById('metric-distill');
+    if (distill) distill.textContent = shadow.avg_distill_ms ? Math.round(shadow.avg_distill_ms) : '0';
+
+    const timeouts = document.getElementById('metric-timeouts');
+    if (timeouts) timeouts.textContent = WM.formatNumber(ctx.total_timeouts || 0);
+
+    const schedulerEl = document.getElementById('metric-scheduler');
+    if (schedulerEl) schedulerEl.textContent = sched.running ? '✅' : '❌';
+  }
+
+  function updateActivityFeed(events) {
     const container = document.getElementById('activity-feed');
 
     if (!events || events.length === 0) {
-        container.innerHTML = '<p class="wm-empty-state">No activity yet</p>';
-        return;
+      container.innerHTML = '<div class="wm-empty"><div class="wm-empty-emoji">📭</div><div class="wm-empty-text">Nenhuma atividade ainda</div></div>';
+      return;
     }
 
-    const eventEmojis = {
-        'observation': '👁️',
-        'retrieval': '🔍',
-        'distill': '✨',
-        'feedback': '💬',
-        'decay': '🌡️',
-        'error': '⚠️',
-        'success': '✅'
-    };
-
-    const html = events.slice(0, 20).map(event => {
-        const emoji = eventEmojis[event.type] || '📌';
-        const timestamp = new Date(event.timestamp).toLocaleTimeString();
-        return `
-            <div class="wm-activity-item">
-                <div class="wm-activity-emoji">${emoji}</div>
-                <div class="wm-activity-content">
-                    <div class="wm-activity-title">${event.title}</div>
-                    <div class="wm-activity-time">${timestamp}</div>
-                </div>
-            </div>
-        `;
+    container.innerHTML = events.slice(0, 20).map(event => {
+      const icon = WM.getIcon(event.icon || event.type || 'observation');
+      return `
+        <div class="wm-activity-item">
+          <div class="wm-activity-emoji">${icon}</div>
+          <div class="wm-activity-content">
+            <div class="wm-activity-title">${WM.escapeHtml(event.summary || event.title || '')}</div>
+            <div class="wm-activity-time">${WM.formatTime(event.timestamp)}</div>
+          </div>
+        </div>
+      `;
     }).join('');
+  }
 
-    container.innerHTML = html;
-}
+  // ── Init ──
+  loadAll();
+  loadDashboardStatus();
 
-function formatNumber(num) {
-    if (num === undefined || num === null) return '—';
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
-}
+  // Poll every 15 seconds
+  setInterval(loadStatus, 15000);
+  setInterval(loadDashboardStatus, 30000);
+  setInterval(loadActivity, 30000);
+})();
 </script>
 {% endblock %}
