@@ -570,14 +570,27 @@ def api_imprint_save():
     try:
         import yaml
         data = request.get_json()
-        if not data or "imprint" not in data:
-            return jsonify({"error": "Missing 'imprint' in body"}), 400
-
         path = adapter.get_imprint_path()
+
+        if data and "imprint_yaml" in data:
+            # Raw YAML string from the editor — validate then write directly
+            raw_yaml = data["imprint_yaml"]
+            parsed = yaml.safe_load(raw_yaml)  # validate syntax
+            if not isinstance(parsed, dict):
+                return jsonify({"error": "YAML inválido: deve ser um dicionário"}), 400
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(raw_yaml)
+            return jsonify({"status": "saved", "path": path})
+
+        if not data or "imprint" not in data:
+            return jsonify({"error": "Missing 'imprint' or 'imprint_yaml' in body"}), 400
+
         with open(path, "w", encoding="utf-8") as f:
             yaml.dump(data["imprint"], f, allow_unicode=True, default_flow_style=False, sort_keys=False)
 
         return jsonify({"status": "saved", "path": path})
+    except yaml.YAMLError as ye:
+        return jsonify({"error": f"YAML inválido: {ye}"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

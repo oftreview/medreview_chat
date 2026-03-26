@@ -3,41 +3,257 @@
 {% block wm_title %}Wild Memory — Salmão (Identidade){% endblock %}
 
 {% block wm_content %}
+<style>
+/* ── Imprint Layout ── */
+.imp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+.imp-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+.imp-card:hover { border-color: rgba(249,115,22,0.3); }
+.imp-card.full { grid-column: 1 / -1; }
+.imp-card-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  font-size: 14px; margin-bottom: 10px; flex-shrink: 0;
+}
+.imp-card-icon.role     { background: rgba(249,115,22,0.12); }
+.imp-card-icon.values   { background: rgba(16,185,129,0.12); }
+.imp-card-icon.constr   { background: rgba(239,68,68,0.12); }
+.imp-card-icon.tone     { background: rgba(99,102,241,0.12); }
+.imp-card-icon.perms    { background: rgba(234,179,8,0.12); }
+.imp-card-icon.org      { background: rgba(6,182,212,0.12); }
+
+.imp-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 8px;
+}
+.imp-role-text {
+  font-size: 13px; line-height: 1.6; color: var(--text);
+}
+.imp-list {
+  list-style: none; padding: 0; margin: 0;
+}
+.imp-list li {
+  position: relative;
+  padding: 6px 0 6px 16px;
+  font-size: 12px; line-height: 1.5;
+  color: var(--text); opacity: 0.9;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.imp-list li:last-child { border-bottom: none; }
+.imp-list li::before {
+  content: ''; position: absolute; left: 0; top: 13px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--primary); opacity: 0.6;
+}
+.imp-list.constraints li::before { background: #ef4444; }
+.imp-tone-text {
+  font-size: 13px; line-height: 1.6; color: var(--text);
+  font-style: italic; opacity: 0.9;
+}
+
+/* Permissions chips */
+.imp-perms-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.imp-perm-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px; font-size: 11px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+}
+.imp-perm-key {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 10px; color: var(--text-dim);
+}
+.imp-perm-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.imp-perm-dot.on  { background: #10b981; }
+.imp-perm-dot.off { background: #ef4444; opacity: 0.6; }
+
+/* ── Editor ── */
+.imp-editor-wrap {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.imp-editor-wrap.focused { border-color: var(--primary); }
+
+.imp-editor-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+}
+.imp-editor-title {
+  font-size: 11px; font-weight: 600; color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px;
+}
+.imp-editor-actions {
+  display: flex; align-items: center; gap: 8px;
+}
+.imp-editor-textarea {
+  width: 100%; min-height: 300px; padding: 14px 16px;
+  background: rgba(0,0,0,0.15);
+  border: none; outline: none; resize: vertical;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px; line-height: 1.7;
+  color: var(--text); tab-size: 2;
+}
+.imp-editor-textarea::placeholder { color: var(--text-dim); opacity: 0.4; }
+
+.imp-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05); color: var(--text-dim);
+  transition: all 0.15s;
+}
+.imp-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.imp-btn-primary {
+  background: rgba(37,99,235,0.2); border-color: rgba(37,99,235,0.3);
+  color: var(--primary-light);
+}
+.imp-btn-primary:hover { background: rgba(37,99,235,0.3); }
+.imp-btn-primary:disabled {
+  opacity: 0.4; cursor: not-allowed;
+}
+
+.imp-toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 12px; font-weight: 600; z-index: 999;
+  animation: impToastIn 0.3s ease;
+}
+.imp-toast.success { background: rgba(16,185,129,0.9); color: #fff; }
+.imp-toast.error   { background: rgba(239,68,68,0.9); color: #fff; }
+@keyframes impToastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── NER Grid ── */
+.ner-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.ner-chip {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 8px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.ner-chip:hover { border-color: rgba(168,85,247,0.3); }
+.ner-dot {
+  width: 10px; height: 10px; border-radius: 3px;
+  margin-top: 3px; flex-shrink: 0;
+}
+.ner-name {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  margin-bottom: 2px;
+}
+.ner-desc {
+  font-size: 11px; color: var(--text-dim); line-height: 1.4;
+}
+
+/* ── Tabs for View/Edit ── */
+.imp-tabs {
+  display: flex; gap: 0; margin-bottom: 0;
+}
+.imp-tab {
+  padding: 8px 16px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim);
+  transition: all 0.15s;
+}
+.imp-tab:first-child { border-radius: 8px 0 0 8px; }
+.imp-tab:last-child  { border-radius: 0 8px 8px 0; border-left: none; }
+.imp-tab.active {
+  background: rgba(37,99,235,0.15); color: var(--primary-light);
+  border-color: rgba(37,99,235,0.3);
+}
+.imp-tab:hover:not(.active) { background: rgba(255,255,255,0.04); }
+
+.imp-view-mode, .imp-edit-mode { display: none; }
+.imp-view-mode.active, .imp-edit-mode.active { display: block; }
+</style>
+
 <div class="wm-page">
-    <!-- Page Header -->
-    <div class="wm-page-header">
+    <div class="wm-page-header" style="display:flex;align-items:center;justify-content:space-between;">
         <div class="wm-page-title">
             <h1>🐟 Salmão — Identidade</h1>
             <p class="wm-page-subtitle">A essência permanente do agente</p>
         </div>
+        <div class="imp-tabs" id="mode-tabs">
+            <button class="imp-tab active" data-mode="view">Visualizar</button>
+            <button class="imp-tab" data-mode="edit">Editar</button>
+        </div>
     </div>
 
-    <!-- Imprint Panel -->
-    <div class="wm-panel wm-panel-large">
-        <div class="wm-panel-header">
-            <h2>Imprint do Agente</h2>
-        </div>
-        <div class="wm-panel-content">
-            <div id="imprint-container" class="wm-loading">
-                <div class="wm-spinner"></div>
-                <p>Loading imprint data...</p>
+    <!-- ══ VIEW MODE ══ -->
+    <div id="view-mode" class="imp-view-mode active">
+        <div class="wm-panel wm-panel-large" style="border-left:3px solid #f97316;">
+            <div class="wm-panel-header">
+                <h2>Imprint do Agente</h2>
+            </div>
+            <div class="wm-panel-content">
+                <div id="imprint-container" class="wm-loading">
+                    <div class="wm-spinner"></div>
+                    <p>Carregando imprint...</p>
+                </div>
+            </div>
+            <div class="wm-panel-footer">
+                <span class="wm-file-path" id="imprint-path">—</span>
             </div>
         </div>
-        <div class="wm-panel-footer">
-            <span class="wm-file-path" id="imprint-path">—</span>
+    </div>
+
+    <!-- ══ EDIT MODE ══ -->
+    <div id="edit-mode" class="imp-edit-mode">
+        <div class="wm-panel wm-panel-large" style="border-left:3px solid #3b82f6;">
+            <div class="wm-panel-header">
+                <h2>Editar Imprint</h2>
+                <p class="wm-panel-subtitle">YAML — as alterações serão salvas no arquivo imprint.yaml</p>
+            </div>
+            <div class="wm-panel-content">
+                <div class="imp-editor-wrap" id="editor-wrap">
+                    <div class="imp-editor-toolbar">
+                        <span class="imp-editor-title">📝 imprint.yaml</span>
+                        <div class="imp-editor-actions">
+                            <button class="imp-btn" id="btn-reset" title="Desfazer alterações">↩ Resetar</button>
+                            <button class="imp-btn imp-btn-primary" id="btn-save" disabled>💾 Salvar</button>
+                        </div>
+                    </div>
+                    <textarea class="imp-editor-textarea" id="yaml-editor"
+                              placeholder="Carregando imprint.yaml..." spellcheck="false"></textarea>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Entity Categories (NER) Panel -->
-    <div class="wm-panel wm-panel-large">
+    <!-- ══ NER Categories ══ -->
+    <div class="wm-panel wm-panel-large" style="border-left:3px solid #a855f7;">
         <div class="wm-panel-header">
             <h2>Domínio NER</h2>
             <p class="wm-panel-subtitle">Named Entity Recognition Categories</p>
         </div>
         <div class="wm-panel-content">
-            <div id="ner-container" class="wm-ner-grid wm-loading">
+            <div id="ner-container" class="wm-loading">
                 <div class="wm-spinner"></div>
-                <p>Loading entity categories...</p>
+                <p>Carregando categorias...</p>
             </div>
         </div>
     </div>
@@ -46,182 +262,281 @@
 
 {% block wm_scripts %}
 <script>
-// Initialize Salmon page
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+  // ── State ──
+  let currentImprint = null;
+  let originalYaml = '';
+
+  // ── Tab switching ──
+  document.querySelectorAll('.imp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.imp-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const mode = tab.dataset.mode;
+      document.getElementById('view-mode').classList.toggle('active', mode === 'view');
+      document.getElementById('edit-mode').classList.toggle('active', mode === 'edit');
+    });
+  });
+
+  // ── Editor focus ring ──
+  const editorEl = document.getElementById('yaml-editor');
+  const editorWrap = document.getElementById('editor-wrap');
+  editorEl.addEventListener('focus', () => editorWrap.classList.add('focused'));
+  editorEl.addEventListener('blur',  () => editorWrap.classList.remove('focused'));
+
+  // ── Enable save on change ──
+  editorEl.addEventListener('input', () => {
+    document.getElementById('btn-save').disabled = (editorEl.value === originalYaml);
+  });
+
+  // ── Tab key inserts 2 spaces ──
+  editorEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = editorEl.selectionStart;
+      editorEl.value = editorEl.value.substring(0, s) + '  ' + editorEl.value.substring(editorEl.selectionEnd);
+      editorEl.selectionStart = editorEl.selectionEnd = s + 2;
+      editorEl.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // ── Reset button ──
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    editorEl.value = originalYaml;
+    document.getElementById('btn-save').disabled = true;
+  });
+
+  // ── Save button ──
+  document.getElementById('btn-save').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.textContent = '⏳ Salvando...';
+    try {
+      const resp = await fetch('/wild-memory/api/imprint', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ imprint_yaml: editorEl.value })
+      });
+      const result = await resp.json();
+      if (resp.ok) {
+        originalYaml = editorEl.value;
+        showToast('Imprint salvo com sucesso!', 'success');
+        // Reload view mode
+        loadImprintData();
+      } else {
+        showToast('Erro: ' + (result.error || 'Falha ao salvar'), 'error');
+      }
+    } catch (err) {
+      showToast('Erro de conexão: ' + err.message, 'error');
+    }
+    btn.textContent = '💾 Salvar';
+    btn.disabled = (editorEl.value === originalYaml);
+  });
+
+  // ── Toast ──
+  function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.className = 'imp-toast ' + type;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ── Escape ──
+  function esc(text) {
+    if (!text) return '';
+    const m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
+    return String(text).replace(/[&<>"']/g, c => m[c]);
+  }
+
+  // ── Load Imprint ──
+  async function loadImprintData() {
+    try {
+      const data = await WM.get('imprint');
+      if (data && data.imprint) {
+        currentImprint = data.imprint;
+        renderImprint(data.imprint, data.file_path);
+        // Populate YAML editor
+        loadYamlEditor(data.imprint);
+      } else {
+        document.getElementById('imprint-container').innerHTML =
+          '<p class="wm-empty-state">Nenhum imprint configurado</p>';
+      }
+    } catch (error) {
+      document.getElementById('imprint-container').innerHTML =
+        '<p class="wm-error-state">Falha ao carregar imprint</p>';
+      console.error('Imprint load error:', error);
+    }
+  }
+
+  function loadYamlEditor(imprint) {
+    // Convert imprint object to readable YAML manually
+    let yaml = '';
+    if (imprint.role) {
+      yaml += 'role: |\n' + imprint.role.split('\n').map(l => '  ' + l).join('\n') + '\n\n';
+    }
+    if (imprint.values && imprint.values.length) {
+      yaml += 'values:\n' + imprint.values.map(v => '  - "' + v.replace(/"/g, '\\"') + '"').join('\n') + '\n\n';
+    }
+    if (imprint.constraints && imprint.constraints.length) {
+      yaml += 'constraints:\n' + imprint.constraints.map(c => '  - "' + c.replace(/"/g, '\\"') + '"').join('\n') + '\n\n';
+    }
+    if (imprint.tone_of_voice) {
+      yaml += 'tone_of_voice: |\n' + imprint.tone_of_voice.split('\n').map(l => '  ' + l).join('\n') + '\n\n';
+    }
+    if (imprint.permissions) {
+      yaml += 'permissions:\n';
+      Object.entries(imprint.permissions).forEach(([k, v]) => {
+        yaml += '  ' + k + ': ' + String(v) + '\n';
+      });
+      yaml += '\n';
+    }
+    if (imprint.org_context) {
+      yaml += 'org_context:\n';
+      Object.entries(imprint.org_context).forEach(([k, v]) => {
+        if (typeof v === 'object') {
+          yaml += '  ' + k + ':\n';
+          Object.entries(v).forEach(([k2, v2]) => {
+            yaml += '    ' + k2 + ': ' + JSON.stringify(v2) + '\n';
+          });
+        } else {
+          yaml += '  ' + k + ': ' + JSON.stringify(v) + '\n';
+        }
+      });
+    }
+    originalYaml = yaml.trim();
+    editorEl.value = originalYaml;
+    document.getElementById('btn-save').disabled = true;
+  }
+
+  // ── Render Imprint (View mode) ──
+  function renderImprint(imp, filePath) {
+    const c = document.getElementById('imprint-container');
+    let html = '<div class="imp-grid">';
+
+    // Role card — full width
+    if (imp.role) {
+      html += `
+        <div class="imp-card full">
+          <div class="imp-card-icon role">🎯</div>
+          <div class="imp-label">Role</div>
+          <div class="imp-role-text">${esc(imp.role)}</div>
+        </div>`;
+    }
+
+    // Values
+    if (imp.values && imp.values.length) {
+      html += `
+        <div class="imp-card">
+          <div class="imp-card-icon values">💚</div>
+          <div class="imp-label">Values</div>
+          <ul class="imp-list">${imp.values.map(v => '<li>' + esc(v) + '</li>').join('')}</ul>
+        </div>`;
+    }
+
+    // Constraints
+    if (imp.constraints && imp.constraints.length) {
+      html += `
+        <div class="imp-card">
+          <div class="imp-card-icon constr">🚫</div>
+          <div class="imp-label">Constraints</div>
+          <ul class="imp-list constraints">${imp.constraints.map(c => '<li>' + esc(c) + '</li>').join('')}</ul>
+        </div>`;
+    }
+
+    // Tone of Voice
+    if (imp.tone_of_voice) {
+      html += `
+        <div class="imp-card">
+          <div class="imp-card-icon tone">🎙️</div>
+          <div class="imp-label">Tom de Voz</div>
+          <div class="imp-tone-text">${esc(imp.tone_of_voice)}</div>
+        </div>`;
+    }
+
+    // Permissions
+    if (imp.permissions && Object.keys(imp.permissions).length) {
+      const chips = Object.entries(imp.permissions).map(([k, v]) => `
+        <div class="imp-perm-chip">
+          <span class="imp-perm-dot ${v ? 'on' : 'off'}"></span>
+          <span class="imp-perm-key">${esc(k)}</span>
+        </div>`).join('');
+      html += `
+        <div class="imp-card">
+          <div class="imp-card-icon perms">🔑</div>
+          <div class="imp-label">Permissões</div>
+          <div class="imp-perms-grid">${chips}</div>
+        </div>`;
+    }
+
+    // Org Context
+    if (imp.org_context && Object.keys(imp.org_context).length) {
+      html += `
+        <div class="imp-card full">
+          <div class="imp-card-icon org">🏢</div>
+          <div class="imp-label">Org Context</div>
+          <pre style="font-size:11px;line-height:1.6;color:var(--text);opacity:0.85;margin:0;white-space:pre-wrap;word-break:break-word;"><code>${esc(JSON.stringify(imp.org_context, null, 2))}</code></pre>
+        </div>`;
+    }
+
+    html += '</div>';
+    c.innerHTML = html;
+
+    if (filePath) {
+      document.getElementById('imprint-path').textContent = filePath;
+    }
+  }
+
+  // ── Load NER ──
+  async function loadNERData() {
+    try {
+      const data = await WM.get('ner');
+      if (data && data.categories) {
+        renderNER(data.categories);
+      } else {
+        document.getElementById('ner-container').innerHTML =
+          '<p class="wm-empty-state">Nenhuma categoria NER definida</p>';
+      }
+    } catch (error) {
+      document.getElementById('ner-container').innerHTML =
+        '<p class="wm-empty-state">Nenhuma categoria NER definida</p>';
+    }
+  }
+
+  function renderNER(categories) {
+    const c = document.getElementById('ner-container');
+    if (!categories || !Object.keys(categories).length) {
+      c.innerHTML = '<p class="wm-empty-state">Nenhuma categoria NER definida</p>';
+      return;
+    }
+    const colors = {
+      'PERSON':'#FF6B6B','ORG':'#4ECDC4','GPE':'#45B7D1','LOCATION':'#96CEB4',
+      'DATE':'#FFEAA7','TIME':'#DDA15E','MONEY':'#BC6C25','PERCENT':'#D4A574',
+      'FACILITY':'#95B8D1','PRODUCT':'#B39DDB','EVENT':'#F8B195','LANGUAGE':'#AA96DA',
+      'MEDICATION':'#f97316','CONDITION':'#ef4444','PROCEDURE':'#8b5cf6',
+      'SYMPTOM':'#ec4899','LAB_TEST':'#06b6d4','ANATOMY':'#10b981'
+    };
+    let html = '<div class="ner-grid">';
+    Object.entries(categories).forEach(([cat, desc]) => {
+      const color = colors[cat] || '#9CA3AF';
+      html += `
+        <div class="ner-chip">
+          <div class="ner-dot" style="background:${color};"></div>
+          <div>
+            <div class="ner-name" style="color:${color};">${esc(cat)}</div>
+            <div class="ner-desc">${esc(typeof desc === 'string' ? desc : JSON.stringify(desc))}</div>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+    c.innerHTML = html;
+  }
+
+  // ── Init ──
+  document.addEventListener('DOMContentLoaded', () => {
     loadImprintData();
     loadNERData();
-});
-
-async function loadImprintData() {
-    try {
-        const data = await WM.get('imprint');
-        if (data && data.imprint) {
-            renderImprint(data.imprint, data.file_path);
-        } else {
-            document.getElementById('imprint-container').innerHTML =
-                '<p class="wm-empty-state">No imprint data available</p>';
-        }
-    } catch (error) {
-        document.getElementById('imprint-container').innerHTML =
-            '<p class="wm-error-state">Failed to load imprint data</p>';
-        console.error('Imprint load error:', error);
-    }
-}
-
-function renderImprint(imprint, filePath) {
-    const container = document.getElementById('imprint-container');
-    let html = '';
-
-    // Role Section
-    if (imprint.role) {
-        html += `
-            <div class="wm-imprint-section">
-                <div class="wm-imprint-role">
-                    <h3>Role</h3>
-                    <p class="wm-imprint-role-text">${escapeHtml(imprint.role)}</p>
-                </div>
-            </div>
-        `;
-    }
-
-    // Values Section
-    if (imprint.values && Array.isArray(imprint.values) && imprint.values.length > 0) {
-        const valuesList = imprint.values
-            .map(v => `<li>${escapeHtml(v)}</li>`)
-            .join('');
-        html += `
-            <div class="wm-imprint-section">
-                <h3>Values</h3>
-                <ul class="wm-imprint-list">${valuesList}</ul>
-            </div>
-        `;
-    }
-
-    // Constraints Section
-    if (imprint.constraints && Array.isArray(imprint.constraints) && imprint.constraints.length > 0) {
-        const constraintsList = imprint.constraints
-            .map(c => `<li>${escapeHtml(c)}</li>`)
-            .join('');
-        html += `
-            <div class="wm-imprint-section">
-                <h3>Constraints</h3>
-                <ul class="wm-imprint-list">${constraintsList}</ul>
-            </div>
-        `;
-    }
-
-    // Tone of Voice Section
-    if (imprint.tone_of_voice) {
-        html += `
-            <div class="wm-imprint-section">
-                <h3>Tone of Voice</h3>
-                <p class="wm-imprint-text">${escapeHtml(imprint.tone_of_voice)}</p>
-            </div>
-        `;
-    }
-
-    // Permissions Section
-    if (imprint.permissions && typeof imprint.permissions === 'object') {
-        const permsList = Object.entries(imprint.permissions)
-            .map(([key, value]) => `
-                <div class="wm-imprint-pair">
-                    <span class="wm-imprint-key">${escapeHtml(key)}</span>
-                    <span class="wm-imprint-value">${escapeHtml(String(value))}</span>
-                </div>
-            `)
-            .join('');
-        html += `
-            <div class="wm-imprint-section">
-                <h3>Permissions</h3>
-                <div class="wm-imprint-pairs">${permsList}</div>
-            </div>
-        `;
-    }
-
-    // Org Context Section
-    if (imprint.org_context && typeof imprint.org_context === 'object') {
-        const orgJson = JSON.stringify(imprint.org_context, null, 2);
-        html += `
-            <div class="wm-imprint-section">
-                <h3>Org Context</h3>
-                <pre class="wm-json-block"><code>${escapeHtml(orgJson)}</code></pre>
-            </div>
-        `;
-    }
-
-    container.innerHTML = html;
-
-    // Update file path footer
-    if (filePath) {
-        document.getElementById('imprint-path').textContent = filePath;
-    }
-}
-
-async function loadNERData() {
-    try {
-        const data = await WM.get('ner');
-        if (data && data.categories) {
-            renderNERCategories(data.categories);
-        } else {
-            document.getElementById('ner-container').innerHTML =
-                '<p class="wm-empty-state">No NER categories defined</p>';
-        }
-    } catch (error) {
-        document.getElementById('ner-container').innerHTML =
-            '<p class="wm-empty-state">No NER categories defined</p>';
-        console.error('NER load error:', error);
-    }
-}
-
-function renderNERCategories(categories) {
-    const container = document.getElementById('ner-container');
-
-    if (!categories || Object.keys(categories).length === 0) {
-        container.innerHTML = '<p class="wm-empty-state">No NER categories defined</p>';
-        return;
-    }
-
-    const categoryColors = {
-        'PERSON': '#FF6B6B',
-        'ORG': '#4ECDC4',
-        'GPE': '#45B7D1',
-        'LOCATION': '#96CEB4',
-        'DATE': '#FFEAA7',
-        'TIME': '#DDA15E',
-        'MONEY': '#BC6C25',
-        'PERCENT': '#D4A574',
-        'FACILITY': '#95B8D1',
-        'PRODUCT': '#B39DDB',
-        'EVENT': '#F8B195',
-        'LANGUAGE': '#AA96DA'
-    };
-
-    let html = '';
-    Object.entries(categories).forEach(([category, description]) => {
-        const color = categoryColors[category] || '#9CA3AF';
-        html += `
-            <div class="wm-ner-category">
-                <div class="wm-ner-color" style="background-color: ${color};"></div>
-                <div class="wm-ner-info">
-                    <div class="wm-ner-name">${escapeHtml(category)}</div>
-                    <div class="wm-ner-desc">${escapeHtml(description || 'No description')}</div>
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-function escapeHtml(text) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, m => map[m]);
-}
+  });
+})();
 </script>
 {% endblock %}
