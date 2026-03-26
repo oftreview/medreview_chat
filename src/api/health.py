@@ -152,3 +152,60 @@ def api_logs():
         logs = []
 
     return jsonify({"logs": logs})
+
+
+@bp.route("/api/logs/history", methods=["GET"])
+def api_logs_history():
+    """Return persistent logs from Supabase with filters."""
+    from src.core.log_buffer import get_history
+
+    result = get_history(
+        tag=request.args.get("tag"),
+        source=request.args.get("source"),
+        search=request.args.get("search"),
+        date_from=request.args.get("date_from"),
+        date_to=request.args.get("date_to"),
+        page=int(request.args.get("page", 1)),
+        per_page=int(request.args.get("per_page", 100)),
+    )
+    return jsonify(result)
+
+
+@bp.route("/api/logs/stats", methods=["GET"])
+def api_logs_stats():
+    """Return daily log volume stats for the calendar heatmap."""
+    from src.core.log_buffer import get_daily_stats
+
+    days = int(request.args.get("days", 30))
+    stats = get_daily_stats(days_back=days)
+    return jsonify({"stats": stats})
+
+
+@bp.route("/api/logs/sources", methods=["GET"])
+def api_logs_sources():
+    """Return distinct log sources for filter dropdown."""
+    from src.core.log_buffer import get_sources
+    return jsonify({"sources": get_sources()})
+
+
+@bp.route("/api/logs/cleanup", methods=["POST"])
+def api_logs_cleanup():
+    """Trigger cleanup of old logs (default 30 days retention)."""
+    from src.config import API_SECRET_TOKEN
+
+    if API_SECRET_TOKEN:
+        auth = request.headers.get("Authorization", "")
+        if auth != f"Bearer {API_SECRET_TOKEN}":
+            return jsonify({"error": "Unauthorized"}), 401
+
+    days = int(request.args.get("days", 30))
+    try:
+        from src.core.database.client import _get_client
+        db = _get_client()
+        if db:
+            result = db.rpc("cleanup_old_logs", {"retention_days": days}).execute()
+            deleted = result.data if result.data else 0
+            return jsonify({"status": "ok", "deleted": deleted, "retention_days": days})
+        return jsonify({"error": "Database not available"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

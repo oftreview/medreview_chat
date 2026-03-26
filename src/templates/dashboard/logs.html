@@ -4,6 +4,24 @@
 {% block extra_styles %}
 .logs-page { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
+/* ── Mode Toggle ── */
+.log-mode-toggle {
+  display:flex; gap:0; margin-left:auto;
+}
+.log-mode-btn {
+  padding:6px 14px; font-size:11px; font-weight:600;
+  cursor:pointer; border:1px solid var(--border);
+  background:transparent; color:var(--text-dim);
+  transition:all 0.15s;
+}
+.log-mode-btn:first-child { border-radius:6px 0 0 6px; }
+.log-mode-btn:last-child  { border-radius:0 6px 6px 0; border-left:none; }
+.log-mode-btn.active {
+  background:rgba(139,63,187,0.15); color:var(--purple-light);
+  border-color:rgba(139,63,187,0.3);
+}
+.log-mode-btn:hover:not(.active) { background:rgba(255,255,255,0.04); }
+
 /* ── Tabs ── */
 .log-tabs {
   display:flex; gap:0; padding:0 24px;
@@ -24,19 +42,110 @@
   padding:1px 6px; border-radius:8px;
 }
 
-/* ── Controls ── */
+/* ── Controls (Live) ── */
 .log-controls {
   display:flex; align-items:center; gap:12px; padding:10px 24px;
   border-bottom:1px solid var(--border);
 }
-.log-controls input {
+.log-controls input[type=text] {
   flex:1; background:var(--surface); border:1px solid var(--border);
   border-radius:8px; padding:6px 12px; font-size:12px;
   font-family:'Space Grotesk',sans-serif; color:var(--text); outline:none;
 }
-.log-controls input:focus { border-color:var(--purple); }
+.log-controls input[type=text]:focus { border-color:var(--purple); }
 .log-controls label { font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:5px; cursor:pointer; }
 .log-controls input[type=checkbox] { width:14px; height:14px; accent-color:var(--purple); }
+
+/* ── History Filters ── */
+.log-history-filters {
+  display:flex; align-items:center; gap:10px; padding:10px 24px;
+  border-bottom:1px solid var(--border); flex-wrap:wrap;
+}
+.log-filter-group {
+  display:flex; align-items:center; gap:5px;
+}
+.log-filter-label {
+  font-size:10px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.8px; color:var(--text-dim); white-space:nowrap;
+}
+.log-filter-select, .log-filter-input {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:6px; padding:5px 8px; font-size:11px;
+  color:var(--text); outline:none; font-family:'Space Grotesk',sans-serif;
+}
+.log-filter-select:focus, .log-filter-input:focus { border-color:var(--purple); }
+.log-filter-input[type=date] { width:130px; }
+.log-filter-input[type=text] { width:180px; }
+.log-filter-btn {
+  padding:5px 12px; border-radius:6px; font-size:11px; font-weight:600;
+  cursor:pointer; border:1px solid rgba(139,63,187,0.3);
+  background:rgba(139,63,187,0.15); color:var(--purple-light);
+  transition:all 0.15s;
+}
+.log-filter-btn:hover { background:rgba(139,63,187,0.25); }
+.log-filter-btn.ghost {
+  background:transparent; border-color:var(--border); color:var(--text-dim);
+}
+.log-filter-btn.ghost:hover { background:rgba(255,255,255,0.04); }
+
+/* ── Calendar Heatmap ── */
+.log-calendar {
+  padding:12px 24px; border-bottom:1px solid var(--border);
+  background:rgba(13,10,20,0.3);
+}
+.log-cal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px;
+}
+.log-cal-title { font-size:11px; font-weight:600; color:var(--text-dim); }
+.log-cal-nav { display:flex; gap:6px; }
+.log-cal-nav button {
+  background:transparent; border:1px solid var(--border); border-radius:4px;
+  color:var(--text-dim); cursor:pointer; padding:2px 8px; font-size:11px;
+}
+.log-cal-nav button:hover { background:rgba(255,255,255,0.04); }
+.log-cal-grid {
+  display:grid; grid-template-columns:repeat(7,1fr); gap:3px;
+}
+.log-cal-day-header {
+  font-size:9px; color:var(--text-dim); text-align:center;
+  padding:2px 0; font-weight:600; text-transform:uppercase;
+}
+.log-cal-cell {
+  aspect-ratio:1; border-radius:3px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; color:var(--text-dim); transition:all 0.15s;
+  border:1px solid transparent; position:relative;
+}
+.log-cal-cell:hover { border-color:var(--purple); }
+.log-cal-cell.today { border-color:var(--purple); font-weight:700; color:var(--text); }
+.log-cal-cell.selected { background:rgba(139,63,187,0.25)!important; border-color:var(--purple); }
+.log-cal-cell.empty { cursor:default; }
+.log-cal-cell.empty:hover { border-color:transparent; }
+.log-cal-cell.heat-0 { background:rgba(255,255,255,0.02); }
+.log-cal-cell.heat-1 { background:rgba(139,63,187,0.08); }
+.log-cal-cell.heat-2 { background:rgba(139,63,187,0.18); }
+.log-cal-cell.heat-3 { background:rgba(139,63,187,0.30); }
+.log-cal-cell.heat-4 { background:rgba(139,63,187,0.45); }
+.log-cal-cell.has-errors::after {
+  content:''; position:absolute; top:2px; right:2px;
+  width:4px; height:4px; border-radius:50%; background:var(--red);
+}
+
+/* ── Pagination ── */
+.log-pagination {
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; padding:10px 24px; border-top:1px solid var(--border);
+}
+.log-page-btn {
+  padding:4px 10px; border-radius:5px; font-size:11px;
+  cursor:pointer; border:1px solid var(--border);
+  background:transparent; color:var(--text-dim); transition:all 0.15s;
+}
+.log-page-btn:hover { background:rgba(255,255,255,0.04); }
+.log-page-btn.active { background:rgba(139,63,187,0.15); color:var(--purple-light); border-color:rgba(139,63,187,0.3); }
+.log-page-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.log-page-info { font-size:11px; color:var(--text-dim); }
 
 /* ── Log entries ── */
 .log-stream {
@@ -50,9 +159,14 @@
 .log-entry { padding:2px 0; display:flex; gap:10px; border-bottom:1px solid rgba(139,63,187,0.05); }
 .log-entry:hover { background:rgba(139,63,187,0.03); }
 .log-time { color:var(--text-dim); flex-shrink:0; width:70px; font-size:10px; padding-top:2px; }
+.log-date-col { color:var(--text-dim); flex-shrink:0; width:80px; font-size:10px; padding-top:2px; }
 .log-tag {
   flex-shrink:0; width:80px; font-size:9px; font-weight:700;
   padding:1px 0; text-transform:uppercase; letter-spacing:0.5px;
+}
+.log-source-col {
+  flex-shrink:0; width:85px; font-size:9px; font-weight:500;
+  color:var(--text-dim); padding-top:2px;
 }
 .log-tag.system { color:var(--purple-light); }
 .log-tag.security { color:var(--orange); }
@@ -64,6 +178,10 @@
 .log-msg.error { color:var(--red); }
 
 .log-empty { text-align:center; padding:60px 20px; color:var(--text-dim); font-size:13px; font-family:'Space Grotesk',sans-serif; }
+
+/* ── Sections visibility ── */
+.log-section { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.log-section.active { display:flex; }
 {% endblock %}
 
 {% block content %}
@@ -72,102 +190,405 @@
     <h1>Logs</h1>
     <span class="page-badge green" id="logStatus">Conectado</span>
   </div>
-  <div class="page-actions">
-    <button class="btn-ghost" onclick="clearLogs()">Limpar</button>
-    <button class="btn-ghost" id="pauseBtn" onclick="togglePause()">&#9646;&#9646; Pausar</button>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="log-mode-toggle">
+      <button class="log-mode-btn active" data-mode="live" onclick="switchMode('live')">⚡ Live</button>
+      <button class="log-mode-btn" data-mode="history" onclick="switchMode('history')">📚 Histórico</button>
+    </div>
+    <div class="page-actions">
+      <button class="btn-ghost" onclick="clearLogs()">Limpar</button>
+      <button class="btn-ghost" id="pauseBtn" onclick="togglePause()">&#9646;&#9646; Pausar</button>
+    </div>
   </div>
 </div>
 
 <div class="logs-page">
-  <div class="log-tabs">
-    <div class="log-tab active" data-tab="all" onclick="switchTab('all')">Todos <span class="tab-count" id="countAll">0</span></div>
-    <div class="log-tab" data-tab="system" onclick="switchTab('system')">Sistema <span class="tab-count" id="countSystem">0</span></div>
-    <div class="log-tab" data-tab="security" onclick="switchTab('security')">Seguranca <span class="tab-count" id="countSecurity">0</span></div>
-    <div class="log-tab" data-tab="error" onclick="switchTab('error')">Erros <span class="tab-count" id="countError">0</span></div>
+
+  <!-- ══════ LIVE MODE ══════ -->
+  <div class="log-section active" id="section-live">
+    <div class="log-tabs">
+      <div class="log-tab active" data-tab="all" onclick="switchTab('all')">Todos <span class="tab-count" id="countAll">0</span></div>
+      <div class="log-tab" data-tab="system" onclick="switchTab('system')">Sistema <span class="tab-count" id="countSystem">0</span></div>
+      <div class="log-tab" data-tab="security" onclick="switchTab('security')">Segurança <span class="tab-count" id="countSecurity">0</span></div>
+      <div class="log-tab" data-tab="error" onclick="switchTab('error')">Erros <span class="tab-count" id="countError">0</span></div>
+    </div>
+    <div class="log-controls">
+      <input type="text" id="logFilter" placeholder="Filtrar logs..." oninput="filterLogs()">
+      <label><input type="checkbox" id="autoScroll" checked> Auto-scroll</label>
+    </div>
+    <div class="log-stream" id="logStream">
+      <div class="log-empty">Aguardando logs...</div>
+    </div>
   </div>
 
-  <div class="log-controls">
-    <input type="text" id="logFilter" placeholder="Filtrar logs..." oninput="filterLogs()">
-    <label><input type="checkbox" id="autoScroll" checked> Auto-scroll</label>
+  <!-- ══════ HISTORY MODE ══════ -->
+  <div class="log-section" id="section-history">
+
+    <!-- Calendar heatmap -->
+    <div class="log-calendar" id="calendarSection">
+      <div class="log-cal-header">
+        <span class="log-cal-title" id="calMonthLabel">Março 2026</span>
+        <div class="log-cal-nav">
+          <button onclick="calNav(-1)">◀</button>
+          <button onclick="calNav(0)">Hoje</button>
+          <button onclick="calNav(1)">▶</button>
+        </div>
+      </div>
+      <div class="log-cal-grid" id="calGrid"></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="log-history-filters">
+      <div class="log-filter-group">
+        <span class="log-filter-label">Tipo</span>
+        <select class="log-filter-select" id="histTag">
+          <option value="all">Todos</option>
+          <option value="system">Sistema</option>
+          <option value="security">Segurança</option>
+          <option value="error">Erros</option>
+          <option value="debug">Debug</option>
+          <option value="flush">Flush</option>
+          <option value="debounce">Debounce</option>
+        </select>
+      </div>
+      <div class="log-filter-group">
+        <span class="log-filter-label">Source</span>
+        <select class="log-filter-select" id="histSource">
+          <option value="all">Todas</option>
+        </select>
+      </div>
+      <div class="log-filter-group">
+        <span class="log-filter-label">De</span>
+        <input type="date" class="log-filter-input" id="histDateFrom">
+      </div>
+      <div class="log-filter-group">
+        <span class="log-filter-label">Até</span>
+        <input type="date" class="log-filter-input" id="histDateTo">
+      </div>
+      <div class="log-filter-group">
+        <span class="log-filter-label">Busca</span>
+        <input type="text" class="log-filter-input" id="histSearch" placeholder="Buscar na mensagem...">
+      </div>
+      <button class="log-filter-btn" onclick="searchHistory()">🔍 Buscar</button>
+      <button class="log-filter-btn ghost" onclick="clearHistoryFilters()">Limpar</button>
+    </div>
+
+    <!-- Results stream -->
+    <div class="log-stream" id="histStream">
+      <div class="log-empty">Selecione um dia no calendário ou use os filtros para buscar logs históricos.</div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="log-pagination" id="histPagination" style="display:none;">
+      <button class="log-page-btn" id="histPrev" onclick="histPage(-1)">← Anterior</button>
+      <span class="log-page-info" id="histPageInfo">Página 1 de 1</span>
+      <button class="log-page-btn" id="histNext" onclick="histPage(1)">Próximo →</button>
+    </div>
   </div>
 
-  <div class="log-stream" id="logStream">
-    <div class="log-empty">Aguardando logs...</div>
-  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-let allLogs = [];
-let activeTab = 'all';
-let paused = false;
-let pollInterval = null;
+(function() {
+  // ══════════════════════════════════════════════════════════
+  // STATE
+  // ══════════════════════════════════════════════════════════
+  let currentMode = 'live';
+  let allLogs = [];
+  let activeTab = 'all';
+  let paused = false;
+  let pollInterval = null;
 
-function switchTab(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.log-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  renderLogs();
-}
+  // History state
+  let histCurrentPage = 1;
+  let histTotalPages = 1;
+  let calYear, calMonth;
+  let calStats = {};
+  let selectedDate = null;
 
-function filterLogs() { renderLogs(); }
+  // Init calendar to current month
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
 
-function renderLogs() {
-  const stream = document.getElementById('logStream');
-  const filter = document.getElementById('logFilter').value.toLowerCase();
-  let filtered = allLogs;
-  if (activeTab !== 'all') filtered = filtered.filter(l => l.tag === activeTab);
-  if (filter) filtered = filtered.filter(l => l.msg.toLowerCase().includes(filter) || l.tag.includes(filter));
+  // ══════════════════════════════════════════════════════════
+  // MODE SWITCHING
+  // ══════════════════════════════════════════════════════════
+  window.switchMode = function(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.log-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    document.getElementById('section-live').classList.toggle('active', mode === 'live');
+    document.getElementById('section-history').classList.toggle('active', mode === 'history');
 
-  if (!filtered.length) {
-    stream.innerHTML = '<div class="log-empty">Nenhum log encontrado</div>';
-    return;
-  }
-
-  stream.innerHTML = filtered.map(l => `<div class="log-entry">
-    <span class="log-time">${l.time}</span>
-    <span class="log-tag ${l.tag}">${l.tag}</span>
-    <span class="log-msg ${l.tag === 'error' ? 'error' : ''}">${escHtml(l.msg)}</span>
-  </div>`).join('');
-
-  if (document.getElementById('autoScroll').checked) stream.scrollTop = stream.scrollHeight;
-  updateCounts();
-}
-
-function updateCounts() {
-  document.getElementById('countAll').textContent = allLogs.length;
-  document.getElementById('countSystem').textContent = allLogs.filter(l=>l.tag==='system').length;
-  document.getElementById('countSecurity').textContent = allLogs.filter(l=>l.tag==='security').length;
-  document.getElementById('countError').textContent = allLogs.filter(l=>l.tag==='error').length;
-}
-
-async function pollLogs() {
-  if (paused) return;
-  try {
-    const res = await fetch('/api/logs?since=' + (allLogs.length ? allLogs[allLogs.length-1].id||0 : 0));
-    const data = await res.json();
-    if (data.logs && data.logs.length) {
-      allLogs.push(...data.logs);
-      if (allLogs.length > 2000) allLogs = allLogs.slice(-1500);
-      renderLogs();
+    if (mode === 'history') {
+      loadCalendarStats();
+      loadSources();
+      renderCalendar();
     }
-  } catch(e) {
-    document.getElementById('logStatus').textContent = 'Desconectado';
-    document.getElementById('logStatus').className = 'page-badge orange';
+  };
+
+  // ══════════════════════════════════════════════════════════
+  // LIVE MODE
+  // ══════════════════════════════════════════════════════════
+  window.switchTab = function(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.log-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    renderLogs();
+  };
+
+  window.filterLogs = function() { renderLogs(); };
+
+  function renderLogs() {
+    const stream = document.getElementById('logStream');
+    const filter = document.getElementById('logFilter').value.toLowerCase();
+    let filtered = allLogs;
+    if (activeTab !== 'all') filtered = filtered.filter(l => l.tag === activeTab);
+    if (filter) filtered = filtered.filter(l => l.msg.toLowerCase().includes(filter) || l.tag.includes(filter));
+
+    if (!filtered.length) {
+      stream.innerHTML = '<div class="log-empty">Nenhum log encontrado</div>';
+      updateCounts();
+      return;
+    }
+
+    stream.innerHTML = filtered.map(l => `<div class="log-entry">
+      <span class="log-time">${l.time}</span>
+      <span class="log-tag ${l.tag}">${l.tag}</span>
+      <span class="log-msg ${l.tag === 'error' ? 'error' : ''}">${escHtml(l.msg)}</span>
+    </div>`).join('');
+
+    if (document.getElementById('autoScroll').checked) stream.scrollTop = stream.scrollHeight;
+    updateCounts();
   }
-}
 
-function togglePause() {
-  paused = !paused;
-  document.getElementById('pauseBtn').innerHTML = paused ? '&#9654; Retomar' : '&#9646;&#9646; Pausar';
-}
+  function updateCounts() {
+    document.getElementById('countAll').textContent = allLogs.length;
+    document.getElementById('countSystem').textContent = allLogs.filter(l => l.tag === 'system').length;
+    document.getElementById('countSecurity').textContent = allLogs.filter(l => l.tag === 'security').length;
+    document.getElementById('countError').textContent = allLogs.filter(l => l.tag === 'error').length;
+  }
 
-function clearLogs() { allLogs = []; renderLogs(); }
+  async function pollLogs() {
+    if (paused || currentMode !== 'live') return;
+    try {
+      const since = allLogs.length ? allLogs[allLogs.length - 1].id || 0 : 0;
+      const res = await fetch('/api/logs?since=' + since);
+      const data = await res.json();
+      if (data.logs && data.logs.length) {
+        allLogs.push(...data.logs);
+        if (allLogs.length > 2000) allLogs = allLogs.slice(-1500);
+        renderLogs();
+      }
+      document.getElementById('logStatus').textContent = 'Conectado';
+      document.getElementById('logStatus').className = 'page-badge green';
+    } catch (e) {
+      document.getElementById('logStatus').textContent = 'Desconectado';
+      document.getElementById('logStatus').className = 'page-badge orange';
+    }
+  }
 
-function escHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  window.togglePause = function() {
+    paused = !paused;
+    document.getElementById('pauseBtn').innerHTML = paused ? '&#9654; Retomar' : '&#9646;&#9646; Pausar';
+  };
 
-// Poll every 2 seconds
-pollInterval = setInterval(pollLogs, 2000);
-pollLogs();
+  window.clearLogs = function() { allLogs = []; renderLogs(); };
+
+  // ══════════════════════════════════════════════════════════
+  // HISTORY MODE — Calendar
+  // ══════════════════════════════════════════════════════════
+  const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                       'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DAY_HEADERS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  async function loadCalendarStats() {
+    try {
+      const res = await fetch('/api/logs/stats?days=90');
+      const data = await res.json();
+      calStats = {};
+      (data.stats || []).forEach(s => {
+        calStats[s.log_date] = s;
+      });
+    } catch (e) { /* silent */ }
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    document.getElementById('calMonthLabel').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+    const grid = document.getElementById('calGrid');
+
+    // Day headers
+    let html = DAY_HEADERS.map(d => `<div class="log-cal-day-header">${d}</div>`).join('');
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      html += '<div class="log-cal-cell empty"></div>';
+    }
+
+    // Find max volume for heat scaling
+    let maxVol = 1;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const stat = calStats[dateStr];
+      if (stat && stat.total > maxVol) maxVol = stat.total;
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const stat = calStats[dateStr];
+      const total = stat ? stat.total : 0;
+      const errors = stat ? stat.errors : 0;
+
+      let heat = 0;
+      if (total > 0) heat = Math.min(4, Math.ceil((total / maxVol) * 4));
+
+      const isToday = dateStr === todayStr;
+      const isSelected = dateStr === selectedDate;
+      const hasErrors = errors > 0;
+
+      html += `<div class="log-cal-cell heat-${heat}${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}${hasErrors ? ' has-errors' : ''}"
+        onclick="selectDate('${dateStr}')" title="${total} logs${errors ? ', ' + errors + ' erros' : ''}">${d}</div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  window.calNav = function(dir) {
+    if (dir === 0) {
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+    } else {
+      calMonth += dir;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+    }
+    renderCalendar();
+  };
+
+  window.selectDate = function(dateStr) {
+    selectedDate = dateStr;
+    renderCalendar();
+    // Auto-fill date filters and search
+    document.getElementById('histDateFrom').value = dateStr;
+    document.getElementById('histDateTo').value = dateStr;
+    searchHistory();
+  };
+
+  // ══════════════════════════════════════════════════════════
+  // HISTORY MODE — Search & Filters
+  // ══════════════════════════════════════════════════════════
+  async function loadSources() {
+    try {
+      const res = await fetch('/api/logs/sources');
+      const data = await res.json();
+      const sel = document.getElementById('histSource');
+      // Keep first "Todas" option
+      while (sel.options.length > 1) sel.remove(1);
+      (data.sources || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sel.appendChild(opt);
+      });
+    } catch (e) { /* silent */ }
+  }
+
+  window.searchHistory = async function(page) {
+    histCurrentPage = page || 1;
+    const stream = document.getElementById('histStream');
+    stream.innerHTML = '<div class="log-empty">Buscando...</div>';
+
+    const params = new URLSearchParams();
+    const tag = document.getElementById('histTag').value;
+    const source = document.getElementById('histSource').value;
+    const dateFrom = document.getElementById('histDateFrom').value;
+    const dateTo = document.getElementById('histDateTo').value;
+    const search = document.getElementById('histSearch').value;
+
+    if (tag !== 'all') params.set('tag', tag);
+    if (source !== 'all') params.set('source', source);
+    if (dateFrom) params.set('date_from', dateFrom + 'T00:00:00-03:00');
+    if (dateTo) params.set('date_to', dateTo);
+    if (search) params.set('search', search);
+    params.set('page', histCurrentPage);
+    params.set('per_page', 100);
+
+    try {
+      const res = await fetch('/api/logs/history?' + params.toString());
+      const data = await res.json();
+
+      histTotalPages = data.pages || 1;
+      const logs = data.logs || [];
+
+      if (!logs.length) {
+        stream.innerHTML = '<div class="log-empty">Nenhum log encontrado para esses filtros.</div>';
+        document.getElementById('histPagination').style.display = 'none';
+        return;
+      }
+
+      stream.innerHTML = logs.map(l => {
+        const ts = new Date(l.created_at);
+        const dateStr = ts.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const timeStr = ts.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `<div class="log-entry">
+          <span class="log-date-col">${dateStr}</span>
+          <span class="log-time">${timeStr}</span>
+          <span class="log-tag ${l.tag}">${l.tag}</span>
+          <span class="log-source-col">${l.source || ''}</span>
+          <span class="log-msg ${l.tag === 'error' ? 'error' : ''}">${escHtml(l.message)}</span>
+        </div>`;
+      }).join('');
+
+      // Pagination
+      const pag = document.getElementById('histPagination');
+      pag.style.display = histTotalPages > 1 ? 'flex' : 'none';
+      document.getElementById('histPageInfo').textContent = `Página ${histCurrentPage} de ${histTotalPages} (${data.total} logs)`;
+      document.getElementById('histPrev').disabled = histCurrentPage <= 1;
+      document.getElementById('histNext').disabled = histCurrentPage >= histTotalPages;
+
+    } catch (e) {
+      stream.innerHTML = `<div class="log-empty">Erro: ${e.message}</div>`;
+    }
+  };
+
+  window.histPage = function(dir) {
+    searchHistory(histCurrentPage + dir);
+  };
+
+  window.clearHistoryFilters = function() {
+    document.getElementById('histTag').value = 'all';
+    document.getElementById('histSource').value = 'all';
+    document.getElementById('histDateFrom').value = '';
+    document.getElementById('histDateTo').value = '';
+    document.getElementById('histSearch').value = '';
+    selectedDate = null;
+    renderCalendar();
+    document.getElementById('histStream').innerHTML =
+      '<div class="log-empty">Selecione um dia no calendário ou use os filtros para buscar logs históricos.</div>';
+    document.getElementById('histPagination').style.display = 'none';
+  };
+
+  // ══════════════════════════════════════════════════════════
+  // UTILS
+  // ══════════════════════════════════════════════════════════
+  function escHtml(t) {
+    if (!t) return '';
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // INIT
+  // ══════════════════════════════════════════════════════════
+  pollInterval = setInterval(pollLogs, 2000);
+  pollLogs();
+})();
 </script>
 {% endblock %}
