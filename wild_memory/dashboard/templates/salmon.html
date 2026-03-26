@@ -144,29 +144,41 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── NER Grid ── */
-.ner-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
+/* ── NER Categories ── */
+.ner-categories {
+  display: flex; flex-direction: column; gap: 14px;
 }
-.ner-chip {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 14px; border-radius: 8px;
-  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+.ner-category {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
   transition: border-color 0.2s;
 }
-.ner-chip:hover { border-color: rgba(168,85,247,0.3); }
-.ner-dot {
-  width: 10px; height: 10px; border-radius: 3px;
-  margin-top: 3px; flex-shrink: 0;
+.ner-category:hover { border-color: rgba(168,85,247,0.25); }
+.ner-cat-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
 }
-.ner-name {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+.ner-cat-dot {
+  width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+}
+.ner-cat-name {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  margin-bottom: 2px;
 }
-.ner-desc {
-  font-size: 11px; color: var(--text-dim); line-height: 1.4;
+.ner-cat-count {
+  font-size: 10px; color: var(--text-dim); margin-left: auto;
+}
+.ner-keywords {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.ner-kw {
+  display: inline-block; padding: 3px 9px;
+  border-radius: 5px; font-size: 11px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: var(--text); opacity: 0.85;
+  line-height: 1.4;
 }
 
 /* ── Tabs for View/Edit ── */
@@ -251,7 +263,7 @@
             <p class="wm-panel-subtitle">Named Entity Recognition Categories</p>
         </div>
         <div class="wm-panel-content">
-            <div id="ner-container" class="wm-loading">
+            <div id="ner-container" class="wm-loading" style="min-height:80px;">
                 <div class="wm-spinner"></div>
                 <p>Carregando categorias...</p>
             </div>
@@ -510,21 +522,32 @@
       return;
     }
     const colors = {
+      'EXAM':'#45B7D1','PRODUCT':'#B39DDB','SPECIALTY':'#10b981',
+      'PLAN':'#eab308','COMPETITOR':'#ef4444','FUNNEL_SIGNAL':'#f97316',
       'PERSON':'#FF6B6B','ORG':'#4ECDC4','GPE':'#45B7D1','LOCATION':'#96CEB4',
       'DATE':'#FFEAA7','TIME':'#DDA15E','MONEY':'#BC6C25','PERCENT':'#D4A574',
-      'FACILITY':'#95B8D1','PRODUCT':'#B39DDB','EVENT':'#F8B195','LANGUAGE':'#AA96DA',
       'MEDICATION':'#f97316','CONDITION':'#ef4444','PROCEDURE':'#8b5cf6',
       'SYMPTOM':'#ec4899','LAB_TEST':'#06b6d4','ANATOMY':'#10b981'
     };
-    let html = '<div class="ner-grid">';
-    Object.entries(categories).forEach(([cat, desc]) => {
+    const labels = {
+      'EXAM':'Provas de Residência','PRODUCT':'Produtos MedReview',
+      'SPECIALTY':'Especialidades Médicas','PLAN':'Planos / Ofertas',
+      'COMPETITOR':'Concorrentes','FUNNEL_SIGNAL':'Sinais de Funil'
+    };
+    let html = '<div class="ner-categories">';
+    Object.entries(categories).forEach(([cat, keywords]) => {
       const color = colors[cat] || '#9CA3AF';
+      const label = labels[cat] || cat;
+      const items = Array.isArray(keywords) ? keywords : [String(keywords)];
       html += `
-        <div class="ner-chip">
-          <div class="ner-dot" style="background:${color};"></div>
-          <div>
-            <div class="ner-name" style="color:${color};">${esc(cat)}</div>
-            <div class="ner-desc">${esc(typeof desc === 'string' ? desc : JSON.stringify(desc))}</div>
+        <div class="ner-category" style="border-left:3px solid ${color};">
+          <div class="ner-cat-header">
+            <div class="ner-cat-dot" style="background:${color};"></div>
+            <span class="ner-cat-name" style="color:${color};">${esc(cat)}</span>
+            <span class="ner-cat-count">${esc(label)} · ${items.length} termos</span>
+          </div>
+          <div class="ner-keywords">
+            ${items.map(kw => '<span class="ner-kw">' + esc(kw) + '</span>').join('')}
           </div>
         </div>`;
     });
