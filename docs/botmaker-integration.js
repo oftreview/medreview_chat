@@ -158,11 +158,28 @@ async function askClosiAI(userId, message) {
 
 // ── Execução ──────────────────────────────────────────────────────────────────
 
-// Resolução do identificador do contato (telefone).
+// Resolução do identificador do contato.
 // A Botmaker disponibiliza o objeto `contact` no escopo do nó.
-// Prioridade: whatsApp > phone > user_id (variável manual)
-const contato = contact?.whatsApp || contact?.phone || user_id || "";
+// Prioridade: whatsApp > phone > platformContactId > contactId > customerId
+// IMPORTANTE: `user_id` não é variável padrão da Botmaker — use campos do contact.
+const contato = contact?.whatsApp
+  || contact?.phone
+  || contact?.platformContactId
+  || contact?.contactId
+  || (typeof platformContactId !== 'undefined' ? platformContactId : "")
+  || (typeof customerId !== 'undefined' ? customerId : "")
+  || (typeof user_id !== 'undefined' ? user_id : "")
+  || "";
 const mensagem = user_message || "";
+
+// ── Debug: remover após confirmar que contato está sendo resolvido ────────
+console.log("[Closi AI DEBUG] Resolução de contato:", JSON.stringify({
+  whatsApp: contact?.whatsApp || null,
+  phone: contact?.phone || null,
+  platformContactId: contact?.platformContactId || null,
+  contactId: contact?.contactId || null,
+  contato_resolvido: contato ? contato.substring(0, 10) + "..." : "VAZIO",
+}));
 
 if (!contato) {
   console.error("[Closi AI] Erro: não foi possível identificar o contato (sem whatsApp/phone/user_id)");

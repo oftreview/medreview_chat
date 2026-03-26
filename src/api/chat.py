@@ -197,9 +197,26 @@ def chat():
     data = request.get_json(silent=True) or {}
 
     # ── Detect API mode vs sandbox mode ───────────────────────────────────────
+    # Channels that indicate external API requests (never fall to sandbox)
+    _EXTERNAL_CHANNELS = {"botmaker", "api", "webchat", "whatsapp", "zapi"}
+
     _has_session = "session_id" in data and data.get("session_id") != "sandbox"
     _has_user_id = "user_id" in data and (data.get("user_id") or "").strip()
-    _is_api_mode = _has_session or _has_user_id
+    _raw_channel = (data.get("channel") or "").strip().lower()
+    _has_external_channel = _raw_channel in _EXTERNAL_CHANNELS
+    _is_api_mode = _has_session or _has_user_id or _has_external_channel
+
+    # ── Diagnostic logging for integration debugging ──────────────────────────
+    if _has_external_channel or _has_user_id:
+        print(
+            f"[CHAT RECV] channel={_raw_channel} "
+            f"has_user_id={_has_user_id} "
+            f"has_session={_has_session} "
+            f"has_ext_channel={_has_external_channel} "
+            f"api_mode={_is_api_mode} "
+            f"user_id_raw={(data.get('user_id') or '')[:20]}...",
+            flush=True,
+        )
 
     if _is_api_mode:
         # ── API mode with authentication ─────────────────────────────────────
@@ -212,6 +229,27 @@ def chat():
         session_id = (data.get("session_id") or "").strip() or user_id
 
         if not session_id:
+            # ── Guard: external channel without any identifier → reject ────
+            # This prevents Botmaker requests with empty user_id from
+            # silently falling through and sharing a single session.
+            if _has_external_channel:
+                print(
+                    f"[CHAT API] BLOQUEADO: canal externo '{channel}' sem user_id. "
+                    f"Payload keys: {list(data.keys())}",
+                    flush=True,
+                )
+                return (
+                    jsonify({
+                        "error": (
+                            f"user_id é obrigatório para canal '{channel}'. "
+                            "Verifique se o campo user_id está sendo enviado no payload. "
+                            "Use contact.platformContactId ou contact.whatsApp como user_id."
+                        ),
+                        "status": "error",
+                        "debug_hint": "MISSING_USER_ID",
+                    }),
+                    400,
+                )
             return (
                 jsonify({"error": "user_id ou session_id é obrigatório", "status": "error"}),
                 400,
