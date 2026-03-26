@@ -582,6 +582,26 @@ def api_imprint_save():
         return jsonify({"error": str(e)}), 500
 
 
+# ── NER Domain Categories (Salmon) ──────────────────────────
+
+@bp.route("/api/ner")
+@_check_access
+def api_ner_get():
+    """Return configured NER domain entity categories."""
+    adapter = _get_adapter()
+    if not adapter:
+        return jsonify({"error": "No adapter configured"}), 500
+
+    try:
+        domain_config = adapter.get_domain_config()
+        if domain_config:
+            return jsonify({"categories": domain_config})
+        else:
+            return jsonify({"categories": None, "message": "No domain NER configured"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ── Maintenance (Manual Trigger) ─────────────────────────────
 
 @bp.route("/api/maintenance", methods=["POST"])

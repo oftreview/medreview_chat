@@ -52,19 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
     loadNERData();
 });
 
-function loadImprintData() {
-    WM.get('imprint', function(data) {
+async function loadImprintData() {
+    try {
+        const data = await WM.get('imprint');
         if (data && data.imprint) {
             renderImprint(data.imprint, data.file_path);
         } else {
             document.getElementById('imprint-container').innerHTML =
                 '<p class="wm-empty-state">No imprint data available</p>';
         }
-    }, function(error) {
+    } catch (error) {
         document.getElementById('imprint-container').innerHTML =
             '<p class="wm-error-state">Failed to load imprint data</p>';
         console.error('Imprint load error:', error);
-    });
+    }
 }
 
 function renderImprint(imprint, filePath) {
@@ -156,19 +157,20 @@ function renderImprint(imprint, filePath) {
     }
 }
 
-function loadNERData() {
-    WM.get('ner', function(data) {
+async function loadNERData() {
+    try {
+        const data = await WM.get('ner');
         if (data && data.categories) {
             renderNERCategories(data.categories);
         } else {
             document.getElementById('ner-container').innerHTML =
                 '<p class="wm-empty-state">No NER categories defined</p>';
         }
-    }, function(error) {
+    } catch (error) {
         document.getElementById('ner-container').innerHTML =
             '<p class="wm-empty-state">No NER categories defined</p>';
         console.error('NER load error:', error);
-    });
+    }
 }
 
 function renderNERCategories(categories) {
