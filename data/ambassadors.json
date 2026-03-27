@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03",
+  "tema": "Programa de Embaixadores Med Review",
+  "regras_de_comunicacao": {
+    "descricao": "Orientações obrigatórias para o agente comercial ao lidar com perguntas sobre o programa de embaixadores.",
+    "regra_fundamental": "Oferecer o programa de embaixadores em detrimento de fazer uma venda é PROIBIDO. A preferência é SEMPRE fazer vendas, mas sem deixar isso transparente para o aluno. O aluno deve ter a impressão de que o agente está sempre querendo ajudá-lo.",
+    "fluxo_de_resposta": [
+      {
+        "etapa": 1,
+        "titulo": "Resposta inicial objetiva",
+        "instrucao": "Responda de forma objetiva com um resumo rápido sobre o programa de embaixadores. Logo em seguida, mencione que existe um processo seletivo para alunos que de fato têm o perfil. Tente voltar para o assunto anterior (venda do Extensive) o mais rápido possível."
+      },
+      {
+        "etapa": 2,
+        "titulo": "Insistência do lead",
+        "instrucao": "Se o lead insistir em fazer parte do programa, citar que existe um formulário de cadastro para se candidatar como embaixador. Mencionar que é um processo que pode demorar e que será verificado se já existe embaixador na turma e outros fatores específicos. Enviar o link de inscrição. Pode responder dúvidas adicionais com base na base de conhecimento.",
+        "link_inscricao": "https://grupomedreview.com.br/r1/embaixadores/"
+      },
+      {
+        "etapa": 3,
+        "titulo": "Aprofundamento excessivo",
+        "instrucao": "Se o aluno começar a aprofundar muito o nível de detalhamento das dúvidas sobre o programa e insistir nisso, incluir esta situação como critério de ESCALADA do atendimento."
+      }
+    ]
+  },
+  "sobre_o_programa": {
+    "descricao_geral": "O Programa de Embaixadores da Med Review é composto por centenas de estudantes de medicina de todo o Brasil. São futuros líderes moldando a educação médica nacional.",
+    "proposta_de_valor": "A estratégia vai além de curtidas e seguidores: aposta no potencial de influência real do aluno na sua faculdade e redes. O objetivo é liderar a mudança diretamente no ambiente universitário a partir do ensino Med Review.",
+    "o_que_significa_ser_embaixador": "Ser o braço direito da Med Review dentro da faculdade, atuando como ponto de conexão entre a melhor preparação para residência e os futuros especialistas (colegas). O embaixador indica e vende Med Review para colegas e amigos.",
+    "vantagens_exclusivas": [
+      {
+        "beneficio": "Acesso Total",
+        "descricao": "Estude com o melhor conteúdo para residência sem custo nenhum."
+      },
+      {
+        "beneficio": "Comissões Reais",
+        "descricao": "Receba premiações em dinheiro a cada matrícula efetivada através da sua indicação."
+      },
+      {
+        "beneficio": "Desbloqueie Prêmios",
+        "descricao": "Com as vendas, pode desbloquear prêmios como Lux Box, Airpods, iPad, aulões exclusivos, jantares e MacBook."
+      },
+      {
+        "beneficio": "Networking",
+        "descricao": "Acesso direto aos professores e a uma comunidade exclusiva de embaixadores de todo o país."
+      },
+      {
+        "beneficio": "Desenvolvimento de Carreira",
+        "descricao": "Treinamentos de vendas e marketing que a faculdade de medicina não ensina e que farão diferença no dia a dia como médico."
+      }
+    ],
+    "missoes_do_embaixador": [
+      "Ser um Usuário Ativo: Usar a plataforma, testar funcionalidades e sair na frente nos estudos.",
+      "Disseminar Conhecimento: Compartilhar conteúdos em grupos de WhatsApp da turma e redes sociais.",
+      "Ser a Voz da Melhoria: Enviar feedbacks para evolução da ferramenta.",
+      "Gerar Conexões: Indicar colegas interessados e oferecer condições especiais — cupom de 10% de desconto.",
+      "Dar Depoimento: Compartilhar experiência real através de textos ou vídeos."
+    ]
+  },
+  "faq_embaixadores": [
+    {
+      "id": 1,
+      "pergunta": "Quando posso realizar o saque das minhas comissões?",
+      "resposta": "As vendas pagas são contabilizadas no saldo e integalizadas progressivamente conforme datas de aprovação no sistema. Prazos para saque: PIX, Boleto ou Saldo Hotmart = 2 dias corridos. Cartão de Crédito e outros = 30 dias corridos. Para consultar valores: login em app.hotmart.com → Carteira → Extrato → selecionar período recente."
+    },
+    {
+      "id": 2,
+      "pergunta": "Dúvidas sobre o onboarding dos embaixadores",
+      "resposta": "Etapas do Onboarding: 1) Reunião de Onboarding com o Daniel; 2) Preenchimento do Termo de Adesão; 3) Cadastro na Hotmart e Filiação a Produtos; 4) Criação do grupo de benefícios; 5) Entrada no Grupo de Avisos dos Embaixadores. Se já solicitou afiliação, basta aguardar aprovação (até 5 dias para gerar cupom). Usar o mesmo email cadastrado no programa."
+    },
+    {
+      "id": 3,
+      "pergunta": "Qual é o prazo para o saque da minha comissão?",
+      "resposta": "PIX, Boleto e Saldo Hotmart: 2 dias corridos. Cartão de Crédito, Débito, PayPal, Google Pay e Samsung Pay: 30 dias corridos. Consultar saldo em Carteira → Extrato."
+    },
+    {
+      "id": 4,
+      "pergunta": "Como devo realizar minhas postagens nas redes sociais sobre a Med Review?",
+      "resposta": "Acessar a área #PV no Circle dos embaixadores para ver os conteúdos disponíveis que orientam e inspiram a criação de conteúdos nas redes sociais."
+    },
+    {
+      "id": 5,
+      "pergunta": "Como criar meu grupo de WhatsApp da turma e extrair o link?",
+      "resposta": "Passo 1: Criar grupo e adicionar os números Med-Review ((31) 98499-5360 e (31) 98261-4980) como ADMINs. Passo 2: Nomear com o formato 'MedReview [Sigla Faculdade] T[Ano.Semestre]' (ex: MedReview USP-SP T2029.2). Passo 3: Extrair o link via nome do grupo → membros → Convidar via link ou QR code."
+    },
+    {
+      "id": 6,
+      "pergunta": "Como criar meu login na Hotmart e me afiliar aos produtos?",
+      "resposta": "Para registrar vendas e receber comissão, é necessário cadastro na Hotmart e filiação aos produtos Extensive e Intensive. A filiação é essencial para gerar o cupom exclusivo ao final do onboarding."
+    },
+    {
+      "id": 7,
+      "pergunta": "Onde consulto meu cupom?",
+      "resposta": "Se o onboarding já foi finalizado, o cupom foi enviado por mensagem no WhatsApp. Caso não encontre, contatar o suporte: https://api.whatsapp.com/send/?phone=5531985518005"
+    },
+    {
+      "id": 8,
+      "pergunta": "Antes de me tornar Embaixador, eu já era aluno da Med, posso pedir reembolso da compra?",
+      "resposta": "O reembolso segue a regra padrão de 7 dias após a compra. Após esse prazo, não é possível reembolsar. Porém, como Embaixador, o aluno recebe upgrade: Acesso VIP ilimitado aos produtos R1, capacitações exclusivas em vendas/marketing/conteúdo, e networking com estudantes de todo o Brasil."
+    },
+    {
+      "id": 9,
+      "pergunta": "Como calcular minha comissão de vendas?",
+      "resposta": "Comissão de 5% sobre o valor líquido das vendas realizadas com o cupom (que garante 10% de desconto ao comprador). Aplicar 10% de desconto sobre o valor do site, depois calcular 5% sobre o total restante. O uso do cupom é indispensável para rastrear a comissão."
+    },
+    {
+      "id": 10,
+      "pergunta": "O que é esperado do Embaixador Med Review?",
+      "resposta": "Indicar cursos; postar conteúdos sobre a Med Review nas redes sociais; apoiar na comunicação de lançamentos e benefícios especiais com colegas de turma; comentar e indicar a Med em posts sobre estudos de medicina; apontar novos colegas para se tornarem embaixadores."
+    }
+  ],
+  "link_inscricao_embaixador": "https://grupomedreview.com.br/r1/embaixadores/",
+  "suporte_whatsapp": "https://api.whatsapp.com/send/?phone=5531985518005"
+}

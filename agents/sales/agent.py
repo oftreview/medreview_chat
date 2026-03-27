@@ -26,6 +26,7 @@ COMPETITORS_PATH    = os.path.join(BASE_DIR, "data/competitors.json")
 OBJECTIONS_PATH     = os.path.join(BASE_DIR, "data/objections.json")
 CONVERSION_PATH     = os.path.join(BASE_DIR, "data/conversion_bible.json")
 CORRECTIONS_PATH    = os.path.join(BASE_DIR, "data/corrections.json")
+AMBASSADORS_PATH    = os.path.join(BASE_DIR, "data/ambassadors.json")
 SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
 
 # Tag estruturada de escalação
@@ -124,6 +125,7 @@ def load_context() -> str:
     objections    = _load_json(OBJECTIONS_PATH)
     conversion    = _load_json(CONVERSION_PATH)
     corrections   = _load_json(CORRECTIONS_PATH)
+    ambassadors   = _load_json(AMBASSADORS_PATH)
 
     corrections_block = _build_corrections_block(corrections)
 
@@ -137,7 +139,8 @@ def load_context() -> str:
         f"# CONCORRENTES (argumentos e abordagem por plataforma + comparativos por módulo)\n{json.dumps(competitors, ensure_ascii=False, indent=2)}\n\n"
         f"# OBJEÇÕES (framework de contorno por tipo de objeção — geral + por módulo)\n{json.dumps(objections, ensure_ascii=False, indent=2)}\n\n"
         f"# BÍBLIA DE CONVERSÃO (100 dores do mercado vs soluções MED-Review + scripts IA)\n{json.dumps(conversion, ensure_ascii=False, indent=2)}\n\n"
-        f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}"
+        f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}\n\n"
+        f"# PROGRAMA DE EMBAIXADORES (regras de comunicação + conhecimento + FAQ)\n{json.dumps(ambassadors, ensure_ascii=False, indent=2)}"
     )
 
 def _truncate_history(messages: list) -> list:
