@@ -183,10 +183,11 @@
 
 /* ── Context Menu (6 dots) ── */
 .drag-handle {
-  cursor:pointer; opacity:0.3; transition:opacity 0.15s; padding:2px 4px;
+  cursor:grab; opacity:0.3; transition:opacity 0.15s; padding:2px 4px;
   user-select:none; font-size:14px; color:var(--text-dim); position:relative;
   border-radius:4px;
 }
+.drag-handle:active { cursor:grabbing; }
 tr:hover .drag-handle { opacity:0.7; }
 .drag-handle:hover { background:rgba(37,99,235,0.1); opacity:1; }
 
@@ -238,10 +239,26 @@ tr:hover .row-actions { opacity:1; }
   padding:10px 12px; cursor:pointer; transition:all 0.15s;
 }
 .kanban-card:hover { border-color:var(--primary); transform:translateY(-1px); }
+.kanban-card.dragging { opacity:0.4; transform:rotate(2deg); }
 .kanban-card-id { font-size:9px; color:var(--text-dim); font-weight:600; letter-spacing:0.5px; }
 .kanban-card-title { font-size:12.5px; font-weight:500; margin:4px 0; }
 .kanban-card-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
 .kanban-card-rice { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; }
+.kanban-cards.drag-over-col { background:rgba(37,99,235,0.06); border-radius:8px; }
+.kanban-drop-indicator {
+  height:3px; background:var(--primary-light); border-radius:3px; margin:2px 0;
+  transition:opacity 0.15s; opacity:0;
+}
+.kanban-drop-indicator.active { opacity:1; }
+
+/* ── Expanded Detail Panel (close btn) ── */
+.expanded-close-btn {
+  float:right; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25);
+  color:var(--red); width:24px; height:24px; border-radius:6px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:14px;
+  line-height:1; transition:all 0.15s; margin:-2px -4px 0 0;
+}
+.expanded-close-btn:hover { background:rgba(239,68,68,0.25); }
 
 /* ── Add Item Modal ── */
 .add-modal { display:none; }
@@ -777,7 +794,7 @@ function renderTable(items) {
     <tr data-id="${esc(i.item_id)}" draggable="true"
         ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropRow(event)" ondragend="dragEnd(event)">
       <td><input type="checkbox" class="row-check" data-id="${esc(i.item_id)}" ${checked} onchange="toggleSelect(this)"></td>
-      <td><span class="drag-handle" draggable="true" ondragstart="dragStart(event)" oncontextmenu="showCtxMenu(event,'${esc(i.item_id)}');return false" onclick="showCtxMenu(event,'${esc(i.item_id)}')">⠿</span></td>
+      <td><span class="drag-handle" oncontextmenu="showCtxMenu(event,'${esc(i.item_id)}');return false" onclick="showCtxMenu(event,'${esc(i.item_id)}')">⠿</span></td>
       <td><span style="font-size:10px;color:var(--text-dim);font-weight:600">${esc(i.item_id)}</span></td>
       <td>
         <div class="cell-title editable" contenteditable="true" data-id="${esc(i.item_id)}" data-field="title" onblur="inlineEdit(this)">${esc(i.title)}</div>
@@ -811,6 +828,7 @@ function renderTable(items) {
     <tr class="expanded-row" id="expand-${esc(i.item_id)}">
       <td colspan="15">
         <div class="expanded-content">
+          <button class="expanded-close-btn" onclick="toggleExpand('${esc(i.item_id)}')" title="Fechar">✕</button>
           <div class="field-label">Descrição</div>
           <textarea data-id="${esc(i.item_id)}" data-field="description" onblur="textareaEdit(this)">${esc(i.description||'')}</textarea>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
@@ -845,10 +863,19 @@ function renderKanban(items) {
     return `
     <div class="kanban-col">
       <div class="kanban-col-header">${STATUS_LABELS[status]||status}<span class="kanban-col-count">${colItems.length}</span></div>
-      <div class="kanban-cards">
+      <div class="kanban-cards"
+           ondragover="kanbanDragOverCol(event)"
+           ondragleave="kanbanDragLeaveCol(event)"
+           ondrop="kanbanDropOnCol(event,'${status}')">
         ${colItems.map(i => {
           const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
-          return `<div class="kanban-card" onclick="editItem('${esc(i.item_id)}')">
+          return `<div class="kanban-card" draggable="true"
+                       data-id="${esc(i.item_id)}"
+                       ondragstart="kanbanDragStart(event,'${esc(i.item_id)}')"
+                       ondragover="kanbanDragOverCard(event)"
+                       ondrop="kanbanDropOnCard(event,'${esc(i.item_id)}','${status}')"
+                       ondragend="kanbanDragEnd(event)"
+                       onclick="editItem('${esc(i.item_id)}')">
             <div class="kanban-card-id">${esc(i.item_id)}</div>
             <div class="kanban-card-title">${esc(i.title)}</div>
             <div class="kanban-card-meta">
@@ -857,6 +884,7 @@ function renderKanban(items) {
             </div>
           </div>`;
         }).join('')}
+        ${colItems.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px;opacity:0.5">Arraste itens aqui</div>' : ''}
       </div>
     </div>`;
   }).join('');
@@ -920,18 +948,122 @@ function showLightbox(src) {
   document.getElementById('ssLightbox').style.display = 'flex';
 }
 
-// ── Drag & Drop ──
-function dragStart(e) { dragSrcRow = e.target.closest('tr'); dragSrcRow.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragSrcRow.dataset.id); }
-function dragOver(e) { e.preventDefault(); const row=e.target.closest('tr'); if(row&&row!==dragSrcRow&&!row.classList.contains('expanded-row')){document.querySelectorAll('.drag-over').forEach(r=>r.classList.remove('drag-over'));row.classList.add('drag-over');} }
-function dropRow(e) {
-  e.preventDefault(); const targetRow=e.target.closest('tr'); if(!targetRow||targetRow===dragSrcRow)return;
-  document.querySelectorAll('.drag-over').forEach(r=>r.classList.remove('drag-over'));
-  const srcIdx=allItems.findIndex(i=>i.item_id===dragSrcRow.dataset.id), tgtIdx=allItems.findIndex(i=>i.item_id===targetRow.dataset.id);
-  if(srcIdx<0||tgtIdx<0)return;
-  const [moved]=allItems.splice(srcIdx,1); allItems.splice(tgtIdx,0,moved); renderAll();
-  fetch('/api/backlog/reorder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ordered_ids:allItems.map(i=>i.item_id)})}).catch(e=>console.error('reorder:',e));
+// ── Drag & Drop (Table) ──
+function dragStart(e) {
+  dragSrcRow = e.target.closest('tr');
+  if (!dragSrcRow) return;
+  dragSrcRow.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcRow.dataset.id);
+  // ghost image offset for smoother feel
+  if (e.dataTransfer.setDragImage) {
+    e.dataTransfer.setDragImage(dragSrcRow, 20, 20);
+  }
 }
-function dragEnd(e) { if(dragSrcRow)dragSrcRow.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(r=>r.classList.remove('drag-over')); dragSrcRow=null; }
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const row = e.target.closest('tr');
+  if (row && row !== dragSrcRow && !row.classList.contains('expanded-row')) {
+    document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+    row.classList.add('drag-over');
+  }
+}
+function dropRow(e) {
+  e.preventDefault();
+  const targetRow = e.target.closest('tr');
+  if (!targetRow || targetRow === dragSrcRow) return;
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  const srcIdx = allItems.findIndex(i => i.item_id === dragSrcRow.dataset.id);
+  const tgtIdx = allItems.findIndex(i => i.item_id === targetRow.dataset.id);
+  if (srcIdx < 0 || tgtIdx < 0) return;
+  const [moved] = allItems.splice(srcIdx, 1);
+  allItems.splice(tgtIdx, 0, moved);
+  renderAll();
+  fetch('/api/backlog/reorder', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ordered_ids: allItems.map(i => i.item_id)})
+  }).catch(e => console.error('reorder:', e));
+}
+function dragEnd(e) {
+  if (dragSrcRow) dragSrcRow.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  dragSrcRow = null;
+}
+
+// ── Drag & Drop (Kanban) ──
+let kanbanDragId = null;
+
+function kanbanDragStart(e, itemId) {
+  kanbanDragId = itemId;
+  const card = e.target.closest('.kanban-card');
+  if (card) card.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', itemId);
+}
+
+function kanbanDragOverCard(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function kanbanDragOverCol(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const cardsContainer = e.target.closest('.kanban-cards');
+  if (cardsContainer) cardsContainer.classList.add('drag-over-col');
+}
+
+function kanbanDragLeaveCol(e) {
+  const cardsContainer = e.target.closest('.kanban-cards');
+  if (cardsContainer && !cardsContainer.contains(e.relatedTarget)) {
+    cardsContainer.classList.remove('drag-over-col');
+  }
+}
+
+function kanbanDropOnCol(e, newStatus) {
+  e.preventDefault();
+  document.querySelectorAll('.drag-over-col').forEach(c => c.classList.remove('drag-over-col'));
+  if (!kanbanDragId) return;
+  const item = allItems.find(i => i.item_id === kanbanDragId);
+  if (!item || item.status === newStatus) { kanbanDragId = null; return; }
+  item.status = newStatus;
+  updateField(kanbanDragId, 'status', newStatus);
+  kanbanDragId = null;
+  renderAll();
+}
+
+function kanbanDropOnCard(e, targetId, colStatus) {
+  e.preventDefault(); e.stopPropagation();
+  document.querySelectorAll('.drag-over-col').forEach(c => c.classList.remove('drag-over-col'));
+  if (!kanbanDragId || kanbanDragId === targetId) { kanbanDragId = null; return; }
+  const item = allItems.find(i => i.item_id === kanbanDragId);
+  if (!item) return;
+  // Update status if dropped in different column
+  if (item.status !== colStatus) {
+    item.status = colStatus;
+    updateField(kanbanDragId, 'status', colStatus);
+  }
+  // Reorder within column
+  const srcIdx = allItems.findIndex(i => i.item_id === kanbanDragId);
+  const tgtIdx = allItems.findIndex(i => i.item_id === targetId);
+  if (srcIdx >= 0 && tgtIdx >= 0) {
+    const [moved] = allItems.splice(srcIdx, 1);
+    allItems.splice(tgtIdx, 0, moved);
+    fetch('/api/backlog/reorder', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ordered_ids: allItems.map(i => i.item_id)})
+    }).catch(e => console.error('reorder:', e));
+  }
+  kanbanDragId = null;
+  renderAll();
+}
+
+function kanbanDragEnd(e) {
+  document.querySelectorAll('.kanban-card.dragging').forEach(c => c.classList.remove('dragging'));
+  document.querySelectorAll('.drag-over-col').forEach(c => c.classList.remove('drag-over-col'));
+  kanbanDragId = null;
+}
 
 // ── Modal ──
 function showAddModal(editId) {
@@ -1066,6 +1198,22 @@ async function emptyTrashAction() {
   await fetch('/api/backlog/trash/empty', { method:'POST' });
   await loadTrash();
 }
+
+// ── Keyboard Shortcuts ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    // Close modal
+    const modal = document.getElementById('addModal');
+    if (modal.classList.contains('show')) { hideAddModal(); return; }
+    // Close lightbox
+    const lb = document.getElementById('ssLightbox');
+    if (lb.style.display !== 'none') { lb.style.display = 'none'; return; }
+    // Close context menu
+    document.getElementById('ctxMenu').classList.remove('show');
+    // Close all expanded rows
+    document.querySelectorAll('.expanded-row.show').forEach(r => r.classList.remove('show'));
+  }
+});
 
 // ── Init ──
 loadBacklog();
