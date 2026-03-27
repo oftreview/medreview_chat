@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "descricao": "Base de conhecimento de suporte ao cliente/aluno — MED-Review (Criatons)",
+    "ultima_atualizacao": "27/03/2026",
+    "nota": "Documento para o agente de vendas usar quando leads/clientes fazem perguntas de suporte. Muitos leads são clientes que estão comprando novamente e podem ter dúvidas operacionais."
+  },
+
+  "acesso_plataforma": {
+    "links": {
+      "ios": "https://bit.ly/AppmedreviewIOS",
+      "android": "https://bit.ly/Appmedreview",
+      "web": "https://www.medmembers.com.br/auth/newLogin"
+    },
+    "regras": [
+      "O aplicativo NÃO é compatível com computadores. Para acessar pelo computador, usar exclusivamente a versão web.",
+      "Não é possível utilizar app e web simultaneamente. Ao fazer login em um dispositivo, o outro será automaticamente desconectado.",
+      "Em alguns casos o download no computador pode ocorrer, mas o app não funciona corretamente — não recomendamos."
+    ]
+  },
+
+  "questoes_offline": {
+    "pergunta": "Posso responder questões off-line?",
+    "resposta": "Não. Para acessar e responder questões, é necessário estar conectado à internet. O recurso off-line ainda não está disponível."
+  },
+
+  "duvidas_academicas_erro_questao": {
+    "descricao": "Como enviar dúvida acadêmica ou reportar erro em questão via app",
+    "passo_a_passo": [
+      "Toque nos três pontinhos na parte inferior da tela.",
+      "Selecione a opção 'Fórum'.",
+      "Digite sua dúvida e envie."
+    ],
+    "prazo_resposta": "Um professor será notificado e responderá em até 48 horas, em média. O aluno receberá uma notificação no app quando respondido."
+  },
+
+  "limpar_historico_questoes": {
+    "descricao": "Como limpar o histórico de questões respondidas",
+    "passo_a_passo": [
+      "Abra o app MED-Review.",
+      "Acesse o ícone de bonequinho no canto superior direito.",
+      "Clique em 'Meu perfil'.",
+      "Suba a tela para acessar a parte inferior.",
+      "Clique em 'Limpar histórico'.",
+      "Clique em 'Salvar'."
+    ]
+  },
+
+  "nota_fiscal": {
+    "descricao": "Emissão de segunda via de nota fiscal",
+    "passo_1_dados_necessarios": {
+      "instrucao": "Solicitar ao aluno os seguintes dados (a NF é emitida com os dados do comprador informados no momento da compra):",
+      "dados": ["Nome completo", "CPF", "E-mail"]
+    },
+    "passo_2_prazo": {
+      "dias_uteis": "Solicitação encaminhada ao setor financeiro, processada em horário comercial, prazo de até 24 horas para envio.",
+      "finais_de_semana_feriados": "Solicitação encaminhada ao setor financeiro, será processada no próximo dia útil."
+    }
+  },
+
+  "atualizar_aplicativo": {
+    "ios": {
+      "passos": [
+        "Abra a App Store.",
+        "No campo de pesquisa, digite: Med-Review e selecione o aplicativo.",
+        "Se aparecer 'Atualizar', toque e aguarde. Se aparecer 'Abrir', já está atualizado.",
+        "Após a atualização, abra o aplicativo normalmente."
+      ],
+      "solucao_problemas": [
+        "Verifique se a conexão com a internet está ativa.",
+        "Reinicie o celular e tente novamente.",
+        "Se a opção de atualização não aparecer, aguarde alguns minutos e tente de novo.",
+        "Se persistir, entre em contato com o suporte."
+      ]
+    },
+    "android": {
+      "passos": [
+        "Abra a Play Store.",
+        "No campo de pesquisa, digite: Med-Review e selecione o aplicativo.",
+        "Se aparecer 'Atualizar', toque e aguarde. Se aparecer 'Abrir', já está atualizado.",
+        "Após a atualização, abra o aplicativo normalmente."
+      ],
+      "solucao_problemas": [
+        "Verifique se a conexão com a internet está ativa.",
+        "Reinicie o celular e tente novamente.",
+        "Se a opção de atualização não aparecer, aguarde alguns minutos e tente de novo.",
+        "Se persistir, entre em contato com o suporte."
+      ]
+    }
+  },
+
+  "redefinir_senha": {
+    "passo_a_passo": [
+      "Acesse a tela de login do aplicativo/site.",
+      "Clique em 'Esqueci minha senha'.",
+      "Digite o e-mail cadastrado e confirme.",
+      "Acesse seu e-mail e procure a mensagem de recuperação de senha.",
+      "Clique no link enviado para cadastrar uma nova senha.",
+      "Escolha uma senha segura e finalize o processo."
+    ],
+    "observacao": "Caso o aluno não receba o e-mail, orientar a verificar caixa de spam/lixo eletrônico ou solicitar suporte."
+  },
+
+  "limpar_cache": {
+    "ios": {
+      "passos": [
+        "Abra o aplicativo Ajustes.",
+        "Role para baixo e selecione o navegador (ex: Safari, Chrome).",
+        "Toque em 'Limpar Histórico e Dados dos Sites'.",
+        "Confirme tocando em 'Limpar Tudo'."
+      ]
+    },
+    "android": {
+      "passos": [
+        "Abra o aplicativo Configurações.",
+        "Vá até 'Aplicativos' (ou 'Gerenciar Apps').",
+        "Filtre por todos os apps (se a opção não estiver selecionada).",
+        "Toque no aplicativo/navegador que deseja limpar.",
+        "Toque em 'Armazenamento' e depois em 'Limpar Cache'."
+      ]
+    },
+    "google_chrome_desktop": {
+      "passos": [
+        "No teclado, pressione CTRL + Shift + Del ao mesmo tempo.",
+        "Marque a opção 'Imagens e arquivos armazenados em cache'.",
+        "Escolha o período 'Todo o período' para limpeza completa.",
+        "Clique em 'Limpar dados'."
+      ]
+    },
+    "mozilla_firefox_desktop": {
+      "passos": [
+        "Clique no menu (três linhas no canto superior direito) e selecione 'Opções'.",
+        "Vá até a aba 'Privacidade e Segurança'.",
+        "Role até 'Conteúdo Web em cache'.",
+        "Clique em 'Limpar agora'."
+      ]
+    }
+  },
+
+  "aba_anonima": {
+    "computador": {
+      "google_chrome": "Ctrl + Shift + N (Windows) ou Cmd + Shift + N (Mac)",
+      "mozilla_firefox": "Ctrl + Shift + P (Windows) ou Cmd + Shift + P (Mac)",
+      "microsoft_edge": "Ctrl + Shift + N",
+      "safari_mac": "Menu Arquivo > Nova Janela Privada"
+    },
+    "celular": {
+      "google_chrome": "Toque nos três pontinhos no canto superior direito > 'Nova guia anônima'.",
+      "mozilla_firefox": "Toque nos três pontinhos (inferior direito no iOS, superior direito no Android) > 'Nova guia privada'.",
+      "microsoft_edge": "Toque nos três pontinhos no canto inferior > 'Nova guia InPrivate'.",
+      "safari_ios": "Toque no ícone de abas (dois quadrados no canto inferior direito) > 'Privado' > 'Concluído'."
+    }
+  },
+
+  "reembolso": {
+    "politica": "O reembolso é possível dentro do prazo de garantia (verificar data da compra).",
+    "fluxo_atendimento": {
+      "1_saudacao": "Acolher o cliente, informar que vai verificar as informações. Usar o mesmo termo que o aluno usou (reembolso ou cancelamento).",
+      "2_verificacao": "Verificar data da compra e se está dentro do prazo de garantia. Perguntar (sem obrigar) o motivo do cancelamento para feedback.",
+      "3_explicacao_estorno": {
+        "processo": [
+          "A solicitação é feita diretamente pela plataforma Hotmart.",
+          "O aluno recebe automaticamente uma mensagem informando que a solicitação foi recebida.",
+          "Em até 48h, receberá confirmação de que o reembolso foi finalizado."
+        ],
+        "forma_estorno": {
+          "cartao_credito": "O valor aparece na fatura como crédito (valor negativo).",
+          "boleto_ou_pix": "A Hotmart deposita na conta bancária informada durante o processo."
+        }
+      },
+      "4_encerramento": "Lamentar a saída, respeitar a decisão, deixar portas abertas para retorno futuro."
+    }
+  }
+}

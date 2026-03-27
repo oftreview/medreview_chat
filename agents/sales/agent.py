@@ -29,6 +29,7 @@ CORRECTIONS_PATH    = os.path.join(BASE_DIR, "data/corrections.json")
 AMBASSADORS_PATH    = os.path.join(BASE_DIR, "data/ambassadors.json")
 SALES_TECH_PATH     = os.path.join(BASE_DIR, "data/sales_techniques.md")
 RESIDENCIA_PATH     = os.path.join(BASE_DIR, "data/residencia_provas.json")
+SUPORTE_PATH        = os.path.join(BASE_DIR, "data/suporte_alunos.json")
 
 # Tag estruturada de escalação
 ESCALATION_TAG = "[ESCALAR]"
@@ -128,6 +129,7 @@ def load_context() -> str:
     corrections   = _load_json(CORRECTIONS_PATH)
     ambassadors   = _load_json(AMBASSADORS_PATH)
     residencia    = _load_json(RESIDENCIA_PATH)
+    suporte       = _load_json(SUPORTE_PATH)
 
     corrections_block = _build_corrections_block(corrections)
 
@@ -143,7 +145,8 @@ def load_context() -> str:
         f"# BÍBLIA DE CONVERSÃO (100 dores do mercado vs soluções MED-Review + scripts IA)\n{json.dumps(conversion, ensure_ascii=False, indent=2)}\n\n"
         f"# REGRAS COMERCIAIS\n{json.dumps(rules, ensure_ascii=False, indent=2)}\n\n"
         f"# PROGRAMA DE EMBAIXADORES (regras de comunicação + conhecimento + FAQ)\n{json.dumps(ambassadors, ensure_ascii=False, indent=2)}\n\n"
-        f"# PROVAS E CONCURSOS DE RESIDÊNCIA MÉDICA (atualizado em {residencia.get('_meta', {}).get('ultima_atualizacao', '27/03/2026')})\n{json.dumps(residencia, ensure_ascii=False, indent=2)}"
+        f"# PROVAS E CONCURSOS DE RESIDÊNCIA MÉDICA (atualizado em {residencia.get('_meta', {}).get('ultima_atualizacao', '27/03/2026')})\n{json.dumps(residencia, ensure_ascii=False, indent=2)}\n\n"
+        f"# SUPORTE AO ALUNO/CLIENTE (atualizado em {suporte.get('_meta', {}).get('ultima_atualizacao', '27/03/2026')})\n{json.dumps(suporte, ensure_ascii=False, indent=2)}"
     )
 
 def _truncate_history(messages: list) -> list:
