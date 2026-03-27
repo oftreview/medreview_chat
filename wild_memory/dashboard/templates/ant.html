@@ -114,12 +114,13 @@
   // Load metric cards
   async function loadMetrics() {
     try {
-      const data = await WM.get('/api/observations/stats?by_status=true');
-      const lifecycle = await WM.get('/api/status');
+      const data = await WM.get('observations/stats?by_status=true');
+      const lifecycle = await WM.get('status');
 
-      const active = data.active || 0;
-      const stale = data.stale || 0;
-      const archived = data.archived || 0;
+      const byStatus = data.by_status || data || {};
+      const active = byStatus.active || 0;
+      const stale = byStatus.stale || 0;
+      const archived = byStatus.archived || 0;
       const lastMaintenance = lifecycle.lifecycle?.last_maintenance_at || 'Nunca';
 
       const metrics = [
@@ -147,7 +148,7 @@
   // Load decay distribution chart
   async function loadDecayChart() {
     try {
-      const data = await WM.get('/api/decay-distribution');
+      const data = await WM.get('decay-distribution');
 
       const labels = data.buckets || [];
       const counts = data.counts || [];
@@ -218,7 +219,7 @@
   // Load maintenance info
   async function loadMaintenanceInfo() {
     try {
-      const lifecycle = await WM.get('/api/status');
+      const lifecycle = await WM.get('status');
       const meta = lifecycle.lifecycle || {};
 
       const totalRuns = meta.total_maintenance_runs || 0;
@@ -254,7 +255,7 @@
   // Load reflections table
   async function loadReflections() {
     try {
-      const data = await WM.get('/api/reflections');
+      const data = await WM.get('reflections');
       const reflections = data.reflections || [];
 
       const tbody = document.querySelector('#reflectionsTable tbody');
@@ -293,7 +294,7 @@
     btn.querySelector('.wm-button-label').textContent = 'Executando...';
 
     try {
-      await WM.get('/api/maintenance', { method: 'POST' });
+      await WM.post('maintenance');
       btn.querySelector('.wm-button-label').textContent = '✓ Concluído';
 
       // Reload all data

@@ -126,11 +126,12 @@
   // Load metric cards
   async function loadMetrics() {
     try {
-      const lifecycle = await WM.get('/api/status');
-      const feedback = await WM.get('/api/feedback/summary');
+      const lifecycle = await WM.get('status');
+      const feedbackRaw = await WM.get('feedback/summary');
+      const feedback = feedbackRaw?.summary || feedbackRaw || {};
 
       const totalFeedback = feedback.total_count || 0;
-      const avgReward = feedback.avg_reward !== undefined ? feedback.avg_reward.toFixed(2) : '0.00';
+      const avgReward = feedback.avg_reward !== undefined && feedback.avg_reward !== null ? Number(feedback.avg_reward).toFixed(2) : '0.00';
       const escalations = feedback.escalations || 0;
 
       const metrics = [
@@ -157,9 +158,10 @@
   // Load feedback signals chart
   async function loadFeedbackChart() {
     try {
-      const data = await WM.get('/api/feedback/summary');
+      const raw = await WM.get('feedback/summary');
+      const summaryData = raw?.summary || raw || {};
 
-      const signals = data.signals || [];
+      const signals = summaryData.signals || [];
       const labels = signals.map(s => formatSignalType(s.type));
       const counts = signals.map(s => s.count || 0);
 
@@ -227,7 +229,7 @@
   // Load feedback history
   async function loadFeedback() {
     try {
-      const data = await WM.get('/api/feedback');
+      const data = await WM.get('feedback');
       const feedbacks = data.feedback || [];
 
       const tbody = document.querySelector('#feedbackTable tbody');
@@ -265,7 +267,7 @@
   // Load procedures
   async function loadProcedures() {
     try {
-      const data = await WM.get('/api/procedures');
+      const data = await WM.get('procedures');
       const procedures = data.procedures || [];
 
       const tbody = document.querySelector('#proceduresTable tbody');
