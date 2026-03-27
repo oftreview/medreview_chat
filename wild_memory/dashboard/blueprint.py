@@ -261,10 +261,6 @@ def api_observation_detail(obs_id):
 @_check_access
 def api_observations_stats():
     """Observation statistics by type and status."""
-    def query_by_type(sb):
-        return sb.rpc("get_observations_by_type", {}).execute().data
-
-    # Fallback: query directly
     def query_counts(sb):
         result = {}
         for obs_type in ["decision", "preference", "fact", "goal", "correction", "feedback", "insight"]:
@@ -272,10 +268,7 @@ def api_observations_stats():
             result[obs_type] = r.count or 0
         return result
 
-    # Try RPC first, fallback to manual counts
-    stats = _safe_rpc("get_observations_by_type", {})
-    if stats is None:
-        stats = _safe_query("observations", query_counts, default={})
+    stats = _safe_query("observations", query_counts, default={})
 
     # Status counts
     status_counts = {}
