@@ -209,3 +209,40 @@ def api_logs_cleanup():
         return jsonify({"error": "Database not available"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ── LLM Usage / Costs History ────────────────────────────────
+
+@bp.route("/api/metrics/history", methods=["GET"])
+def api_metrics_history():
+    """Return persistent LLM usage history from Supabase."""
+    from src.core.metrics import get_history
+
+    result = get_history(
+        model=request.args.get("model"),
+        date_from=request.args.get("date_from"),
+        date_to=request.args.get("date_to"),
+        page=int(request.args.get("page", 1)),
+        per_page=int(request.args.get("per_page", 50)),
+    )
+    return jsonify(result)
+
+
+@bp.route("/api/metrics/daily", methods=["GET"])
+def api_metrics_daily():
+    """Return daily cost stats for charts."""
+    from src.core.metrics import get_daily_stats
+
+    days = int(request.args.get("days", 30))
+    stats = get_daily_stats(days_back=days)
+    return jsonify({"stats": stats})
+
+
+@bp.route("/api/metrics/totals", methods=["GET"])
+def api_metrics_totals():
+    """Return all-time accumulated totals from Supabase."""
+    from src.core.metrics import get_totals
+
+    since = request.args.get("since")
+    totals = get_totals(since=since)
+    return jsonify({"totals": totals})

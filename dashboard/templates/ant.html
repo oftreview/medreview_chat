@@ -114,8 +114,8 @@
   // Load metric cards
   async function loadMetrics() {
     try {
-      const data = await WM.get('/api/observations/stats?by_status=true');
-      const lifecycle = await WM.get('/api/status');
+      const data = await WM.get('observations/stats?by_status=true');
+      const lifecycle = await WM.get('status');
 
       const active = data.active || 0;
       const stale = data.stale || 0;
@@ -147,7 +147,7 @@
   // Load decay distribution chart
   async function loadDecayChart() {
     try {
-      const data = await WM.get('/api/decay-distribution');
+      const data = await WM.get('decay-distribution');
 
       const labels = data.buckets || [];
       const counts = data.counts || [];
@@ -218,12 +218,12 @@
   // Load maintenance info
   async function loadMaintenanceInfo() {
     try {
-      const lifecycle = await WM.get('/api/status');
+      const lifecycle = await WM.get('status');
       const meta = lifecycle.lifecycle || {};
 
       const totalRuns = meta.total_maintenance_runs || 0;
-      const lastRun = meta.last_maintenance_at ? new Date(meta.last_maintenance_at).toLocaleString('pt-BR') : 'Nunca';
-      const nextRun = meta.next_maintenance_at ? new Date(meta.next_maintenance_at).toLocaleString('pt-BR') : 'Não agendado';
+      const lastRun = meta.last_maintenance_at ? new Date((meta.last_maintenance_at < 1e12 ? meta.last_maintenance_at * 1000 : meta.last_maintenance_at)).toLocaleString('pt-BR') : 'Nunca';
+      const nextRun = meta.next_maintenance_at ? new Date((meta.next_maintenance_at < 1e12 ? meta.next_maintenance_at * 1000 : meta.next_maintenance_at)).toLocaleString('pt-BR') : 'Não agendado';
       const schedule = meta.maintenance_schedule || 'Padrão (24h)';
 
       const html = `
@@ -254,7 +254,7 @@
   // Load reflections table
   async function loadReflections() {
     try {
-      const data = await WM.get('/api/reflections');
+      const data = await WM.get('reflections');
       const reflections = data.reflections || [];
 
       const tbody = document.querySelector('#reflectionsTable tbody');
@@ -293,7 +293,7 @@
     btn.querySelector('.wm-button-label').textContent = 'Executando...';
 
     try {
-      await WM.get('/api/maintenance', { method: 'POST' });
+      await WM.post('maintenance');
       btn.querySelector('.wm-button-label').textContent = '✓ Concluído';
 
       // Reload all data

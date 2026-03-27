@@ -205,7 +205,7 @@ wm.register_adapter(MeuAdaptador())</code></pre>
   // Load health check data
   async function loadHealthCheck() {
     try {
-      const data = await WM.get('/api/health-check');
+      const data = await WM.get('health-check');
 
       loadConnections(data);
       loadTables(data);
