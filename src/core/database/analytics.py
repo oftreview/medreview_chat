@@ -205,6 +205,22 @@ def analytics_conversation_quality(user_id: str = None) -> dict:
             by_user[uid][m["role"]] = by_user[uid].get(m["role"], 0) + 1
             by_user[uid]["total"] += 1
 
+        # Batch: carregar todos os metadados de uma vez (evita N+1 queries)
+        all_uids = list(by_user.keys())
+        metadata_map = {}
+        if all_uids:
+            try:
+                meta_result = (
+                    db.table("lead_metadata")
+                    .select("user_id, funnel_stage")
+                    .in_("user_id", all_uids)
+                    .execute()
+                )
+                for row in (meta_result.data or []):
+                    metadata_map[row["user_id"]] = row.get("funnel_stage", "desconhecido")
+            except Exception:
+                pass  # Fallback: stage fica "desconhecido"
+
         scores = []
         for uid, counts in by_user.items():
             total = counts["total"]
@@ -231,9 +247,7 @@ def analytics_conversation_quality(user_id: str = None) -> dict:
                 "fechamento": 25, "pos_venda": 25,
                 "desqualificado": 10, "escalado": 12,
             }
-            # Busca stage do lead
-            meta = get_lead_metadata(uid)
-            stage = meta.get("funnel_stage", "desconhecido") if meta else "desconhecido"
+            stage = metadata_map.get(uid, "desconhecido")
             progress = stage_scores.get(stage, 5)
 
             total_score = engagement + depth + balance + progress

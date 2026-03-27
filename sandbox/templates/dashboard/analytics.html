@@ -13,36 +13,91 @@
 .a-card .card-label { font-size:10px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
 .a-card .card-value { font-size:26px; font-weight:700; font-family:'Syne',sans-serif; }
 .a-card .card-sub { font-size:11px; color:var(--text-dim); margin-top:4px; }
-.a-card.purple .card-value { color:var(--purple-light); }
+.a-card.blue .card-value { color:var(--primary-light); }
 .a-card.green  .card-value { color:var(--green); }
 .a-card.orange .card-value { color:var(--orange); }
 
 /* ── Section titles ── */
 .section-title { font-size:14px; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-.section-title .dot { width:6px; height:6px; border-radius:50%; background:var(--purple); }
+.section-title .dot { width:6px; height:6px; border-radius:50%; background:var(--primary); }
 
 /* ── Two-column layout ── */
 .analytics-cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
 
-/* ── Funnel ── */
+/* ── Funnel (visual estilizado) ── */
 .funnel-panel {
   background:var(--surface); border:1px solid var(--border);
-  border-radius:12px; padding:20px;
+  border-radius:12px; padding:24px 20px;
 }
-.funnel-stage { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-.funnel-stage:last-child { margin-bottom:0; }
-.funnel-label { width:120px; font-size:12px; font-weight:500; color:var(--text-dim); flex-shrink:0; text-align:right; }
-.funnel-bar-wrap { flex:1; height:28px; background:var(--bg); border-radius:6px; overflow:hidden; position:relative; }
+.funnel-container {
+  display:flex; flex-direction:column; align-items:center; gap:0; position:relative;
+}
+.funnel-stage {
+  display:flex; align-items:center; gap:0; width:100%; position:relative;
+  margin-bottom:2px;
+}
+.funnel-label {
+  width:110px; font-size:11px; font-weight:500; color:var(--text-dim);
+  flex-shrink:0; text-align:right; padding-right:14px;
+}
+.funnel-bar-area {
+  flex:1; display:flex; justify-content:center; position:relative; height:36px;
+}
 .funnel-bar {
-  height:100%; border-radius:6px;
-  background:linear-gradient(90deg, var(--purple), var(--purple-light));
-  transition:width 0.6s ease; min-width:2px;
+  height:100%; border-radius:4px; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  transition:width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width:28px; cursor:default;
 }
-.funnel-count {
-  position:absolute; right:10px; top:50%; transform:translateY(-50%);
-  font-size:11px; font-weight:600; color:var(--text);
+.funnel-bar .bar-inner {
+  font-size:11px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3);
+  z-index:2; white-space:nowrap;
 }
-.funnel-pct { width:50px; font-size:12px; font-weight:600; color:var(--purple-light); text-align:right; }
+.funnel-bar .bar-glow {
+  position:absolute; inset:0; border-radius:4px; opacity:0.3;
+  filter:blur(8px);
+}
+.funnel-pct {
+  width:55px; font-size:11px; font-weight:600; color:var(--text-dim); text-align:left; padding-left:14px;
+}
+.funnel-pct strong { color:var(--text); }
+
+/* Cores do funil — gradiente de quente (topo) a frio (base) */
+.funnel-bar.stage-0 { background:linear-gradient(135deg, #6366f1, #818cf8); }
+.funnel-bar.stage-0 .bar-glow { background:#818cf8; }
+.funnel-bar.stage-1 { background:linear-gradient(135deg, #3b82f6, #60a5fa); }
+.funnel-bar.stage-1 .bar-glow { background:#60a5fa; }
+.funnel-bar.stage-2 { background:linear-gradient(135deg, #0ea5e9, #38bdf8); }
+.funnel-bar.stage-2 .bar-glow { background:#38bdf8; }
+.funnel-bar.stage-3 { background:linear-gradient(135deg, #06b6d4, #22d3ee); }
+.funnel-bar.stage-3 .bar-glow { background:#22d3ee; }
+.funnel-bar.stage-4 { background:linear-gradient(135deg, #f59e0b, #fbbf24); }
+.funnel-bar.stage-4 .bar-glow { background:#fbbf24; }
+.funnel-bar.stage-5 { background:linear-gradient(135deg, #f97316, #fb923c); }
+.funnel-bar.stage-5 .bar-glow { background:#fb923c; }
+.funnel-bar.stage-6 { background:linear-gradient(135deg, #10b981, #34d399); }
+.funnel-bar.stage-6 .bar-glow { background:#34d399; }
+.funnel-bar.stage-7 { background:linear-gradient(135deg, #059669, #10b981); }
+.funnel-bar.stage-7 .bar-glow { background:#10b981; }
+
+/* Connector lines between stages */
+.funnel-connector {
+  width:2px; height:6px; background:rgba(255,255,255,0.08); margin:0 auto;
+}
+
+/* Totals row */
+.funnel-totals {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:16px; padding-top:14px;
+  border-top:1px solid var(--border);
+  font-size:12px; color:var(--text-dim);
+}
+.funnel-totals .total-value { font-weight:700; color:var(--text); font-size:14px; }
+.funnel-totals .conversion-badge {
+  background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25);
+  color:var(--green); font-weight:600; font-size:12px;
+  padding:4px 12px; border-radius:20px;
+}
 
 /* ── Keywords ── */
 .keywords-panel {
@@ -52,10 +107,10 @@
 .keywords-cloud { display:flex; flex-wrap:wrap; gap:8px; }
 .kw-tag {
   padding:5px 12px; border-radius:20px; font-size:12px;
-  background:rgba(139,63,187,0.12); border:1px solid rgba(139,63,187,0.2);
-  color:var(--purple-light); transition:all 0.15s;
+  background:rgba(37,99,235,0.12); border:1px solid rgba(37,99,235,0.2);
+  color:var(--primary-light); transition:all 0.15s;
 }
-.kw-tag:hover { background:rgba(139,63,187,0.2); }
+.kw-tag:hover { background:rgba(37,99,235,0.2); }
 .kw-tag .kw-count { font-size:10px; color:var(--text-dim); margin-left:4px; }
 .kw-tag.size-lg { font-size:15px; font-weight:600; padding:7px 16px; }
 .kw-tag.size-md { font-size:13px; font-weight:500; }
@@ -75,7 +130,7 @@
 .quality-table th:first-child { border-radius:10px 0 0 0; }
 .quality-table th:last-child { border-radius:0 10px 0 0; }
 .quality-table td { padding:8px 12px; font-size:12px; border-bottom:1px solid var(--border); }
-.quality-table tr:hover td { background:rgba(139,63,187,0.04); }
+.quality-table tr:hover td { background:rgba(37,99,235,0.04); }
 
 .score-bar { display:flex; align-items:center; gap:8px; }
 .score-bar-track { flex:1; height:6px; background:var(--bg); border-radius:3px; overflow:hidden; max-width:100px; }
@@ -84,11 +139,6 @@
 .score-bar-fill.mid  { background:var(--yellow); }
 .score-bar-fill.bad  { background:var(--red); }
 .score-val { font-weight:600; font-size:12px; min-width:28px; }
-
-/* ── Corrections mini ── */
-.corr-stats { display:flex; gap:16px; margin-top:4px; }
-.corr-stat { font-size:12px; color:var(--text-dim); }
-.corr-stat strong { color:var(--text); }
 
 /* ── Loading / empty ── */
 .loading-text { color:var(--text-dim); font-size:13px; padding:20px; text-align:center; }
@@ -104,7 +154,7 @@
 <div class="page-header">
   <div class="page-title">
     <h1>Analytics</h1>
-    <span class="page-badge purple" id="analyticsBadge">Carregando...</span>
+    <span class="page-badge" id="analyticsBadge" style="background:rgba(37,99,235,0.15);color:var(--primary-light);">Carregando...</span>
   </div>
   <div class="page-actions">
     <button class="btn-ghost" onclick="loadAll()">&#8635; Atualizar</button>
@@ -114,7 +164,7 @@
 <div class="analytics-page">
   <!-- ── Summary cards ── -->
   <div class="analytics-grid">
-    <div class="a-card purple">
+    <div class="a-card blue">
       <div class="card-label">Total Leads</div>
       <div class="card-value" id="cardLeads">-</div>
       <div class="card-sub" id="cardLeadsSub">no funil</div>
@@ -224,12 +274,11 @@ async function loadSummary() {
 
     // Total leads
     const funnel = d.funnel || {};
-    const stages = funnel.stages || [];
-    const totalLeads = stages.reduce((s, st) => s + (st.count || 0), 0);
+    const totalLeads = funnel.total_leads || 0;
     document.getElementById('cardLeads').textContent = totalLeads;
 
     // Conversion rate
-    const rate = funnel.conversion_rate || 0;
+    const rate = funnel.conversion_rate_pct || 0;
     document.getElementById('cardConversion').textContent = fmtPct(rate);
     document.getElementById('cardConversionSub').textContent = `do total de ${totalLeads} leads`;
 
@@ -240,8 +289,8 @@ async function loadSummary() {
 
     // Corrections 7d
     const c = d.corrections_7d || {};
-    const totalCorr = (c.by_severity || []).reduce((s, x) => s + (x.count || 0), 0);
-    const reincident = (c.reincident_count || 0);
+    const totalCorr = c.total_active || 0;
+    const reincident = c.reincidences_last_period || 0;
     document.getElementById('cardErrors').textContent = totalCorr;
     document.getElementById('cardErrorsSub').textContent = reincident > 0 ? `${reincident} reincidentes` : 'sem reincidencias';
   } catch(e) {
@@ -253,34 +302,71 @@ async function loadFunnel() {
   try {
     const res = await fetch('/api/analytics/funnel');
     const d = await res.json();
-    const stages = d.stages || [];
+    const stages = d.funnel || [];
+    const totalLeads = d.total_leads || 0;
+    const convRate = d.conversion_rate_pct || 0;
+
     if (!stages.length) {
       document.getElementById('funnelPanel').innerHTML = '<div class="loading-text">Nenhum lead no funil ainda</div>';
       return;
     }
+
+    // Calcular a largura máxima do funil (a etapa com mais leads)
     const maxCount = Math.max(...stages.map(s => s.count || 0), 1);
-    let html = '';
+
     const stageLabels = {
-      'novo': 'Novo',
-      'qualificando': 'Qualificando',
-      'interessado': 'Interessado',
-      'negociando': 'Negociando',
-      'convertido': 'Convertido',
-      'perdido': 'Perdido',
-      'desqualificado': 'Desqualificado',
+      'abertura': 'Abertura',
+      'qualificacao': 'Qualificação',
+      'diagnostico': 'Diagnóstico',
+      'apresentacao': 'Apresentação',
+      'objecao': 'Objeção',
+      'negociacao': 'Negociação',
+      'fechamento': 'Fechamento',
+      'pos_venda': 'Pós-Venda',
     };
-    stages.forEach(s => {
-      const pct = maxCount > 0 ? ((s.count || 0) / maxCount * 100) : 0;
+
+    // Gerar HTML do funil em formato visual de funil real
+    // Cada barra diminui progressivamente — máxima no topo, mínima na base
+    let html = '<div class="funnel-container">';
+
+    const totalStages = stages.length;
+    stages.forEach((s, i) => {
+      const count = s.count || 0;
       const label = stageLabels[s.stage] || s.stage || 'Outro';
+
+      // Largura da barra: combina posição no funil (decrescente) + proporção real
+      // O topo tem 100% de largura, a base tem ~25%, e o dado real influencia dentro desse range
+      const positionWidth = 100 - (i / Math.max(totalStages - 1, 1)) * 65; // 100% → 35%
+      const dataWidth = maxCount > 0 ? (count / maxCount * 100) : 0;
+      // Blend: 60% posição no funil + 40% dados reais
+      const finalWidth = Math.max(20, (positionWidth * 0.6) + (dataWidth * 0.4));
+
+      const barContent = count > 0 ? `${count}` : '';
+
       html += `<div class="funnel-stage">
         <div class="funnel-label">${label}</div>
-        <div class="funnel-bar-wrap">
-          <div class="funnel-bar" style="width:${pct}%"></div>
-          <div class="funnel-count">${s.count || 0}</div>
+        <div class="funnel-bar-area">
+          <div class="funnel-bar stage-${i}" style="width:${finalWidth}%">
+            <div class="bar-glow"></div>
+            <span class="bar-inner">${barContent}</span>
+          </div>
         </div>
-        <div class="funnel-pct">${fmtPct(s.percentage)}</div>
+        <div class="funnel-pct"><strong>${fmtPct(s.pct)}</strong></div>
       </div>`;
+
+      // Connector entre estágios
+      if (i < totalStages - 1) {
+        html += '<div class="funnel-connector"></div>';
+      }
     });
+
+    // Totals row
+    html += `</div>
+    <div class="funnel-totals">
+      <div><span class="total-value">${totalLeads}</span> leads no funil</div>
+      <div class="conversion-badge">${fmtPct(convRate)} conversão</div>
+    </div>`;
+
     document.getElementById('funnelPanel').innerHTML = html;
   } catch(e) {
     console.error('Erro funnel:', e);
@@ -317,14 +403,17 @@ async function loadQuality() {
       document.getElementById('qualityBody').innerHTML = '<tr><td colspan="6" class="loading-text">Nenhuma conversa analisada</td></tr>';
       return;
     }
-    document.getElementById('qualityBody').innerHTML = convs.slice(0, 20).map(c => `<tr>
+    document.getElementById('qualityBody').innerHTML = convs.slice(0, 20).map(c => {
+      const b = c.breakdown || {};
+      return `<tr>
       <td>${maskPhone(c.user_id)}</td>
-      <td>${scoreBar(c.quality_score)}</td>
-      <td>${scoreBar(c.engagement)}</td>
-      <td>${scoreBar(c.depth)}</td>
-      <td>${scoreBar(c.balance)}</td>
-      <td>${scoreBar(c.progress)}</td>
-    </tr>`).join('');
+      <td>${scoreBar(c.score)}</td>
+      <td>${scoreBar(b.engagement)}</td>
+      <td>${scoreBar(b.depth)}</td>
+      <td>${scoreBar(b.balance)}</td>
+      <td>${scoreBar(b.progress)}</td>
+    </tr>`;
+    }).join('');
   } catch(e) {
     console.error('Erro quality:', e);
     document.getElementById('qualityBody').innerHTML = '<tr><td colspan="6" class="loading-text">Erro ao carregar qualidade</td></tr>';
