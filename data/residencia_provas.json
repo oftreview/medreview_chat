@@ -1,0 +1,313 @@
+{
+  "_meta": {
+    "descricao": "Base de conhecimento sobre provas e concursos de residência médica — Brasil 2026/2027",
+    "ultima_atualizacao": "27/03/2026",
+    "nota": "Documento de contexto para o agente de vendas Criatons. Atualizar periodicamente conforme novos editais do ciclo 2026/2027 forem publicados."
+  },
+
+  "visao_geral": {
+    "status_ciclo_2025_2026": "Ciclo principal encerrado. Provas aplicadas entre out/2025 e jan/2026, resultados divulgados, matrículas concluídas ou em andamento.",
+    "acontecendo_agora_marco_2026": [
+      "Chamadas de excedentes e vagas remanescentes em diversas instituições",
+      "Processos seletivos complementares pontuais (USP-SP Complementar, UNICAMP Vagas Remanescentes, USP-RP Vagas Remanescentes, SES-DF Vagas Remanescentes)",
+      "Segunda entrada (setembro/2026) — editais previstos para o 1º semestre de 2026"
+    ],
+    "ciclo_2026_2027": {
+      "ingresso": "Março de 2027",
+      "editais_previstos": "Publicação entre junho e outubro de 2026",
+      "provas_previstas": "Entre outubro e dezembro de 2026",
+      "resultados_matriculas": "Entre janeiro e março de 2027"
+    }
+  },
+
+  "provas": {
+    "enare": {
+      "nome_completo": "ENARE — Exame Nacional de Residência",
+      "organizador": "Ebserh + MEC",
+      "banca": "Fundação Getúlio Vargas (FGV)",
+      "abrangencia": "Nacional — ~198 instituições participantes",
+      "vagas_2025_2026": "~7.060 vagas de residência médica (11.388 total incluindo multiprofissional)",
+      "inscricoes_2025_2026": "07 a 30/07/2025",
+      "taxa": "R$ 330,00",
+      "prova_2025_2026": "19/10/2025 (já realizada)",
+      "formato": "Prova objetiva (fase única desde 2025/2026; análise curricular foi cancelada)",
+      "nota_minima": "50% de acerto",
+      "novidade_2025_2026": "Integração obrigatória com o ENAMED para candidatos de Acesso Direto",
+      "site_oficial": "enare.inep.gov.br",
+      "status_atual": "Concluído — resultados divulgados, escolha de vagas realizada",
+      "previsao_2026_2027": "Edital esperado entre maio e julho de 2026. Prova prevista para outubro de 2026.",
+      "enamed": {
+        "descricao": "Exame Nacional de Avaliação da Formação Médica — obrigatório para formandos em Medicina",
+        "substitui": "Substitui o ENADE para o curso de Medicina",
+        "requisito_enare": "Para concorrer a vagas de Acesso Direto no ENARE, é necessária inscrição concluída no ENAMED",
+        "taxa": "Sem taxa de inscrição para o ENAMED em si. Para usar nota no ENARE, precisa pagar a taxa do ENARE (R$ 330)"
+      }
+    },
+
+    "usp_sp": {
+      "nome_completo": "USP-SP — FMUSP (Faculdade de Medicina da USP)",
+      "organizador": "COREME/FMUSP",
+      "banca": "FUVEST",
+      "vagas_2025_2026": "834 vagas",
+      "inscricoes_2025_2026": "07 a 29/10/2025",
+      "taxa": "R$ 620,00",
+      "prova_1_fase": "07/12/2025 (já realizada)",
+      "formato": "2 fases: Prova Objetiva (peso 9) + Análise Curricular (peso 1)",
+      "prova_objetiva": "120 questões ABCD para Acesso Direto, 6h de duração",
+      "nota_minima": "50% de acerto",
+      "envio_curriculo": "05 a 12/01/2026",
+      "site_oficial": "fm.usp.br/coreme + fuvest.br",
+      "status_atual": "Concluído — resultados finais divulgados",
+      "areas_cobertas": "Cirurgia Geral, Clínica Médica, GO, Medicina Preventiva e Social, MFC, Saúde Coletiva, Pediatria, Saúde Mental e Medicina de Urgência",
+      "edital_complementar_2026": {
+        "publicado": "13/01/2026",
+        "vagas": "14 vagas em Cardiologia (AA), Cardiointensivismo, Cirurgia do Aparelho Digestivo (AA) e Ergometria",
+        "inscricoes": "28/01 a 03/02/2026"
+      },
+      "previsao_2026_2027": "Edital esperado em setembro de 2026. Inscrições em outubro de 2026. Prova em dezembro de 2026."
+    },
+
+    "usp_rp": {
+      "nome_completo": "USP-RP — FMRP (Faculdade de Medicina de Ribeirão Preto)",
+      "organizador": "COREME/FMRP",
+      "taxa_2025_2026": "R$ 800,00 (AD) / R$ 600,00 (Pré-Requisito)",
+      "formato": "Até 3 fases: Prova Escrita + Prova Prática (06/12/2025) + Análise Curricular",
+      "site_oficial": "fmrp.usp.br",
+      "status_atual": "Concluído — vagas remanescentes com inscrições em março/2026",
+      "vagas_remanescentes_2026": {
+        "editais": "Publicados em 05 e 06/03/2026",
+        "inscricoes": "06 a 09/03/2026",
+        "taxa": "R$ 250,00",
+        "prova": "12/03/2026"
+      },
+      "previsao_2026_2027": "Edital esperado em agosto/setembro de 2026. Prova entre outubro e novembro de 2026."
+    },
+
+    "unifesp": {
+      "nome_completo": "UNIFESP — Escola Paulista de Medicina",
+      "organizador": "COREME/EPM-UNIFESP",
+      "vagas_2025_2026": "~596 vagas",
+      "inscricoes_2025_2026": "17/09 a 18/10/2025",
+      "taxa": "R$ 660,00",
+      "prova_1_fase": "30/11/2025 (já realizada)",
+      "formato": "Até 3 fases: Prova Teórica + Prova Prática + Análise Curricular",
+      "prova_objetiva_ad": "100 questões ABCD nas 5 grandes áreas",
+      "nota_de_corte": "5,0 (maioria) a 6,0 (Anestesiologia, Cirurgia Geral, Clínica Médica, GO, Pediatria, Psiquiatria)",
+      "pesos": "Prova teórica (5) + Prova prática (4) + Análise curricular (1)",
+      "prova_pratica": "09 e 10/01/2026",
+      "resultado_final": "A partir de 05/02/2026",
+      "site_oficial": "site.unifesp.br/coreme",
+      "status_atual": "Concluído — chamadas de matrícula em andamento (março/2026)",
+      "diferencial": "Processo seletivo com 3 fases avaliativas (a maioria das instituições tem apenas 1 ou 2). Prova prática com peso elevado.",
+      "previsao_2026_2027": "Edital esperado em setembro de 2026. Inscrições em setembro/outubro de 2026. Prova em novembro de 2026."
+    },
+
+    "unicamp": {
+      "nome_completo": "UNICAMP — Universidade Estadual de Campinas",
+      "organizador": "COREME/FCM-UNICAMP",
+      "vagas_2025_2026": "~354 vagas (196 AD + 158 Pré-Requisito)",
+      "inscricoes_2025_2026": "01 a 15/10/2025",
+      "taxa": "R$ 740,00 (AD) / R$ 630,00 (Pré-Requisito)",
+      "prova_1_fase": "15/11/2025 (Pré-Requisito) e 16/11/2025 (AD) — já realizadas",
+      "formato": "2 fases: Prova Objetiva (peso 90) + Análise Curricular (peso 10)",
+      "prova_ad": "100 questões de resposta curta (50 manhã + 50 tarde), 4h cada período",
+      "nota_minima": "50% de acerto",
+      "local": "Campinas/SP",
+      "site_oficial": "portal.fcm.unicamp.br/residencias-em-saude/",
+      "status_atual": "Vagas remanescentes em andamento (edital publicado 04/02/2026)",
+      "diferencial": "Prova de respostas curtas (não é múltipla escolha). Exige domínio profundo do conteúdo.",
+      "vagas_remanescentes_2026": {
+        "edital": "Publicado em 04/02/2026 (retificado 20/02)",
+        "inscricoes": "21 a 23/02/2026",
+        "prova": "01/03/2026",
+        "resultado_final": "09/03/2026",
+        "chamadas": "Em andamento (até 19/03/2026 - 4ª chamada)"
+      },
+      "previsao_2026_2027": "Edital esperado em setembro de 2026. Inscrições em outubro de 2026. Prova em novembro de 2026."
+    },
+
+    "sus_sp": {
+      "nome_completo": "SUS-SP — Secretaria de Estado da Saúde de São Paulo",
+      "organizador": "SES-SP",
+      "banca": "Fundação VUNESP (novidade 2025/2026)",
+      "vagas_2025_2026": "~1.431 vagas (1.189 AD + 242 R+)",
+      "inscricoes_2025_2026": "16/10 a 04/11/2025",
+      "taxa": "R$ 120,00",
+      "prova": "14/12/2025 (já realizada)",
+      "formato": "Fase única — Prova objetiva de múltipla escolha (5 alternativas)",
+      "nota_minima": "50% (5,0 pontos)",
+      "resultado_final": "06/02/2026",
+      "instituicoes": "~50+ instituições participantes (A.C. Camargo, IAMSPE, Dante Pazzanese, etc.)",
+      "site_oficial": "vunesp.com.br",
+      "status_atual": "Concluído — escolha de vagas (leilão) em andamento",
+      "observacao": "Hospitais da SMS-SP (Secretaria Municipal) NÃO participaram do SUS-SP nesta edição — migraram para o ENARE/Enamed.",
+      "leilao_de_vagas": "Após resultado, candidatos habilitados são convocados por ordem de classificação para escolher vaga + instituição. Até 4 chamadas previstas.",
+      "bonificacao_ppi": "Candidatos autodeclarados pretos, pardos ou indígenas recebem 10% de bonificação na nota.",
+      "previsao_2026_2027": "Edital esperado em outubro de 2026. Inscrições outubro/novembro de 2026. Prova em dezembro de 2026."
+    },
+
+    "einstein": {
+      "nome_completo": "Hospital Albert Einstein (HIAE)",
+      "organizador": "Einstein Hospital Israelita",
+      "banca": "Fundação VUNESP",
+      "vagas_2025_2026": "~110 vagas",
+      "inscricoes_2025_2026": "19/08 a 22/09/2025",
+      "taxa": "R$ 770,00",
+      "formato": "3 fases: Prova Objetiva (peso 5) + Prova Prática + Análise Curricular",
+      "prova_ad": "75 questões ABCD, 4h de duração",
+      "prova_pre_requisito": "50 questões ABCD, 2h30 de duração",
+      "prova_pratica": "5 estações clínicas (8 min cada) + 2 estações de habilidades (4 min cada)",
+      "aceita_treineiros": true,
+      "site_oficial": "einstein.br/ensino + vunesp.com.br",
+      "status_atual": "Concluído",
+      "diferencial": "Hospital de referência em alta complexidade. Prova prática avalia competências como trabalho em equipe, comunicação, ética, empatia e profissionalismo.",
+      "previsao_2026_2027": "Edital esperado em agosto de 2026. Inscrições entre agosto e setembro de 2026."
+    },
+
+    "sirio_libanes": {
+      "nome_completo": "Hospital Sírio-Libanês (HSL)",
+      "organizador": "Hospital Sírio-Libanês",
+      "inscricoes_2025_2026": "10/09 a 14/10/2025",
+      "prova_1_fase": "22/11/2025 (sábado à tarde) — data retificada, era originalmente 23/11",
+      "formato": "Prova objetiva + fases subsequentes (a depender da especialidade)",
+      "aceita_treineiros": true,
+      "status_atual": "Concluído",
+      "referencia_em": "Oncologia, cardiologia, terapia intensiva e outras áreas de alta complexidade. Forte componente acadêmico.",
+      "previsao_2026_2027": "Edital esperado em setembro de 2026."
+    },
+
+    "santa_casa_sp": {
+      "nome_completo": "Santa Casa de São Paulo (SCMSP)",
+      "inscricoes_2025_2026": "12/12/2025 a 12/01/2026",
+      "taxa": "R$ 500,00",
+      "prova": "18/01/2026 (já realizada)",
+      "resultado": "30/01/2026",
+      "matriculas": "09 a 13/02/2026",
+      "status_atual": "Concluído",
+      "tradicao": "Um dos serviços filantrópicos mais tradicionais do país. Grande volume de atendimentos pelo SUS. Forte formação em clínica e cirurgia.",
+      "previsao_2026_2027": "Edital esperado entre novembro e dezembro de 2026."
+    },
+
+    "amrigs": {
+      "nome_completo": "AMRIGS — Associação Médica do RS (PSU Sul)",
+      "organizador": "AMRIGS + Fundatec",
+      "abrangencia": "RS, SC, MS, RO, RJ (~120 instituições)",
+      "vagas_2025_2026": "1.000+ vagas",
+      "inscricoes_2025_2026": "09/09 a 30/10/2025",
+      "taxa": "R$ 850 a R$ 3.850 (AD, varia por nº de estados) / R$ 600 a R$ 2.900 (Pré-Requisito)",
+      "prova": "23/11/2025 (já realizada)",
+      "formato": "Prova objetiva (fase 1) + 2ª fase opcional pelas instituições (análise curricular)",
+      "status_atual": "Concluído",
+      "destaque": "Maior seletivo unificado do Sul do Brasil. Candidato faz uma prova e concorre a diversas instituições de vários estados.",
+      "previsao_2026_2027": "Edital esperado em agosto/setembro de 2026. Inscrições setembro/outubro de 2026. Prova em novembro de 2026."
+    },
+
+    "psu_mg": {
+      "nome_completo": "PSU-MG — Processo Seletivo Unificado de Minas Gerais",
+      "organizador": "AREMG",
+      "abrangencia": "Minas Gerais (~20+ hospitais)",
+      "prova_2025_2026": "30/11/2025 (já realizada)",
+      "prova_ad": "90 questões (12 por grande área × 5 + outras), 4h de duração",
+      "formato": "2 fases: Prova Objetiva + Análise Curricular",
+      "status_atual": "Concluído — PSU-MG Complementar 2026 com prova em 22/02/2026",
+      "complementar_2026": {
+        "instituicoes": "46 instituições participantes",
+        "prova": "22/02/2026"
+      },
+      "previsao_2026_2027": "Edital esperado em setembro/outubro de 2026. Prova em novembro de 2026."
+    },
+
+    "ses_df": {
+      "nome_completo": "SES-DF — Secretaria de Saúde do Distrito Federal",
+      "status": "Edital de vagas remanescentes publicado em 06/03/2026",
+      "inscricoes": "Até 10/03/2026",
+      "taxa": "R$ 120,00",
+      "prova": "14/03/2026 (3h de duração)",
+      "resultado_final": "15/03/2026"
+    }
+  },
+
+  "segunda_entrada_setembro_2026": {
+    "descricao": "Desde 2025, a CNRM aprovou a possibilidade de segunda entrada anual nos programas de residência médica, com início em setembro. O objetivo é preencher vagas ociosas e acelerar a formação de especialistas em áreas prioritárias do SUS.",
+    "o_que_o_aluno_precisa_saber": [
+      "Nem todas as instituições aderiram ainda",
+      "Foco em áreas prioritárias do SUS (MFC, Psiquiatria, Pediatria, etc.)",
+      "Editais específicos serão publicados ao longo do 1º semestre de 2026",
+      "Processos seletivos normalmente mais simplificados",
+      "Instituições que já aderiram em edições anteriores: UFES, PSU-MG Complementar, PSU-GO Complementar"
+    ]
+  },
+
+  "previsoes_ciclo_2026_2027": {
+    "nota": "Os editais do ciclo 2026/2027 (ingresso em março de 2027) ainda não foram publicados. Previsões baseadas no padrão dos últimos anos.",
+    "calendario_estimado": [
+      {"instituicao": "ENARE", "edital_previsto": "Jun-Jul/2026", "inscricoes": "Jul/2026", "prova": "Out/2026"},
+      {"instituicao": "Einstein (HIAE)", "edital_previsto": "Ago/2026", "inscricoes": "Ago-Set/2026", "prova": "Nov-Dez/2026"},
+      {"instituicao": "Sírio-Libanês", "edital_previsto": "Set/2026", "inscricoes": "Set-Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "AMRIGS", "edital_previsto": "Set/2026", "inscricoes": "Set-Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "UNIFESP", "edital_previsto": "Set/2026", "inscricoes": "Set-Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "UNICAMP", "edital_previsto": "Set/2026", "inscricoes": "Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "USP-RP", "edital_previsto": "Set/2026", "inscricoes": "Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "USP-SP", "edital_previsto": "Set/2026", "inscricoes": "Out/2026", "prova": "Dez/2026"},
+      {"instituicao": "SUS-SP", "edital_previsto": "Out/2026", "inscricoes": "Out-Nov/2026", "prova": "Dez/2026"},
+      {"instituicao": "PSU-MG", "edital_previsto": "Set-Out/2026", "inscricoes": "Out/2026", "prova": "Nov/2026"},
+      {"instituicao": "Santa Casa SP", "edital_previsto": "Nov-Dez/2026", "inscricoes": "Dez/2026-Jan/2027", "prova": "Jan/2027"}
+    ]
+  },
+
+  "resumo_rapido_agente_vendas": {
+    "orientacoes_por_cenario": {
+      "ciclo_2025_2026": "As provas principais já aconteceram. Restam vagas remanescentes e chamadas de excedentes.",
+      "ciclo_2026_2027": "Os editais ainda não saíram, mas historicamente começam a ser publicados a partir de junho/2026 (ENARE) e agosto/setembro/2026 (instituições isoladas).",
+      "segunda_entrada": "Existe desde 2025, com início em setembro, mas depende da adesão de cada instituição."
+    },
+    "provas_mais_concorridas": [
+      {"posicao": 1, "nome": "USP-SP", "vagas": "~834", "candidatos": "mais de 10 mil"},
+      {"posicao": 2, "nome": "ENARE", "vagas": "~7.000", "candidatos": "mais de 87 mil inscritos"},
+      {"posicao": 3, "nome": "SUS-SP", "vagas": "~1.431", "candidatos": "~26 mil inscritos"},
+      {"posicao": 4, "nome": "UNIFESP", "vagas": "~596", "candidatos": "~7.500 inscritos"},
+      {"posicao": 5, "nome": "UNICAMP", "vagas": "~354", "candidatos": "~5.200 inscritos"},
+      {"posicao": 6, "nome": "AMRIGS", "vagas": "1.000+", "candidatos": "abrangência nacional"},
+      {"posicao": 7, "nome": "Einstein", "vagas": "~110", "candidatos": "alta concorrência"},
+      {"posicao": 8, "nome": "Sírio-Libanês", "vagas": "limitadas", "candidatos": "altíssima concorrência"}
+    ],
+    "taxas_referencia_2025_2026": [
+      {"instituicao": "SUS-SP", "taxa": "R$ 120"},
+      {"instituicao": "ENARE", "taxa": "R$ 330"},
+      {"instituicao": "Santa Casa SP", "taxa": "R$ 500"},
+      {"instituicao": "USP-SP", "taxa": "R$ 620"},
+      {"instituicao": "PSU-MG", "taxa": "R$ 630"},
+      {"instituicao": "UNIFESP", "taxa": "R$ 660"},
+      {"instituicao": "UNICAMP", "taxa": "R$ 630-740"},
+      {"instituicao": "Einstein", "taxa": "R$ 770"},
+      {"instituicao": "USP-RP", "taxa": "R$ 600-800"},
+      {"instituicao": "AMRIGS", "taxa": "R$ 600-3.850"}
+    ],
+    "sites_oficiais": {
+      "ENARE/ENAMED": "enare.inep.gov.br",
+      "USP-SP/RP": "fuvest.br",
+      "UNIFESP": "site.unifesp.br/coreme",
+      "UNICAMP": "portal.fcm.unicamp.br",
+      "SUS-SP": "vunesp.com.br",
+      "Einstein": "einstein.br/ensino",
+      "AMRIGS": "amrigs.org.br",
+      "PSU-MG": "aremg.org.br",
+      "Calendario_geral": "med.estrategia.com/portal/residencia-medica/calendario-de-residencia-medica"
+    }
+  },
+
+  "glossario": {
+    "acesso_direto_ad": "Especialidades em que o médico recém-formado pode ingressar diretamente (ex: Clínica Médica, Cirurgia Geral, Pediatria, GO, MFC, Psiquiatria)",
+    "pre_requisito_r_mais": "Especialidades que exigem conclusão de uma residência anterior (ex: Cardiologia exige Clínica Médica)",
+    "area_de_atuacao": "Subespecialidades com duração menor, geralmente 1 ano",
+    "ano_adicional": "Ano extra de formação em área específica",
+    "treineiro": "Candidato que faz a prova apenas para treinar, sem concorrer às vagas",
+    "coreme": "Comissão de Residência Médica de cada instituição",
+    "cnrm": "Comissão Nacional de Residência Médica (MEC)",
+    "leilao_de_vagas": "Sistema do SUS-SP onde candidatos escolhem vagas por ordem de classificação",
+    "enamed": "Exame Nacional de Avaliação da Formação Médica (substitui o ENADE para Medicina)",
+    "provab_prmgfc": "Programas que garantem bonificação de 10% na nota final de alguns processos",
+    "vagas_remanescentes": "Vagas não preenchidas que são oferecidas em processo seletivo complementar",
+    "segunda_entrada": "Nova possibilidade de ingresso em setembro (além de março), implementada a partir de 2025"
+  }
+}
