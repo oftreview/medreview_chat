@@ -16,6 +16,38 @@
 .cost-card.purple .card-value { color:var(--purple-light); }
 .cost-card.orange .card-value { color:var(--orange); }
 
+/* ── Daily chart ── */
+.section-title { font-size:14px; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.section-title .dot { width:6px; height:6px; border-radius:50%; background:var(--purple); }
+
+.daily-chart-wrap {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:20px; margin-bottom:24px; overflow-x:auto;
+}
+.chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.chart-header .chart-total { font-size:11px; color:var(--text-dim); }
+.chart-header .chart-total strong { color:var(--orange); font-size:13px; }
+
+.daily-bars { display:flex; align-items:flex-end; gap:4px; height:120px; min-width:fit-content; }
+.daily-bar {
+  flex:1; min-width:16px; max-width:28px; border-radius:4px 4px 0 0;
+  background:var(--purple); position:relative; cursor:pointer;
+  min-height:2px; transition:all .2s;
+}
+.daily-bar:hover { background:var(--purple-light); }
+.daily-bar-tip {
+  display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  padding:8px 12px; font-size:11px; white-space:nowrap; z-index:10;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.daily-bar:hover .daily-bar-tip { display:block; }
+.chart-x-labels { display:flex; gap:4px; margin-top:6px; }
+.chart-x-label {
+  flex:1; min-width:16px; max-width:28px; text-align:center;
+  font-size:8px; color:var(--text-dim);
+}
+
 /* ── Mode toggle ── */
 .mode-toggle { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:3px; }
 .mode-btn {
@@ -26,9 +58,6 @@
 .mode-btn.active { background:var(--purple); color:#fff; }
 
 /* ── Model config ── */
-.section-title { font-size:14px; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.section-title .dot { width:6px; height:6px; border-radius:50%; background:var(--purple); }
-
 .config-panel {
   background:var(--surface); border:1px solid var(--border);
   border-radius:12px; padding:20px; margin-bottom:24px;
@@ -70,25 +99,6 @@
 }
 .hist-filters input[type="date"] { width:140px; }
 
-/* ── Daily chart ── */
-.daily-chart-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:12px; padding:16px; margin-bottom:20px; overflow-x:auto;
-}
-.daily-bars { display:flex; align-items:flex-end; gap:3px; height:80px; min-width:fit-content; }
-.daily-bar {
-  width:14px; border-radius:3px 3px 0 0; background:var(--purple);
-  position:relative; cursor:pointer; min-height:2px; transition:opacity .2s;
-}
-.daily-bar:hover { opacity:.7; }
-.daily-bar-tip {
-  display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
-  background:var(--surface); border:1px solid var(--border); border-radius:6px;
-  padding:6px 10px; font-size:10px; white-space:nowrap; z-index:10;
-  box-shadow:0 4px 12px rgba(0,0,0,.3);
-}
-.daily-bar:hover .daily-bar-tip { display:block; }
-
 /* ── Pagination ── */
 .pagination { display:flex; gap:6px; justify-content:center; margin-top:14px; }
 .page-btn {
@@ -107,73 +117,79 @@
     <span class="page-badge green" id="modelBadge">-</span>
   </div>
   <div class="page-actions">
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="btnLive" onclick="switchMode('live')">&#9889; Sessao</button>
-      <button class="mode-btn" id="btnHist" onclick="switchMode('history')">&#128202; Historico</button>
-    </div>
-    <button class="btn-ghost" onclick="refresh()" style="margin-left:8px">&#8635; Atualizar</button>
+    <button class="btn-ghost" onclick="refreshAll()">&#8635; Atualizar</button>
   </div>
 </div>
 
 <div class="costs-page">
-  <!-- ── Metric cards ── -->
+  <!-- ══════════════════════════════════════════════════════════
+       CUSTO TOTAL ACUMULADO (Supabase — persiste entre deploys)
+       ══════════════════════════════════════════════════════════ -->
   <div class="costs-grid">
+    <div class="cost-card orange">
+      <div class="card-label">Custo Total</div>
+      <div class="card-value" id="totalCost">-</div>
+      <div class="card-sub" id="totalCostSub">acumulado (all-time)</div>
+    </div>
     <div class="cost-card purple">
       <div class="card-label">Total Tokens</div>
-      <div class="card-value" id="metricTokens">-</div>
-      <div class="card-sub" id="metricTokensSub">input + output</div>
+      <div class="card-value" id="totalTokens">-</div>
+      <div class="card-sub" id="totalTokensSub">input + output</div>
     </div>
     <div class="cost-card green">
       <div class="card-label">Cache Hit Rate</div>
-      <div class="card-value" id="metricCache">-</div>
-      <div class="card-sub" id="metricCacheSub">tokens cacheados</div>
-    </div>
-    <div class="cost-card orange">
-      <div class="card-label">Custo Estimado</div>
-      <div class="card-value" id="metricCost">-</div>
-      <div class="card-sub" id="metricCostSub">acumulado na sessao</div>
+      <div class="card-value" id="totalCache">-</div>
+      <div class="card-sub" id="totalCacheSub">economia de cache</div>
     </div>
     <div class="cost-card">
-      <div class="card-label">Chamadas API</div>
-      <div class="card-value" id="metricCalls">-</div>
-      <div class="card-sub" id="metricCallsSub">total de requests</div>
+      <div class="card-label">Total Chamadas</div>
+      <div class="card-value" id="totalCalls">-</div>
+      <div class="card-sub" id="totalCallsSub">requests all-time</div>
     </div>
   </div>
 
-  <!-- ── Model config ── -->
-  <div class="section-title"><div class="dot"></div>Configuracao do Modelo</div>
-  <div class="config-panel">
-    <div class="config-row">
-      <div class="config-label">Modelo ativo</div>
-      <div class="config-value">
-        <select id="modelSelect" onchange="updateModelPreview()">
-          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (rapido, barato)</option>
-          <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (equilibrado)</option>
-          <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (mais recente)</option>
-          <option value="claude-opus-4-6">Claude Opus 4.6 (mais inteligente)</option>
-        </select>
-      </div>
+  <!-- ══════════════════════════════════════════════════════════
+       GRAFICO DE CUSTO DIARIO (ultimos 30 dias)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="daily-chart-wrap">
+    <div class="chart-header">
+      <div class="section-title" style="margin:0"><div class="dot"></div>Custo Diario — Ultimos 30 dias</div>
+      <div class="chart-total">Total 30d: <strong id="chart30dTotal">$0.00</strong></div>
     </div>
-    <div class="config-row">
-      <div class="config-label">Max Tokens</div>
-      <div class="config-value"><input type="number" id="maxTokensInput" value="4000" min="500" max="16000" step="500"></div>
+    <div class="daily-bars" id="dailyBars">
+      <span style="color:var(--text-dim);font-size:12px;padding:30px">Carregando...</span>
     </div>
-    <div class="config-row">
-      <div class="config-label">Custo estimado/msg</div>
-      <div class="config-value" id="costPerMsg" style="color:var(--green)">-</div>
-    </div>
-    <div class="config-row" style="border-bottom:none">
-      <div class="config-label"></div>
-      <div class="config-value">
-        <button class="btn-primary" onclick="applyModelConfig()">Aplicar mudancas</button>
-        <span id="configStatus" style="margin-left:12px;font-size:12px;color:var(--green);display:none">Salvo!</span>
-      </div>
+    <div class="chart-x-labels" id="chartLabels"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ABAS: Sessao Atual / Historico / Config
+       ══════════════════════════════════════════════════════════ -->
+  <div style="display:flex;gap:8px;margin-bottom:18px;">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnTab0" onclick="switchTab(0)">&#9889; Sessao Atual</button>
+      <button class="mode-btn" id="btnTab1" onclick="switchTab(1)">&#128202; Historico</button>
+      <button class="mode-btn" id="btnTab2" onclick="switchTab(2)">&#9881; Modelo</button>
     </div>
   </div>
 
-  <!-- ── Live: usage history (session) ── -->
-  <div id="liveSection">
-    <div class="section-title"><div class="dot"></div>Historico de Uso (sessao atual)</div>
+  <!-- Tab 0: Sessao atual (live) -->
+  <div id="tab0">
+    <div class="section-title"><div class="dot"></div>Chamadas desta sessao</div>
+    <div class="costs-grid" style="margin-bottom:16px">
+      <div class="cost-card" style="border-left:3px solid var(--orange)">
+        <div class="card-label">Custo Sessao</div>
+        <div class="card-value" style="font-size:20px;color:var(--orange)" id="sessCost">$0</div>
+      </div>
+      <div class="cost-card">
+        <div class="card-label">Chamadas</div>
+        <div class="card-value" style="font-size:20px" id="sessCalls">0</div>
+      </div>
+      <div class="cost-card">
+        <div class="card-label">Tokens</div>
+        <div class="card-value" style="font-size:20px" id="sessTokens">0</div>
+      </div>
+    </div>
     <table class="usage-table">
       <thead>
         <tr><th>Hora</th><th>Modelo</th><th>Input</th><th>Output</th><th>Cache</th><th>Custo</th></tr>
@@ -184,14 +200,9 @@
     </table>
   </div>
 
-  <!-- ── History: persistent usage ── -->
-  <div id="histSection" style="display:none">
-    <div class="section-title"><div class="dot"></div>Custo Diario (ultimos 30 dias)</div>
-    <div class="daily-chart-wrap">
-      <div class="daily-bars" id="dailyBars"></div>
-    </div>
-
-    <div class="section-title"><div class="dot"></div>Historico Completo</div>
+  <!-- Tab 1: Historico persistente -->
+  <div id="tab1" style="display:none">
+    <div class="section-title"><div class="dot"></div>Historico Completo (Supabase)</div>
     <div class="hist-filters">
       <select id="histModel" onchange="loadHistory()">
         <option value="all">Todos modelos</option>
@@ -203,7 +214,6 @@
       <input type="date" id="histFrom" onchange="loadHistory()">
       <input type="date" id="histTo" onchange="loadHistory()">
     </div>
-
     <table class="usage-table">
       <thead>
         <tr><th>Data/Hora</th><th>Modelo</th><th>Input</th><th>Output</th><th>Cache R/W</th><th>Custo</th></tr>
@@ -214,77 +224,169 @@
     </table>
     <div class="pagination" id="histPagination"></div>
   </div>
+
+  <!-- Tab 2: Config modelo -->
+  <div id="tab2" style="display:none">
+    <div class="section-title"><div class="dot"></div>Configuracao do Modelo</div>
+    <div class="config-panel">
+      <div class="config-row">
+        <div class="config-label">Modelo ativo</div>
+        <div class="config-value">
+          <select id="modelSelect" onchange="updateModelPreview()">
+            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (rapido, barato)</option>
+            <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (equilibrado)</option>
+            <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (mais recente)</option>
+            <option value="claude-opus-4-6">Claude Opus 4.6 (mais inteligente)</option>
+          </select>
+        </div>
+      </div>
+      <div class="config-row">
+        <div class="config-label">Max Tokens</div>
+        <div class="config-value"><input type="number" id="maxTokensInput" value="4000" min="500" max="16000" step="500"></div>
+      </div>
+      <div class="config-row">
+        <div class="config-label">Custo estimado/msg</div>
+        <div class="config-value" id="costPerMsg" style="color:var(--green)">-</div>
+      </div>
+      <div class="config-row" style="border-bottom:none">
+        <div class="config-label"></div>
+        <div class="config-value">
+          <button class="btn-primary" onclick="applyModelConfig()">Aplicar mudancas</button>
+          <span id="configStatus" style="margin-left:12px;font-size:12px;color:var(--green);display:none">Salvo!</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-const MODEL_PRICES = {
-  'claude-haiku-4-5-20251001':  { input: 1, output: 5, name: 'Haiku 4.5' },
-  'claude-sonnet-4-20250514':   { input: 3, output: 15, name: 'Sonnet 4' },
-  'claude-sonnet-4-6':          { input: 3, output: 15, name: 'Sonnet 4.6' },
-  'claude-opus-4-6':            { input: 5, output: 25, name: 'Opus 4.6' },
-};
-
 const MODEL_SHORT = {
   'claude-haiku-4-5-20251001': 'Haiku 4.5',
   'claude-sonnet-4-20250514': 'Sonnet 4',
   'claude-sonnet-4-6': 'Sonnet 4.6',
   'claude-opus-4-6': 'Opus 4.6',
 };
+const MODEL_PRICES = {
+  'claude-haiku-4-5-20251001':  { input: 1, output: 5 },
+  'claude-sonnet-4-20250514':   { input: 3, output: 15 },
+  'claude-sonnet-4-6':          { input: 3, output: 15 },
+  'claude-opus-4-6':            { input: 5, output: 25 },
+};
 
-let currentMode = 'live';
+let currentTab = 0;
 let histPage = 1;
 
-function switchMode(mode) {
-  currentMode = mode;
-  document.getElementById('btnLive').classList.toggle('active', mode === 'live');
-  document.getElementById('btnHist').classList.toggle('active', mode === 'history');
-  document.getElementById('liveSection').style.display = mode === 'live' ? '' : 'none';
-  document.getElementById('histSection').style.display = mode === 'history' ? '' : 'none';
-
-  if (mode === 'live') {
-    loadMetrics();
-  } else {
-    loadTotals();
-    loadDailyChart();
-    loadHistory();
-  }
+function switchTab(idx) {
+  currentTab = idx;
+  [0,1,2].forEach(i => {
+    document.getElementById(`btnTab${i}`).classList.toggle('active', i === idx);
+    document.getElementById(`tab${i}`).style.display = i === idx ? '' : 'none';
+  });
+  if (idx === 1) loadHistory();
 }
 
-function refresh() {
-  if (currentMode === 'live') loadMetrics();
-  else { loadTotals(); loadDailyChart(); loadHistory(); }
+function refreshAll() {
+  loadTotals();
+  loadDailyChart();
+  loadSessionMetrics();
+  if (currentTab === 1) loadHistory();
 }
 
-function updateModelPreview() {
-  const model = document.getElementById('modelSelect').value;
-  const prices = MODEL_PRICES[model] || MODEL_PRICES['claude-haiku-4-5-20251001'];
-  const estInput = 30000 * prices.input / 1000000;
-  const estOutput = 2000 * prices.output / 1000000;
-  const estTotal = estInput + estOutput;
-  document.getElementById('costPerMsg').textContent =
-    `~$${estTotal.toFixed(4)} / mensagem ($${prices.input}/MTok in, $${prices.output}/MTok out)`;
+/* ══════════════════════════════════════════════════════════════
+   TOTAIS ACUMULADOS (Supabase — all-time)
+   ══════════════════════════════════════════════════════════════ */
+async function loadTotals() {
+  try {
+    const res = await fetch('/api/metrics/totals');
+    const data = await res.json();
+    const t = data.totals || {};
+
+    const cost = parseFloat(t.total_cost || 0);
+    const inp = parseInt(t.total_input || 0);
+    const out = parseInt(t.total_output || 0);
+    const calls = parseInt(t.total_calls || 0);
+    const cr = parseInt(t.total_cache_read || 0);
+    const cw = parseInt(t.total_cache_write || 0);
+
+    document.getElementById('totalCost').textContent = '$' + cost.toFixed(4);
+    document.getElementById('totalTokens').textContent = formatNum(inp + out);
+    document.getElementById('totalTokensSub').textContent = `${formatNum(inp)} in + ${formatNum(out)} out`;
+    document.getElementById('totalCalls').textContent = calls;
+
+    const cachePool = cr + cw + (inp || 1);
+    const cacheRate = cachePool > 0 ? (cr / cachePool * 100) : 0;
+    document.getElementById('totalCache').textContent = cacheRate.toFixed(0) + '%';
+    document.getElementById('totalCacheSub').textContent = `${formatNum(cr)} read / ${formatNum(cw)} write`;
+
+    // Se nao tem dados no Supabase, mostrar hint
+    if (!calls) {
+      document.getElementById('totalCost').textContent = '$0.00';
+      document.getElementById('totalCostSub').textContent = 'dados acumulam a partir de agora';
+      document.getElementById('totalCalls').textContent = '0';
+    }
+  } catch(e) { console.error('loadTotals:', e); }
 }
 
-/* ── Live mode ── */
-async function loadMetrics() {
+/* ══════════════════════════════════════════════════════════════
+   GRAFICO DE CUSTO DIARIO (30 dias)
+   ══════════════════════════════════════════════════════════════ */
+async function loadDailyChart() {
+  try {
+    const res = await fetch('/api/metrics/daily?days=30');
+    const data = await res.json();
+    const stats = (data.stats || []).slice().reverse(); // cronologico
+    const container = document.getElementById('dailyBars');
+    const labelsEl = document.getElementById('chartLabels');
+
+    if (!stats.length) {
+      container.innerHTML = '<span style="color:var(--text-dim);font-size:12px;padding:30px 0">Os dados comecam a aparecer apos a primeira chamada ao LLM</span>';
+      labelsEl.innerHTML = '';
+      document.getElementById('chart30dTotal').textContent = '$0.00';
+      return;
+    }
+
+    const costs = stats.map(s => parseFloat(s.total_cost) || 0);
+    const maxCost = Math.max(...costs, 0.001);
+    const sum30d = costs.reduce((a, b) => a + b, 0);
+    document.getElementById('chart30dTotal').textContent = '$' + sum30d.toFixed(4);
+
+    container.innerHTML = stats.map((s, i) => {
+      const cost = costs[i];
+      const h = Math.max(2, (cost / maxCost) * 100);
+      return `<div class="daily-bar" style="height:${h}px" title="${s.day}">
+        <div class="daily-bar-tip">
+          <strong>${s.day||'?'}</strong><br>
+          ${s.total_calls || 0} chamadas<br>
+          ${formatNum((parseInt(s.total_input)||0) + (parseInt(s.total_output)||0))} tokens<br>
+          <span style="color:var(--orange)">$${cost.toFixed(4)}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    // X-axis labels (show every ~5 days)
+    labelsEl.innerHTML = stats.map((s, i) => {
+      const show = (i % 5 === 0) || i === stats.length - 1;
+      const label = show && s.day ? s.day.slice(5) : '';
+      return `<div class="chart-x-label">${label}</div>`;
+    }).join('');
+  } catch(e) { console.error('loadDailyChart:', e); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SESSAO ATUAL (live — memoria)
+   ══════════════════════════════════════════════════════════════ */
+async function loadSessionMetrics() {
   try {
     const res = await fetch('/api/metrics');
     const data = await res.json();
     const m = data.metrics || {};
-    document.getElementById('modelBadge').textContent = m.model || '-';
-    document.getElementById('metricTokens').textContent = formatNum((m.total_input_tokens||0) + (m.total_output_tokens||0));
-    document.getElementById('metricTokensSub').textContent = `${formatNum(m.total_input_tokens||0)} in + ${formatNum(m.total_output_tokens||0)} out`;
-    document.getElementById('metricCalls').textContent = m.total_calls || 0;
-    document.getElementById('metricCallsSub').textContent = 'nesta sessao';
-    document.getElementById('metricCost').textContent = '$' + (m.total_cost || 0).toFixed(4);
-    document.getElementById('metricCostSub').textContent = 'acumulado na sessao';
 
-    const cacheTotal = (m.total_cache_read||0) + (m.total_cache_write||0) + (m.total_input_tokens||1);
-    const cacheRate = cacheTotal > 0 ? ((m.total_cache_read||0) / cacheTotal * 100) : 0;
-    document.getElementById('metricCache').textContent = cacheRate.toFixed(0) + '%';
-    document.getElementById('metricCacheSub').textContent = `${formatNum(m.total_cache_read||0)} read / ${formatNum(m.total_cache_write||0)} write`;
+    document.getElementById('modelBadge').textContent = m.model || '-';
+    document.getElementById('sessCost').textContent = '$' + (m.total_cost || 0).toFixed(4);
+    document.getElementById('sessCalls').textContent = m.total_calls || 0;
+    document.getElementById('sessTokens').textContent = formatNum((m.total_input_tokens||0) + (m.total_output_tokens||0));
 
     if (m.model) {
       for (let opt of document.getElementById('modelSelect').options) {
@@ -305,57 +407,13 @@ async function loadMetrics() {
       </tr>`).join('');
     }
   } catch(e) {
-    console.error('Erro ao carregar metricas:', e);
+    console.error('loadSessionMetrics:', e);
   }
 }
 
-/* ── History mode ── */
-async function loadTotals() {
-  try {
-    const res = await fetch('/api/metrics/totals');
-    const data = await res.json();
-    const t = data.totals || {};
-    if (!t.total_calls) return; // sem dados persistentes
-    document.getElementById('metricTokens').textContent = formatNum((t.total_input||0) + (t.total_output||0));
-    document.getElementById('metricTokensSub').textContent = `${formatNum(t.total_input||0)} in + ${formatNum(t.total_output||0)} out`;
-    document.getElementById('metricCalls').textContent = t.total_calls || 0;
-    document.getElementById('metricCallsSub').textContent = 'total (all-time)';
-    document.getElementById('metricCost').textContent = '$' + parseFloat(t.total_cost || 0).toFixed(4);
-    document.getElementById('metricCostSub').textContent = 'acumulado total';
-
-    const ct = (t.total_cache_read||0) + (t.total_cache_write||0) + (t.total_input||1);
-    const cr = ct > 0 ? ((t.total_cache_read||0) / ct * 100) : 0;
-    document.getElementById('metricCache').textContent = cr.toFixed(0) + '%';
-    document.getElementById('metricCacheSub').textContent = `${formatNum(t.total_cache_read||0)} read / ${formatNum(t.total_cache_write||0)} write`;
-  } catch(e) { console.error(e); }
-}
-
-async function loadDailyChart() {
-  try {
-    const res = await fetch('/api/metrics/daily?days=30');
-    const data = await res.json();
-    const stats = data.stats || [];
-    const container = document.getElementById('dailyBars');
-    if (!stats.length) {
-      container.innerHTML = '<span style="color:var(--text-dim);font-size:12px;padding:20px">Sem dados ainda</span>';
-      return;
-    }
-    const maxCost = Math.max(...stats.map(s => parseFloat(s.total_cost) || 0), 0.001);
-    container.innerHTML = stats.reverse().map(s => {
-      const cost = parseFloat(s.total_cost) || 0;
-      const h = Math.max(2, (cost / maxCost) * 70);
-      const day = s.day ? s.day.slice(5) : '?';
-      return `<div class="daily-bar" style="height:${h}px">
-        <div class="daily-bar-tip">
-          <strong>${s.day||'?'}</strong><br>
-          ${s.total_calls} chamadas<br>
-          $${cost.toFixed(4)}
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) { console.error(e); }
-}
-
+/* ══════════════════════════════════════════════════════════════
+   HISTORICO PERSISTENTE (Supabase)
+   ══════════════════════════════════════════════════════════════ */
 async function loadHistory(page) {
   histPage = page || 1;
   const model = document.getElementById('histModel').value;
@@ -393,7 +451,6 @@ async function loadHistory(page) {
       </tr>`;
     }).join('');
 
-    // Pagination
     const pages = data.pages || 1;
     let pgHtml = '';
     pgHtml += `<button class="page-btn" onclick="loadHistory(${histPage-1})" ${histPage<=1?'disabled':''}>&#8249;</button>`;
@@ -404,6 +461,15 @@ async function loadHistory(page) {
     pgHtml += `<button class="page-btn" onclick="loadHistory(${histPage+1})" ${histPage>=pages?'disabled':''}>&#8250;</button>`;
     document.getElementById('histPagination').innerHTML = pgHtml;
   } catch(e) { console.error(e); }
+}
+
+/* ── Config ── */
+function updateModelPreview() {
+  const model = document.getElementById('modelSelect').value;
+  const prices = MODEL_PRICES[model] || MODEL_PRICES['claude-haiku-4-5-20251001'];
+  const est = (30000 * prices.input + 2000 * prices.output) / 1000000;
+  document.getElementById('costPerMsg').textContent =
+    `~$${est.toFixed(4)} / mensagem ($${prices.input}/MTok in, $${prices.output}/MTok out)`;
 }
 
 async function applyModelConfig() {
@@ -417,7 +483,7 @@ async function applyModelConfig() {
     if (res.ok) {
       const el = document.getElementById('configStatus');
       el.style.display = 'inline'; setTimeout(() => el.style.display = 'none', 2000);
-      loadMetrics();
+      loadSessionMetrics();
     }
   } catch(e) { alert('Erro: ' + e.message); }
 }
@@ -428,7 +494,10 @@ function formatNum(n) {
   return String(n);
 }
 
+/* ── Init: carrega tudo ao abrir ── */
 updateModelPreview();
-loadMetrics();
+loadTotals();
+loadDailyChart();
+loadSessionMetrics();
 </script>
 {% endblock %}
