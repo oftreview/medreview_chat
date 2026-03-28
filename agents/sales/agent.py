@@ -39,11 +39,16 @@ META_TAG = "[META]"
 META_PATTERN = re.compile(r"\[META\]\s*(.+)$", re.MULTILINE)
 
 # Fallback: frases de escalação por string matching
+# Nota: estas frases só disparam escalação se encontradas nas PRIMEIRAS 200
+# caracteres da resposta E se motivo_escalacao != "nenhum" nos metadados.
+# Isso evita falsos positivos quando o agente menciona essas frases em outro contexto.
 ESCALATION_FALLBACK_PHRASES = [
     "vou conectar você com",
     "consultor humano",
     "vou te passar para um consultor",
     "vou transferir você",
+    "vou te encaminhar para",
+    "transferir para um especialista",
 ]
 
 
@@ -211,12 +216,22 @@ class SalesAgent:
             response_text = response_text.strip()[len(ESCALATION_TAG):].strip()
             print(f"[AGENT] Escalação detectada via tag [ESCALAR]", flush=True)
         else:
-            escalate = any(
-                phrase in response_text.lower()
+            # Fallback: só dispara se a frase está no INÍCIO da resposta (primeiros 200 chars)
+            # E se os metadados indicam motivo de escalação real (não "nenhum")
+            response_start = response_text[:200].lower()
+            has_escalation_phrase = any(
+                phrase in response_start
                 for phrase in ESCALATION_FALLBACK_PHRASES
             )
-            if escalate:
-                print(f"[AGENT] Escalação detectada via fallback (string match)", flush=True)
+            # Verifica se metadados confirmam escalação (motivo != nenhum)
+            motivo = metadata.get("motivo_escalacao", "nenhum") if metadata else "nenhum"
+            meta_confirms = motivo and motivo.lower() not in ("nenhum", "none", "")
+
+            if has_escalation_phrase and meta_confirms:
+                escalate = True
+                print(f"[AGENT] Escalação detectada via fallback (string match + meta confirmado: {motivo})", flush=True)
+            elif has_escalation_phrase:
+                print(f"[AGENT] Fallback de escalação IGNORADO (frase encontrada mas motivo_escalacao='{motivo}')", flush=True)
 
         # Salva a resposta LIMPA (sem tag e sem [META]) no histórico
         self.memory.add(session_id, "assistant", response_text)
