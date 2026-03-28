@@ -23,11 +23,17 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Docs & tests (not needed in production)
+# Docs (not needed in production)
 docs/
-tests/
 *.md
 !README.md
+
+# Tests — exclude test files but keep dashboard + runner
+tests/unit/
+tests/critical/
+tests/integration/
+tests/e2e/
+tests/conftest.py
 
 # Local cache
 local_cache/
