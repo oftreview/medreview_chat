@@ -1,139 +1,190 @@
 {% extends "base.html" %}
-
 {% block title %}Test Suite{% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('test_dashboard.static', filename='test_dashboard.css') }}">
+/* ── Test Dashboard ─────────────────────────────────────────────────────── */
+.td-page { flex:1; overflow-y:auto; padding:24px; position:relative; z-index:1; }
+
+/* ── Cards ── */
+.td-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+.td-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:18px;
+}
+.td-card .card-label { font-size:10px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.td-card .card-value { font-size:28px; font-weight:700; font-family:'Syne',sans-serif; }
+.td-card .card-sub { font-size:11px; color:var(--text-dim); margin-top:4px; }
+.td-card.green .card-value  { color:var(--green); }
+.td-card.red .card-value    { color:var(--red); }
+.td-card.red.all-pass .card-value { color:var(--green); }
+.td-card.blue .card-value   { color:var(--primary-light); }
+
+/* ── Progress bar ── */
+.td-prog { width:100%; height:6px; background:rgba(37,99,235,0.12); border-radius:3px; margin-top:10px; overflow:hidden; }
+.td-prog-fill { height:100%; border-radius:3px; transition:width 0.5s ease, background 0.3s ease; }
+
+/* ── Section panel ── */
+.td-section {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:20px; margin-bottom:20px;
+}
+.td-section-title {
+  font-size:13px; font-weight:600; margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.td-section-title .dot { width:6px; height:6px; border-radius:50%; }
+.td-section-title .dot.green { background:var(--green); }
+.td-section-title .dot.blue  { background:var(--primary); }
+.td-section-title .dot.orange { background:var(--orange); }
+.td-section-title .dot.red   { background:var(--red); }
+
+/* ── Tables ── */
+.td-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.td-table th {
+  text-align:left; padding:8px 12px; font-size:10px; font-weight:600;
+  color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px;
+  border-bottom:1px solid var(--border);
+}
+.td-table td { padding:8px 12px; border-bottom:1px solid rgba(37,99,235,0.07); vertical-align:middle; }
+.td-table tr:hover td { background:rgba(37,99,235,0.04); }
+.td-muted { color:var(--text-dim); text-align:center; padding:20px 12px !important; }
+
+/* ── Badges ── */
+.td-badge {
+  display:inline-block; padding:2px 10px; border-radius:10px;
+  font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+}
+.td-badge.pass { background:rgba(16,185,129,0.15); color:var(--green); }
+.td-badge.fail { background:rgba(239,68,68,0.15); color:var(--red); }
+.td-badge.skip { background:rgba(245,158,11,0.15); color:var(--yellow); }
+.td-badge.none { background:rgba(100,116,139,0.12); color:var(--text-dim); }
+
+/* ── Tabs ── */
+.td-tabs { display:flex; gap:6px; margin-bottom:14px; }
+.td-tab {
+  padding:6px 16px; background:transparent; border:1px solid var(--border);
+  border-radius:8px; color:var(--text-dim); cursor:pointer;
+  font-size:12px; font-family:'Space Grotesk',sans-serif; transition:all 0.15s;
+}
+.td-tab:hover { color:var(--text); border-color:var(--text-dim); }
+.td-tab.active { background:rgba(37,99,235,0.12); color:var(--primary-light); border-color:var(--primary); }
+
+/* ── Chart ── */
+.td-chart { margin-bottom:16px; position:relative; height:200px; }
+.td-chart canvas { width:100% !important; height:100% !important; }
+
+/* ── Coverage mini bar ── */
+.td-minibar { width:100px; height:5px; background:rgba(37,99,235,0.1); border-radius:3px; display:inline-block; overflow:hidden; vertical-align:middle; }
+.td-minibar-fill { height:100%; border-radius:3px; }
+
+/* ── Spinner ── */
+.td-spinner {
+  width:14px; height:14px; border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff; border-radius:50%; animation:td-spin 0.6s linear infinite;
+  display:inline-block;
+}
+.td-hidden { display:none !important; }
+@keyframes td-spin { to { transform:rotate(360deg); } }
+
+/* ── Responsive ── */
+@media (max-width:900px) { .td-cards { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:550px) { .td-cards { grid-template-columns:1fr; } .td-page { padding:16px; } }
 {% endblock %}
 
 {% block content %}
-<div class="test-dashboard">
-    <!-- Header -->
-    <header class="page-header">
-        <div class="page-title">
-            <h1>Test Suite</h1>
-            <span class="page-badge green">153 tests</span>
-            <span id="last-run-time" class="subtitle" style="margin-left:12px;font-size:12px;color:var(--text-dim);">Nenhum run registrado</span>
-        </div>
-        <div class="page-actions">
-            <button id="btn-run" class="btn-primary" onclick="runTests()">
-                <span id="btn-run-text">Run Tests Now</span>
-                <span id="btn-run-spinner" class="spinner hidden"></span>
-            </button>
-        </div>
-    </header>
+<!-- ── Header ── -->
+<div class="page-header">
+  <div class="page-title">
+    <h1>Test Suite</h1>
+    <span class="page-badge green" id="badge-count">—</span>
+    <span id="last-run-time" style="margin-left:12px;font-size:11px;color:var(--text-dim)">Nenhum run registrado</span>
+  </div>
+  <div class="page-actions">
+    <button id="btn-run" class="btn-primary" onclick="runTests()" style="display:flex;align-items:center;gap:8px;">
+      <span id="btn-run-text">Run Tests Now</span>
+      <span id="btn-run-spinner" class="td-spinner td-hidden"></span>
+    </button>
+  </div>
+</div>
 
-    <div class="test-content">
-        <!-- Summary Cards -->
-        <section class="cards">
-            <div class="card" id="card-total">
-                <div class="card-label">Total Tests</div>
-                <div class="card-value" id="total-tests">&mdash;</div>
-                <div class="card-trend" id="total-trend"></div>
-            </div>
-            <div class="card card-pass" id="card-pass">
-                <div class="card-label">Passing</div>
-                <div class="card-value" id="passing-tests">&mdash;</div>
-                <div class="card-subtitle" id="passing-pct"></div>
-            </div>
-            <div class="card card-fail" id="card-fail">
-                <div class="card-label">Failing</div>
-                <div class="card-value" id="failing-tests">&mdash;</div>
-                <div class="card-subtitle" id="failing-pct"></div>
-            </div>
-            <div class="card" id="card-coverage">
-                <div class="card-label">Coverage</div>
-                <div class="card-value" id="coverage-pct">&mdash;</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="coverage-bar"></div>
-                </div>
-            </div>
-        </section>
+<!-- ── Scrollable content ── -->
+<div class="td-page">
 
-        <!-- Critical Bugs -->
-        <section class="section">
-            <h2>Testes Criticos</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Bug</th>
-                        <th>Status</th>
-                        <th>Descricao</th>
-                    </tr>
-                </thead>
-                <tbody id="critical-bugs-tbody">
-                    <tr><td colspan="3" class="muted">Aguardando dados...</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Results by Category -->
-        <section class="section">
-            <h2>Resultados por Categoria</h2>
-            <div class="tabs">
-                <button class="tab active" data-tab="unit" onclick="switchTab('unit')">Unit</button>
-                <button class="tab" data-tab="critical" onclick="switchTab('critical')">Critical</button>
-                <button class="tab" data-tab="integration" onclick="switchTab('integration')">Integration</button>
-                <button class="tab" data-tab="e2e" onclick="switchTab('e2e')">E2E</button>
-            </div>
-            <div class="tab-content" id="tab-content">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Teste</th>
-                            <th>Status</th>
-                            <th>Duracao</th>
-                            <th>Erro</th>
-                        </tr>
-                    </thead>
-                    <tbody id="category-tbody">
-                        <tr><td colspan="4" class="muted">Aguardando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- History -->
-        <section class="section">
-            <h2>Historico de Runs</h2>
-            <div class="chart-container">
-                <canvas id="history-chart" width="800" height="200"></canvas>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Total</th>
-                        <th>Pass</th>
-                        <th>Fail</th>
-                        <th>Coverage</th>
-                        <th>Duracao</th>
-                    </tr>
-                </thead>
-                <tbody id="history-tbody">
-                    <tr><td colspan="6" class="muted">Aguardando dados...</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Coverage by Module -->
-        <section class="section">
-            <h2>Cobertura por Modulo</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Modulo</th>
-                        <th>Linhas</th>
-                        <th>Cobertura</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="coverage-tbody">
-                    <tr><td colspan="4" class="muted">Aguardando dados...</td></tr>
-                </tbody>
-            </table>
-        </section>
+  <!-- Summary Cards -->
+  <div class="td-cards">
+    <div class="td-card blue" id="card-total">
+      <div class="card-label">Total Tests</div>
+      <div class="card-value" id="total-tests">&mdash;</div>
+      <div class="card-sub" id="total-trend"></div>
     </div>
+    <div class="td-card green" id="card-pass">
+      <div class="card-label">Passing</div>
+      <div class="card-value" id="passing-tests">&mdash;</div>
+      <div class="card-sub" id="passing-pct"></div>
+    </div>
+    <div class="td-card red" id="card-fail">
+      <div class="card-label">Failing</div>
+      <div class="card-value" id="failing-tests">&mdash;</div>
+      <div class="card-sub" id="failing-pct"></div>
+    </div>
+    <div class="td-card" id="card-coverage">
+      <div class="card-label">Coverage</div>
+      <div class="card-value" id="coverage-pct">&mdash;</div>
+      <div class="td-prog"><div class="td-prog-fill" id="coverage-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- Critical Bugs -->
+  <div class="td-section">
+    <div class="td-section-title"><span class="dot red"></span> Bugs Criticos</div>
+    <table class="td-table">
+      <thead><tr><th>Bug</th><th>Status</th><th>Descricao</th></tr></thead>
+      <tbody id="critical-bugs-tbody">
+        <tr><td colspan="3" class="td-muted">Aguardando dados...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Results by Category -->
+  <div class="td-section">
+    <div class="td-section-title"><span class="dot blue"></span> Resultados por Categoria</div>
+    <div class="td-tabs">
+      <button class="td-tab active" data-tab="unit" onclick="switchTab('unit')">Unit <span id="tab-count-unit"></span></button>
+      <button class="td-tab" data-tab="critical" onclick="switchTab('critical')">Critical <span id="tab-count-critical"></span></button>
+      <button class="td-tab" data-tab="integration" onclick="switchTab('integration')">Integration <span id="tab-count-integration"></span></button>
+      <button class="td-tab" data-tab="e2e" onclick="switchTab('e2e')">E2E <span id="tab-count-e2e"></span></button>
+    </div>
+    <table class="td-table">
+      <thead><tr><th>Teste</th><th>Status</th><th>Duracao</th><th>Erro</th></tr></thead>
+      <tbody id="category-tbody">
+        <tr><td colspan="4" class="td-muted">Aguardando dados...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- History -->
+  <div class="td-section">
+    <div class="td-section-title"><span class="dot green"></span> Historico de Runs</div>
+    <div class="td-chart"><canvas id="history-chart"></canvas></div>
+    <table class="td-table">
+      <thead><tr><th>Timestamp</th><th>Total</th><th>Pass</th><th>Fail</th><th>Coverage</th><th>Duracao</th></tr></thead>
+      <tbody id="history-tbody">
+        <tr><td colspan="6" class="td-muted">Nenhum historico</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Coverage -->
+  <div class="td-section">
+    <div class="td-section-title"><span class="dot orange"></span> Cobertura por Modulo</div>
+    <table class="td-table">
+      <thead><tr><th>Modulo</th><th>Linhas</th><th>Missing</th><th>Cobertura</th><th></th></tr></thead>
+      <tbody id="coverage-tbody">
+        <tr><td colspan="5" class="td-muted">Sem dados de cobertura</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 {% endblock %}
 

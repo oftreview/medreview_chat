@@ -16,29 +16,28 @@ const CRITICAL_BUGS = [
     {
         key: "BUG1_debounce_race",
         name: "BUG 1 — Debounce Race",
-        description: "Race condition no timer de debounce Z-API. kill() do timer pode perder msgs acumuladas.",
+        desc: "Race condition no timer de debounce Z-API. kill() do timer pode perder msgs acumuladas.",
     },
     {
         key: "BUG2_primary_waiter",
         name: "BUG 2 — Primary Waiter Race",
-        description: "Race na eleicao do primary waiter no /chat. Requests concorrentes podem perder mensagens.",
+        desc: "Race na eleicao do primary waiter no /chat. Requests concorrentes podem perder mensagens.",
     },
     {
         key: "BUG3_memory_cleanup",
         name: "BUG 3 — Memory Cleanup Race",
-        description: "cleanup_expired() remove sessao enquanto add() esta sendo chamado.",
+        desc: "cleanup_expired() remove sessao enquanto add() esta sendo chamado.",
     },
     {
         key: "BUG4_history_truncation",
         name: "BUG 4 — History Truncation",
-        description: "KEEP_FIRST=4 + KEEP_LAST=26 perde msg do meio com 31 mensagens.",
+        desc: "KEEP_FIRST=4 + KEEP_LAST=26 perde msg do meio com 31 mensagens.",
     },
 ];
 
 // ── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
     loadAll();
-    // Auto-refresh every 30s
     setInterval(loadAll, 30000);
 });
 
@@ -51,17 +50,16 @@ async function loadResults() {
     try {
         const resp = await fetch(`${API_BASE}/results`);
         const data = await resp.json();
-
-        if (data.status === "no_data") {
-            return;
-        }
+        if (data.status === "no_data") return;
 
         latestData = data;
         renderCards(data);
         renderCriticalBugs(data.critical_bugs || {});
         renderCategoryTab(currentTab);
+        renderTabCounts(data.categories || {});
         renderCoverage(data.coverage || {});
         renderLastRunTime(data.timestamp);
+        updateBadge(data.total);
     } catch (e) {
         console.error("Failed to load results:", e);
     }
@@ -81,44 +79,33 @@ async function loadHistory() {
 
 // ── Render Cards ───────────────────────────────────────────────────────────
 function renderCards(data) {
-    document.getElementById("total-tests").textContent = data.total || 0;
-    document.getElementById("passing-tests").textContent = data.passed || 0;
-    document.getElementById("failing-tests").textContent = data.failed || 0;
+    setText("total-tests", data.total || 0);
+    setText("passing-tests", data.passed || 0);
+    setText("failing-tests", data.failed || 0);
 
     const total = data.total || 1;
-    const passPct = ((data.passed / total) * 100).toFixed(1);
-    const failPct = ((data.failed / total) * 100).toFixed(1);
+    setText("passing-pct", `${((data.passed / total) * 100).toFixed(1)}%`);
+    setText("failing-pct", `${((data.failed / total) * 100).toFixed(1)}%`);
 
-    document.getElementById("passing-pct").textContent = `${passPct}%`;
-    document.getElementById("failing-pct").textContent = `${failPct}%`;
-
-    // Fail card color: green if 0 failures
+    // Fail card color
     const failCard = document.getElementById("card-fail");
-    if (data.failed === 0) {
-        failCard.classList.add("all-pass");
-    } else {
-        failCard.classList.remove("all-pass");
-    }
+    failCard.classList.toggle("all-pass", data.failed === 0);
 
     // Coverage
     const covPct = data.coverage?.total_percent || 0;
-    document.getElementById("coverage-pct").textContent = `${covPct}%`;
+    setText("coverage-pct", `${covPct}%`);
 
     const bar = document.getElementById("coverage-bar");
     bar.style.width = `${Math.min(covPct, 100)}%`;
-    if (covPct >= 80) bar.style.background = "var(--green)";
-    else if (covPct >= 50) bar.style.background = "var(--yellow)";
-    else bar.style.background = "var(--red)";
+    bar.style.background = covPct >= 80 ? "var(--green)" : covPct >= 50 ? "var(--yellow)" : "var(--red)";
 
     // Trend
     if (historyData.length >= 2) {
         const prev = historyData[historyData.length - 2];
         const diff = (data.total || 0) - (prev.total || 0);
-        const trendEl = document.getElementById("total-trend");
-        if (diff > 0) trendEl.textContent = `+${diff} vs anterior`;
-        else if (diff < 0) trendEl.textContent = `${diff} vs anterior`;
-        else trendEl.textContent = "= anterior";
-        trendEl.style.color = diff >= 0 ? "var(--green)" : "var(--red)";
+        const el = document.getElementById("total-trend");
+        el.textContent = diff > 0 ? `+${diff} vs anterior` : diff < 0 ? `${diff} vs anterior` : "= anterior";
+        el.style.color = diff >= 0 ? "var(--green)" : "var(--red)";
     }
 }
 
@@ -127,23 +114,31 @@ function renderCriticalBugs(bugResults) {
     const tbody = document.getElementById("critical-bugs-tbody");
     tbody.innerHTML = CRITICAL_BUGS.map(bug => {
         const outcome = bugResults[bug.key] || "not_run";
-        const badge = outcome === "passed"
-            ? '<span class="badge badge-pass">PASS</span>'
-            : outcome === "failed"
-            ? '<span class="badge badge-fail">FAIL</span>'
-            : '<span class="badge badge-none">NOT RUN</span>';
+        const cls = outcome === "passed" ? "pass" : outcome === "failed" ? "fail" : "none";
+        const label = outcome === "passed" ? "PASS" : outcome === "failed" ? "FAIL" : "NOT RUN";
         return `<tr>
             <td><strong>${bug.name}</strong></td>
-            <td>${badge}</td>
-            <td style="color:var(--text-muted);font-size:0.8rem">${bug.description}</td>
+            <td><span class="td-badge ${cls}">${label}</span></td>
+            <td style="color:var(--text-dim);font-size:11px">${bug.desc}</td>
         </tr>`;
     }).join("");
+}
+
+// ── Render Tab Counts ─────────────────────────────────────────────────────
+function renderTabCounts(categories) {
+    for (const cat of ["unit", "critical", "integration", "e2e"]) {
+        const el = document.getElementById(`tab-count-${cat}`);
+        if (el) {
+            const count = (categories[cat] || []).length;
+            el.textContent = count > 0 ? `(${count})` : "";
+        }
+    }
 }
 
 // ── Render Category Tab ────────────────────────────────────────────────────
 function switchTab(tab) {
     currentTab = tab;
-    document.querySelectorAll(".tab").forEach(t => {
+    document.querySelectorAll(".td-tab").forEach(t => {
         t.classList.toggle("active", t.dataset.tab === tab);
     });
     renderCategoryTab(tab);
@@ -152,34 +147,32 @@ function switchTab(tab) {
 function renderCategoryTab(tab) {
     const tbody = document.getElementById("category-tbody");
     if (!latestData || !latestData.categories) {
-        tbody.innerHTML = '<tr><td colspan="4" class="muted">Sem dados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="td-muted">Sem dados</td></tr>';
         return;
     }
 
     const tests = latestData.categories[tab] || [];
     if (tests.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="muted">Nenhum teste nesta categoria</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="td-muted">Nenhum teste nesta categoria</td></tr>';
         return;
     }
 
     tbody.innerHTML = tests.map(t => {
-        const badge = t.outcome === "passed"
-            ? '<span class="badge badge-pass">PASS</span>'
-            : t.outcome === "failed"
-            ? '<span class="badge badge-fail">FAIL</span>'
-            : '<span class="badge badge-skip">SKIP</span>';
+        const cls = t.outcome === "passed" ? "pass" : t.outcome === "failed" ? "fail" : "skip";
+        const label = t.outcome === "passed" ? "PASS" : t.outcome === "failed" ? "FAIL" : "SKIP";
 
-        const name = t.nodeid.split("::").slice(-1)[0];
-        const module = t.nodeid.split("::")[0].split("/").slice(-1)[0];
-        const errorMsg = t.message
-            ? `<span style="color:var(--red);font-size:0.75rem">${escapeHtml(t.message.substring(0, 200))}</span>`
+        const parts = t.nodeid.split("::");
+        const name = parts[parts.length - 1];
+        const module = parts[0].split("/").pop();
+        const errMsg = t.message
+            ? `<span style="color:var(--red);font-size:10px">${escapeHtml(t.message.substring(0, 200))}</span>`
             : "";
 
         return `<tr>
-            <td><span style="color:var(--text-muted);font-size:0.75rem">${module}::</span>${name}</td>
-            <td>${badge}</td>
-            <td style="color:var(--text-muted)">${(t.duration * 1000).toFixed(0)}ms</td>
-            <td>${errorMsg}</td>
+            <td><span style="color:var(--text-dim);font-size:10px">${module}::</span>${name}</td>
+            <td><span class="td-badge ${cls}">${label}</span></td>
+            <td style="color:var(--text-dim)">${(t.duration * 1000).toFixed(0)}ms</td>
+            <td>${errMsg}</td>
         </tr>`;
     }).join("");
 }
@@ -193,7 +186,7 @@ function renderCoverage(coverage) {
         .sort((a, b) => b[1].coverage - a[1].coverage);
 
     if (entries.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="muted">Sem dados de cobertura</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="td-muted">Sem dados de cobertura</td></tr>';
         return;
     }
 
@@ -201,14 +194,11 @@ function renderCoverage(coverage) {
         const pct = data.coverage.toFixed(1);
         const color = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--yellow)" : "var(--red)";
         return `<tr>
-            <td style="font-family:monospace;font-size:0.8rem">${filepath}</td>
-            <td>${data.statements}</td>
+            <td style="font-family:monospace;font-size:11px">${filepath}</td>
+            <td style="text-align:center">${data.statements}</td>
+            <td style="text-align:center">${data.missing}</td>
             <td style="color:${color};font-weight:600">${pct}%</td>
-            <td>
-                <div class="coverage-mini-bar">
-                    <div class="coverage-mini-fill" style="width:${Math.min(pct, 100)}%;background:${color}"></div>
-                </div>
-            </td>
+            <td><div class="td-minibar"><div class="td-minibar-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div></td>
         </tr>`;
     }).join("");
 }
@@ -219,7 +209,7 @@ function renderHistoryTable(history) {
     const recent = history.slice(-10).reverse();
 
     if (recent.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="muted">Nenhum historico</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="td-muted">Nenhum historico</td></tr>';
         return;
     }
 
@@ -227,90 +217,106 @@ function renderHistoryTable(history) {
         const ts = new Date(r.timestamp).toLocaleString("pt-BR");
         const failColor = r.failed > 0 ? "var(--red)" : "var(--green)";
         return `<tr>
-            <td style="font-size:0.8rem">${ts}</td>
+            <td style="font-size:11px">${ts}</td>
             <td>${r.total}</td>
             <td style="color:var(--green)">${r.passed}</td>
             <td style="color:${failColor}">${r.failed}</td>
-            <td>${r.coverage || "—"}%</td>
-            <td style="color:var(--text-muted)">${r.duration}s</td>
+            <td>${r.coverage != null ? r.coverage + "%" : "—"}</td>
+            <td style="color:var(--text-dim)">${r.duration}s</td>
         </tr>`;
     }).join("");
 }
 
 function renderHistoryChart(history) {
     const canvas = document.getElementById("history-chart");
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const data = history.slice(-30);
 
     if (data.length < 2) return;
 
-    // Set canvas size
     const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * 2;
-    canvas.height = 400;
-    ctx.scale(2, 2);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
 
     const w = rect.width;
-    const h = 200;
-    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
-    const chartW = w - padding.left - padding.right;
-    const chartH = h - padding.top - padding.bottom;
+    const h = rect.height;
+    const pad = { top: 20, right: 20, bottom: 28, left: 44 };
+    const cw = w - pad.left - pad.right;
+    const ch = h - pad.top - pad.bottom;
 
     ctx.clearRect(0, 0, w, h);
 
     const maxVal = Math.max(...data.map(d => d.total), 1);
-    const xStep = chartW / (data.length - 1);
+    const xStep = cw / (data.length - 1);
 
-    // Grid lines
-    ctx.strokeStyle = "rgba(42,45,55,0.8)";
+    // Grid
+    ctx.strokeStyle = "rgba(37,99,235,0.08)";
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
-        const y = padding.top + (chartH / 4) * i;
+        const y = pad.top + (ch / 4) * i;
         ctx.beginPath();
-        ctx.moveTo(padding.left, y);
-        ctx.lineTo(w - padding.right, y);
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
         ctx.stroke();
 
-        ctx.fillStyle = "#71717a";
-        ctx.font = "10px sans-serif";
+        ctx.fillStyle = "var(--text-dim, #64748b)";
+        ctx.font = "10px 'Space Grotesk', sans-serif";
         ctx.textAlign = "right";
-        ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), padding.left - 6, y + 3);
+        ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), pad.left - 8, y + 4);
     }
 
-    // Pass line (green)
-    ctx.strokeStyle = "#22c55e";
+    // Passed line
+    ctx.strokeStyle = "#10b981";
     ctx.lineWidth = 2;
     ctx.beginPath();
     data.forEach((d, i) => {
-        const x = padding.left + i * xStep;
-        const y = padding.top + chartH - (d.passed / maxVal) * chartH;
+        const x = pad.left + i * xStep;
+        const y = pad.top + ch - (d.passed / maxVal) * ch;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
     ctx.stroke();
 
-    // Fail line (red)
+    // Passed dots
+    ctx.fillStyle = "#10b981";
+    data.forEach((d, i) => {
+        const x = pad.left + i * xStep;
+        const y = pad.top + ch - (d.passed / maxVal) * ch;
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Failed line
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 2;
     ctx.beginPath();
     data.forEach((d, i) => {
-        const x = padding.left + i * xStep;
-        const y = padding.top + chartH - (d.failed / maxVal) * chartH;
+        const x = pad.left + i * xStep;
+        const y = pad.top + ch - (d.failed / maxVal) * ch;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
     ctx.stroke();
 
     // Legend
-    ctx.fillStyle = "#22c55e";
-    ctx.fillRect(padding.left, h - 12, 12, 3);
-    ctx.fillStyle = "#71717a";
-    ctx.font = "10px sans-serif";
+    const ly = h - 8;
+    ctx.fillStyle = "#10b981";
+    ctx.beginPath();
+    ctx.arc(pad.left + 6, ly - 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#64748b";
+    ctx.font = "10px 'Space Grotesk', sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText("Passed", padding.left + 16, h - 8);
+    ctx.fillText("Passed", pad.left + 14, ly);
 
     ctx.fillStyle = "#ef4444";
-    ctx.fillRect(padding.left + 80, h - 12, 12, 3);
-    ctx.fillStyle = "#71717a";
-    ctx.fillText("Failed", padding.left + 96, h - 8);
+    ctx.beginPath();
+    ctx.arc(pad.left + 76, ly - 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("Failed", pad.left + 84, ly);
 }
 
 // ── Run Tests ──────────────────────────────────────────────────────────────
@@ -321,34 +327,29 @@ async function runTests() {
 
     btn.disabled = true;
     btnText.textContent = "Running...";
-    spinner.classList.remove("hidden");
+    spinner.classList.remove("td-hidden");
 
     try {
         const resp = await fetch(`${API_BASE}/run`, { method: "POST" });
         const data = await resp.json();
         runningJobId = data.job_id;
-
-        // Poll for completion
         await pollJob(runningJobId);
     } catch (e) {
         console.error("Run failed:", e);
     } finally {
         btn.disabled = false;
         btnText.textContent = "Run Tests Now";
-        spinner.classList.add("hidden");
+        spinner.classList.add("td-hidden");
         runningJobId = null;
     }
 }
 
 async function pollJob(jobId) {
-    const maxAttempts = 60;
-    for (let i = 0; i < maxAttempts; i++) {
+    for (let i = 0; i < 60; i++) {
         await sleep(2000);
-
         try {
             const resp = await fetch(`${API_BASE}/run/${jobId}`);
             const data = await resp.json();
-
             if (data.status === "completed" || data.status === "failed") {
                 await loadAll();
                 return;
@@ -360,11 +361,20 @@ async function pollJob(jobId) {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
+function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+}
+
+function updateBadge(total) {
+    const el = document.getElementById("badge-count");
+    if (el) el.textContent = total ? `${total} tests` : "—";
+}
+
 function renderLastRunTime(timestamp) {
     if (!timestamp) return;
     const dt = new Date(timestamp);
-    document.getElementById("last-run-time").textContent =
-        `Ultimo run: ${dt.toLocaleString("pt-BR")}`;
+    setText("last-run-time", `Ultimo run: ${dt.toLocaleString("pt-BR")}`);
 }
 
 function escapeHtml(text) {
