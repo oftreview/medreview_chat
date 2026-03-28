@@ -23,6 +23,7 @@ dev = [
     "responses>=0.25",
     "ruff>=0.4.0",
     "coverage[toml]>=7.4",
+    "pytest-json-report>=1.5",
 ]
 
 [tool.ruff]

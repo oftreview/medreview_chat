@@ -47,6 +47,14 @@ def create_app():
         import logging
         logging.getLogger(__name__).warning(f"[Wild Memory Dashboard] Failed to register: {e}")
 
+    # Register Test Dashboard
+    try:
+        from tests.dashboard.blueprint import bp as test_dashboard_bp
+        app.register_blueprint(test_dashboard_bp)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"[Test Dashboard] Failed to register: {e}")
+
     # Root redirect
     @app.route("/")
     def index():

@@ -1,0 +1,56 @@
+[
+  {
+    "timestamp": "2026-03-28T20:26:41.992515+00:00",
+    "duration": 0.15,
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 0
+  },
+  {
+    "timestamp": "2026-03-28T20:26:52.414006+00:00",
+    "duration": 0.15,
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 0
+  },
+  {
+    "timestamp": "2026-03-28T20:27:31.411400+00:00",
+    "duration": 2.18,
+    "total": 153,
+    "passed": 153,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 0
+  },
+  {
+    "timestamp": "2026-03-28T20:27:45.476453+00:00",
+    "duration": 0.15,
+    "total": 153,
+    "passed": 153,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 0
+  },
+  {
+    "timestamp": "2026-03-28T20:28:14.303478+00:00",
+    "duration": 0.15,
+    "total": 153,
+    "passed": 153,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 0
+  },
+  {
+    "timestamp": "2026-03-28T20:29:23.975164+00:00",
+    "duration": 2.5,
+    "total": 153,
+    "passed": 153,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": 43.5
+  }
+]

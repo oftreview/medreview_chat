@@ -1,0 +1,1143 @@
+{
+  "timestamp": "2026-03-28T20:29:23.975164+00:00",
+  "duration": 2.5,
+  "exit_code": 1,
+  "total": 153,
+  "passed": 153,
+  "failed": 0,
+  "skipped": 0,
+  "errors": 0,
+  "categories": {
+    "unit": [
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_full_data_brief",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_empty_data_brief",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_brief_contains_escalation_header",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_brief_contains_resolve_instruction",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_partial_data_only_shows_available",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestIsEscalated::test_escalated_session_returns_true",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestIsEscalated::test_active_session_returns_false",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestIsEscalated::test_unknown_status_returns_false",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_logic.py::TestIsEscalated::test_calls_get_status_with_phone",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_exponential_backoff_attempt_1",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_exponential_backoff_attempt_2",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_exponential_backoff_attempt_3",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_retry_after_header_respected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_retry_after_invalid_falls_back",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_retry_after_missing_header",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_error_without_headers_attr",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryDelay::test_none_error_uses_backoff",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_max_retries_is_positive",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_max_retries_reasonable",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_base_delay_positive",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_status_codes_contains_429",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_status_codes_contains_500",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_status_codes_contains_529",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_does_not_contain_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_does_not_contain_401",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseBasic::test_short_text_returns_single_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseBasic::test_empty_text_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseBasic::test_none_text_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseBasic::test_whitespace_only_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseBasic::test_exact_max_chars_returns_single",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseSplitting::test_long_text_splits_into_multiple",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseSplitting::test_max_messages_limit_respected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseSplitting::test_paragraph_splitting_preserves_context",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseSplitting::test_splits_at_sentence_boundary",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitParagraph::test_short_paragraph_not_split",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitParagraph::test_long_paragraph_split_at_sentence",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitParagraph::test_single_giant_word_force_split",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitParagraph::test_preserves_all_content",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseCustomParams::test_custom_max_chars",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseCustomParams::test_custom_max_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_message_splitter.py::TestSplitResponseCustomParams::test_max_messages_1_returns_full_text",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_no_meta_tag_returns_original",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_valid_meta_tag_extracted",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_clean_text_excludes_meta",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_multiple_pipe_separated_fields",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_desconhecido_value_becomes_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_meta_at_end_of_text",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_preserves_response_before_meta",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_empty_value_ignored",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_meta_pattern_regex_matches",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_ddi_unchanged",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_without_ddi_adds_55",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_whatsapp_suffix_stripped",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_cus_suffix_stripped",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_formatting_cleaned",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_plus_sign",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestFormatPhone::test_phone_with_spaces",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestNormalizePhone::test_normalize_removes_non_digits",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestNormalizePhone::test_normalize_strips_leading_zero",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestNormalizePhone::test_normalize_adds_ddi",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestNormalizePhone::test_normalize_preserves_ddi",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_valid_mobile_11_digits",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_valid_landline_10_digits",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_invalid_too_short",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_invalid_too_long",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_invalid_without_ddi",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestPhoneRegex::test_invalid_alphanumeric",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_valid_text_message_parsed",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_nested_text_message_parsed",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_from_me_returns_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_non_received_type_returns_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_empty_body_returns_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_phone_validation.py::TestParseIncoming::test_no_phone_returns_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_under_max_returns_all",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_at_max_returns_all",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_over_max_truncates",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_keeps_first_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_keeps_last_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_first_message_is_first",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_last_message_is_last",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_31_messages_truncation",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_empty_history",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestTruncateHistory::test_single_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_max_history_equals_sum",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_keep_first_positive",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_keep_last_positive",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_escalation_tag_format",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_escalation_fallback_phrases_not_empty",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestConstants::test_fallback_phrases_are_lowercase",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestEscalationDetection::test_escalation_tag_detected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestEscalationDetection::test_escalation_tag_not_in_middle",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestEscalationDetection::test_fallback_phrases_in_first_200_chars",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_sales_agent_logic.py::TestEscalationDetection::test_fallback_phrases_after_200_chars_not_detected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      }
+    ],
+    "critical": [
+      {
+        "nodeid": "tests/critical/test_debounce_race.py::TestDebounceAccumulation::test_concurrent_messages_accumulated_before_flush",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_debounce_race.py::TestDebounceAccumulation::test_timer_reset_preserves_previous_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_debounce_race.py::TestDebounceAccumulation::test_concurrent_phones_independent",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_30_messages_no_truncation",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_31_messages_truncation_documents_bug",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_50_messages_truncation_integrity",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_truncation_preserves_order",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_exact_max_history_boundary",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_history_truncation.py::TestHistoryTruncation::test_one_over_max_loses_exactly_one_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestCleanupActiveSessions::test_cleanup_does_not_remove_active_session",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestCleanupActiveSessions::test_cleanup_removes_expired_session",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestCleanupActiveSessions::test_cleanup_preserves_escalated_sessions",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestCleanupActiveSessions::test_cleanup_removes_only_expired",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestConcurrentAddAndCleanup::test_concurrent_add_and_cleanup",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestConcurrentAddAndCleanup::test_cleanup_during_add_does_not_lose_new_data",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_memory_cleanup_race.py::TestConcurrentAddAndCleanup::test_cleanup_clears_all_session_artifacts",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_primary_waiter_race.py::TestPrimaryWaiterElection::test_last_request_becomes_primary_waiter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_primary_waiter_race.py::TestPrimaryWaiterElection::test_secondary_waiters_get_debounced_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_primary_waiter_race.py::TestPrimaryWaiterElection::test_all_messages_included_in_combined",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/critical/test_primary_waiter_race.py::TestPrimaryWaiterElection::test_waiter_seq_increments",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      }
+    ],
+    "integration": [
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatSandboxMode::test_sandbox_mode_basic",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatSandboxMode::test_sandbox_empty_message_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatSandboxMode::test_sandbox_no_message_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatSandboxMode::test_sandbox_secret_command_escalate",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_api_mode_without_auth_returns_401",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_api_mode_wrong_token_returns_401",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_api_mode_with_auth",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_missing_message_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_missing_user_id_for_external_channel_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_escalated_session_returns_escalated_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatApiMode::test_secret_commands_work_via_chat",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatReset::test_reset_returns_ok",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_chat_api.py::TestChatReset::test_reset_without_session_resets_all",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestHealthEndpoints::test_health_returns_ok",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestHealthEndpoints::test_health_db_returns_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestHealthEndpoints::test_health_memory_returns_stats",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestHealthEndpoints::test_metrics_returns_structure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestHealthEndpoints::test_health_security_returns_events",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestResetAndHistory::test_history_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_health_api.py::TestResetAndHistory::test_sessions_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormValid::test_valid_form_returns_200",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormValid::test_phone_normalization",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormValid::test_phone_with_formatting",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormValid::test_alternative_phone_fields",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormValid::test_alternative_name_fields",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormErrors::test_missing_phone_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormErrors::test_invalid_phone_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormErrors::test_form_rate_limit_returns_429",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_form.py::TestWebhookFormErrors::test_empty_payload_returns_400",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiValid::test_valid_zapi_message_returns_200_queued",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiValid::test_message_is_sanitized_before_processing",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiIgnored::test_fromMe_ignored",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiIgnored::test_non_text_type_ignored",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiIgnored::test_empty_body_ignored",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiIgnored::test_no_phone_ignored",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiSpecialCases::test_escalated_session_returns_200",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiSpecialCases::test_secret_command_escalate",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiSpecialCases::test_secret_command_deescalate",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiSpecialCases::test_injection_detected_still_processes",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/integration/test_webhook_zapi.py::TestWebhookZapiSpecialCases::test_rate_limited_returns_200",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      }
+    ],
+    "e2e": []
+  },
+  "critical_bugs": {
+    "BUG4_history_truncation": "passed",
+    "BUG1_debounce_race": "passed",
+    "BUG3_memory_cleanup": "passed",
+    "BUG2_primary_waiter": "passed"
+  },
+  "coverage": {
+    "total_percent": 43.5,
+    "files": {
+      "src/__init__.py": {
+        "statements": 0,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/agent/__init__.py": {
+        "statements": 0,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/agent/sales_agent.py": {
+        "statements": 157,
+        "missing": 35,
+        "coverage": 77.70700636942675
+      },
+      "src/api/__init__.py": {
+        "statements": 12,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/api/analytics_api.py": {
+        "statements": 24,
+        "missing": 11,
+        "coverage": 54.166666666666664
+      },
+      "src/api/backlog_api.py": {
+        "statements": 75,
+        "missing": 50,
+        "coverage": 33.333333333333336
+      },
+      "src/api/chat.py": {
+        "statements": 209,
+        "missing": 27,
+        "coverage": 87.08133971291866
+      },
+      "src/api/corrections_api.py": {
+        "statements": 58,
+        "missing": 40,
+        "coverage": 31.03448275862069
+      },
+      "src/api/dashboard.py": {
+        "statements": 23,
+        "missing": 7,
+        "coverage": 69.56521739130434
+      },
+      "src/api/escalation_api.py": {
+        "statements": 32,
+        "missing": 20,
+        "coverage": 37.5
+      },
+      "src/api/health.py": {
+        "statements": 129,
+        "missing": 78,
+        "coverage": 39.53488372093023
+      },
+      "src/api/hubspot_api.py": {
+        "statements": 26,
+        "missing": 15,
+        "coverage": 42.30769230769231
+      },
+      "src/api/webhooks.py": {
+        "statements": 142,
+        "missing": 28,
+        "coverage": 80.28169014084507
+      },
+      "src/app.py": {
+        "statements": 33,
+        "missing": 9,
+        "coverage": 72.72727272727273
+      },
+      "src/config.py": {
+        "statements": 29,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/core/__init__.py": {
+        "statements": 0,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/core/database/__init__.py": {
+        "statements": 9,
+        "missing": 0,
+        "coverage": 100.0
+      },
+      "src/core/database/analytics.py": {
+        "statements": 128,
+        "missing": 120,
+        "coverage": 6.25
+      },
+      "src/core/database/backlog.py": {
+        "statements": 215,
+        "missing": 194,
+        "coverage": 9.767441860465116
+      },
+      "src/core/database/client.py": {
+        "statements": 56,
+        "missing": 47,
+        "coverage": 16.071428571428573
+      },
+      "src/core/database/conversations.py": {
+        "statements": 51,
+        "missing": 45,
+        "coverage": 11.764705882352942
+      },
+      "src/core/database/corrections.py": {
+        "statements": 128,
+        "missing": 115,
+        "coverage": 10.15625
+      },
+      "src/core/database/escalations.py": {
+        "statements": 38,
+        "missing": 32,
+        "coverage": 15.789473684210526
+      },
+      "src/core/database/leads.py": {
+        "statements": 76,
+        "missing": 66,
+        "coverage": 13.157894736842104
+      },
+      "src/core/escalation.py": {
+        "statements": 67,
+        "missing": 37,
+        "coverage": 44.776119402985074
+      },
+      "src/core/hubspot.py": {
+        "statements": 153,
+        "missing": 133,
+        "coverage": 13.071895424836601
+      },
+      "src/core/llm.py": {
+        "statements": 58,
+        "missing": 23,
+        "coverage": 60.3448275862069
+      },
+      "src/core/log_buffer.py": {
+        "statements": 141,
+        "missing": 100,
+        "coverage": 29.078014184397162
+      },
+      "src/core/logger.py": {
+        "statements": 49,
+        "missing": 7,
+        "coverage": 85.71428571428571
+      },
+      "src/core/memory.py": {
+        "statements": 114,
+        "missing": 18,
+        "coverage": 84.21052631578948
+      },
+      "src/core/message_splitter.py": {
+        "statements": 65,
+        "missing": 3,
+        "coverage": 95.38461538461539
+      },
+      "src/core/metrics.py": {
+        "statements": 109,
+        "missing": 66,
+        "coverage": 39.44954128440367
+      },
+      "src/core/scheduler.py": {
+        "statements": 45,
+        "missing": 28,
+        "coverage": 37.77777777777778
+      },
+      "src/core/security.py": {
+        "statements": 60,
+        "missing": 9,
+        "coverage": 85.0
+      },
+      "src/core/whatsapp.py": {
+        "statements": 38,
+        "missing": 11,
+        "coverage": 71.05263157894737
+      },
+      "src/core/wild_memory_adapter.py": {
+        "statements": 52,
+        "missing": 38,
+        "coverage": 26.923076923076923
+      },
+      "src/core/wild_memory_context.py": {
+        "statements": 146,
+        "missing": 98,
+        "coverage": 32.87671232876713
+      },
+      "src/core/wild_memory_lifecycle.py": {
+        "statements": 187,
+        "missing": 140,
+        "coverage": 25.13368983957219
+      },
+      "src/core/wild_memory_shadow.py": {
+        "statements": 127,
+        "missing": 80,
+        "coverage": 37.00787401574803
+      }
+    }
+  }
+}
