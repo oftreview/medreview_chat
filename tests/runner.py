@@ -54,38 +54,92 @@ def run_tests() -> dict:
 
     env = {
         **os.environ,
+        # ── Test-mode env vars (must match conftest.py) ──
+        "TEST_MODE": "true",
         "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", "test-key"),
+        "SUPABASE_URL": os.environ.get("SUPABASE_URL", "http://localhost:54321"),
+        "SUPABASE_KEY": os.environ.get("SUPABASE_KEY", "test-key-not-real"),
+        "ZAPI_INSTANCE_ID": os.environ.get("ZAPI_INSTANCE_ID", ""),
+        "ZAPI_TOKEN": os.environ.get("ZAPI_TOKEN", ""),
+        "ZAPI_CLIENT_TOKEN": os.environ.get("ZAPI_CLIENT_TOKEN", ""),
+        "HUBSPOT_ACCESS_TOKEN": os.environ.get("HUBSPOT_ACCESS_TOKEN", ""),
+        "HUBSPOT_ENABLED": "false",
+        "SUPERVISOR_PHONE": "",
+        "API_SECRET_TOKEN": os.environ.get("API_SECRET_TOKEN", "test-secret-token"),
+        "RESPONSE_DELAY_SECONDS": "1",
         "COVERAGE_FILE": coverage_data_file,
     }
 
     exit_code = -2
+    last_stdout = ""
+    last_stderr = ""
     for attempt, cmd in enumerate([base_cmd + cov_args, base_cmd]):
         try:
+            print(f"[TEST RUNNER] Attempt {attempt+1}, cmd: {' '.join(cmd[:6])}...", flush=True)
             result = subprocess.run(
                 cmd,
                 capture_output=True, text=True,
                 cwd=str(PROJECT_ROOT),
                 env=env,
-                timeout=120,
+                timeout=180,
             )
             exit_code = result.returncode
+            last_stdout = result.stdout or ""
+            last_stderr = result.stderr or ""
+
+            # Log output for debugging
+            if last_stderr:
+                # Limit to last 2000 chars to avoid flooding logs
+                stderr_tail = last_stderr[-2000:] if len(last_stderr) > 2000 else last_stderr
+                print(f"[TEST RUNNER] stderr (attempt {attempt+1}):\n{stderr_tail}", flush=True)
+            if exit_code != 0:
+                stdout_tail = last_stdout[-1000:] if len(last_stdout) > 1000 else last_stdout
+                print(f"[TEST RUNNER] stdout (attempt {attempt+1}, exit={exit_code}):\n{stdout_tail}", flush=True)
+
             # If json report was generated, we're good
             if Path(json_report_file).exists():
                 break
             # If coverage caused PermissionError, retry without
-            if "PermissionError" in (result.stderr or "") and attempt == 0:
+            if "PermissionError" in last_stderr and attempt == 0:
                 print("[TEST RUNNER] Coverage PermissionError, retrying without coverage...", flush=True)
                 continue
+            # If no report generated, log the issue
+            print(f"[TEST RUNNER] No JSON report generated on attempt {attempt+1}", flush=True)
             break
         except subprocess.TimeoutExpired:
+            print("[TEST RUNNER] Timeout expired (180s)", flush=True)
             exit_code = -1
             break
         except Exception as e:
-            print(f"[TEST RUNNER] Error: {e}", flush=True)
+            print(f"[TEST RUNNER] Exception: {e}", flush=True)
             exit_code = -2
             break
 
     duration = round(time.time() - start_time, 2)
+
+    # If no report generated at all, create a minimal error report
+    if not Path(json_report_file).exists():
+        error_msg = last_stderr[-1000:] if last_stderr else "No output from pytest"
+        print(f"[TEST RUNNER] FATAL: No json report. stderr: {error_msg}", flush=True)
+        # Create a minimal latest.json with error info so dashboard shows something
+        latest = {
+            "timestamp": timestamp,
+            "duration": round(time.time() - start_time, 2),
+            "exit_code": exit_code,
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+            "errors": 1,
+            "categories": {"unit": [], "critical": [], "integration": [], "e2e": []},
+            "critical_bugs": {},
+            "coverage": {"total_percent": 0, "files": {}},
+            "runner_error": error_msg,
+        }
+        with open(LATEST_FILE, "w") as f:
+            json.dump(latest, f, indent=2)
+        _append_history(latest)
+        return latest
 
     # Parse json-report
     report = {}

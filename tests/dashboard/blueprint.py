@@ -119,6 +119,61 @@ def api_run():
     return jsonify({"job_id": job_id, "status": "running"})
 
 
+@bp.route("/api/debug")
+def api_debug():
+    """Diagnostic endpoint: check test infrastructure health."""
+    import sys
+    import subprocess
+    diag = {
+        "python": sys.executable,
+        "version": sys.version,
+        "cwd": os.getcwd(),
+        "project_root": str(Path(__file__).parent.parent.parent),
+        "results_dir": str(_RESULTS_DIR),
+        "results_dir_exists": _RESULTS_DIR.exists(),
+    }
+
+    # Check test directories exist
+    project_root = Path(__file__).parent.parent.parent
+    for d in ["tests/unit", "tests/critical", "tests/integration", "tests/dashboard"]:
+        full = project_root / d
+        diag[f"dir_{d.replace('/', '_')}"] = full.exists()
+        if full.exists():
+            diag[f"files_{d.replace('/', '_')}"] = len(list(full.glob("*.py")))
+
+    # Check key files
+    for f in ["tests/conftest.py", "tests/__init__.py", "tests/runner.py"]:
+        diag[f"file_{f.replace('/', '_').replace('.', '_')}"] = (project_root / f).exists()
+
+    # Check pytest is importable
+    try:
+        import pytest as _pt
+        diag["pytest_version"] = _pt.__version__
+    except ImportError as e:
+        diag["pytest_error"] = str(e)
+
+    # Quick dry-run: collect only (no execution)
+    try:
+        r = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/unit/", "--collect-only", "-q"],
+            capture_output=True, text=True,
+            cwd=str(project_root),
+            env={**os.environ, "TEST_MODE": "true",
+                 "SUPABASE_URL": "http://localhost:54321",
+                 "SUPABASE_KEY": "test-key",
+                 "ANTHROPIC_API_KEY": "test-key"},
+            timeout=30,
+        )
+        diag["collect_exit_code"] = r.returncode
+        # Last 500 chars of stdout/stderr
+        diag["collect_stdout"] = (r.stdout or "")[-500:]
+        diag["collect_stderr"] = (r.stderr or "")[-500:]
+    except Exception as e:
+        diag["collect_error"] = str(e)
+
+    return jsonify(diag)
+
+
 @bp.route("/api/run/<job_id>")
 def api_run_status(job_id):
     """Return status of a running test job."""

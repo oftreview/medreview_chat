@@ -60,6 +60,17 @@ async function loadResults() {
         renderCoverage(data.coverage || {});
         renderLastRunTime(data.timestamp);
         updateBadge(data.total);
+
+        // Show runner error if present
+        const errEl = document.getElementById("runner-error");
+        if (errEl) {
+            if (data.runner_error) {
+                errEl.style.display = "block";
+                errEl.textContent = "Runner error: " + data.runner_error.substring(0, 500);
+            } else {
+                errEl.style.display = "none";
+            }
+        }
     } catch (e) {
         console.error("Failed to load results:", e);
     }
