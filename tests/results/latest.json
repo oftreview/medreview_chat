@@ -1,14 +1,998 @@
 {
-  "timestamp": "2026-03-28T20:29:23.975164+00:00",
-  "duration": 2.5,
-  "exit_code": 1,
-  "total": 153,
-  "passed": 153,
+  "timestamp": "2026-03-28T21:10:45.017470+00:00",
+  "duration": 13.64,
+  "exit_code": 0,
+  "total": 484,
+  "passed": 484,
   "failed": 0,
   "skipped": 0,
   "errors": 0,
   "categories": {
     "unit": [
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_empty_result",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_counts_by_stage",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_calculates_percentages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_conversion_rate",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_unknown_stages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsFunnel::test_analytics_funnel_handles_null_stage",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsTimePerStage::test_analytics_time_per_stage_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsTimePerStage::test_analytics_time_per_stage_empty_result",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsTimePerStage::test_analytics_time_per_stage_calculates_duration",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsTimePerStage::test_analytics_time_per_stage_averages_multiple_records",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsTimePerStage::test_analytics_time_per_stage_handles_invalid_dates",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_empty_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_filters_stopwords",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_min_length_three",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_counts_frequency",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_returns_top_n",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsKeywords::test_analytics_keywords_handles_special_chars",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_empty_conversations",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_calculates_engagement",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_filters_by_user",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_scores_structure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_analytics.py::TestAnalyticsConversationQuality::test_analytics_conversation_quality_top_50",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_all_default_values",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_clamping_max_values",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_clamping_min_values",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_high_effort_contributes_full",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_low_effort_contributes_zero",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_missing_fields_default_to_five",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_empty_dict_uses_defaults",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_mixed_valid_and_clamped",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestCalcRice::test_calc_rice_rounding_to_one_decimal",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_load_backlog_json_file_not_exists",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_load_backlog_json_valid_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_load_backlog_json_empty_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_load_backlog_json_malformed_json",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_save_backlog_json_creates_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_save_backlog_json_creates_directories",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestJsonHelpers::test_save_backlog_json_handles_unicode",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_returns_empty_when_db_none",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_supabase_success",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_excludes_deleted_by_default",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_includes_deleted_when_requested",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_filters_by_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_filters_by_phase",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestLoadBacklog::test_load_backlog_json_fallback_filters_deleted",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_requires_item_id",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_strips_whitespace_from_id",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_calculates_rice_score",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_sets_updated_at",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_upsert_updates_existing",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_supabase_failure_returns_false",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestSaveBacklogItem::test_save_backlog_item_supabase_success_returns_true",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestDeleteAndRestore::test_delete_backlog_item_sets_deleted_at",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestDeleteAndRestore::test_restore_backlog_item_clears_deleted_at",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestDeleteAndRestore::test_permanent_delete_item_removes_from_json",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestTrash::test_load_trash_returns_deleted_items",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestTrash::test_empty_trash_deletes_all_trash_items",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestNextItemId::test_get_next_item_id_returns_clo_001_for_empty_backlog",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestNextItemId::test_get_next_item_id_increments_correctly",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestNextItemId::test_get_next_item_id_ignores_non_clo_items",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestReorderBacklog::test_reorder_backlog_updates_sort_order",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestBacklogAnalytics::test_backlog_analytics_empty_backlog",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestBacklogAnalytics::test_backlog_analytics_counts_by_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestBacklogAnalytics::test_backlog_analytics_calculates_avg_rice",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestBacklogAnalytics::test_backlog_analytics_identifies_blocked_items",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_backlog.py::TestBacklogAnalytics::test_backlog_analytics_top5_rice",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_returns_none_when_url_not_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_returns_none_when_key_not_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_creates_client_when_both_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_caches_client_singleton",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_handles_create_client_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetClient::test_get_client_handles_missing_both_url_and_key",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIsEnabled::test_is_enabled_returns_false_when_url_missing",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIsEnabled::test_is_enabled_returns_false_when_key_missing",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIsEnabled::test_is_enabled_returns_false_when_both_missing",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIsEnabled::test_is_enabled_returns_true_when_both_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIsEnabled::test_is_enabled_ignores_client_state",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetConnectionStatus::test_get_connection_status_when_not_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetConnectionStatus::test_get_connection_status_when_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetConnectionStatus::test_get_connection_status_includes_error_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestGetConnectionStatus::test_get_connection_status_structure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_returns_disabled_when_not_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_returns_error_when_client_initialization_fails",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_successful_write_read_delete",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_write_failure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_read_failure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_delete_failure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_measures_latency",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_has_all_expected_fields",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestHealthCheck::test_health_check_uses_uuid_for_test_record",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIntegration::test_get_connection_status_uses_is_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIntegration::test_health_check_uses_is_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIntegration::test_get_client_preserves_error_across_calls",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestIntegration::test_client_state_after_successful_initialization",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestEdgeCases::test_is_enabled_with_whitespace_only_url",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestEdgeCases::test_health_check_without_read_success_marks_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestEdgeCases::test_health_check_with_empty_data_means_no_read",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_client.py::TestEdgeCases::test_health_check_with_none_data_means_no_read",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_load_corrections_json_file_not_exists",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_load_corrections_json_valid_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_load_corrections_json_empty_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_load_corrections_json_malformed_json",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_save_corrections_json_creates_file",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_save_corrections_json_creates_directories",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestJsonHelpers::test_save_corrections_json_handles_unicode",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_requires_id",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_maps_fields",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_includes_conversation_links",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_uses_defaults",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_upsert_success",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSaveCorrection::test_save_correction_upsert_failure",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestLoadCorrections::test_load_corrections_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestLoadCorrections::test_load_corrections_returns_all_active",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestLoadCorrections::test_load_corrections_excludes_archived_by_default",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestLoadCorrections::test_load_corrections_includes_archived_when_requested",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestLoadCorrections::test_load_corrections_filters_by_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestIncrementReincidence::test_increment_reincidence_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestIncrementReincidence::test_increment_reincidence_increments_counter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestIncrementReincidence::test_increment_reincidence_sets_reincidence_flag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestIncrementReincidence::test_increment_reincidence_sets_timestamp",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestIncrementReincidence::test_increment_reincidence_handles_missing_count",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestAutoArchiveCorrections::test_auto_archive_corrections_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestAutoArchiveCorrections::test_auto_archive_corrections_archives_old_items",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestAutoArchiveCorrections::test_auto_archive_corrections_uses_created_at_fallback",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_empty_corrections",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_counts_active",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_counts_by_category",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_identifies_critical_reincident",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_counts_recent_reincidences",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestCorrectionAnalytics::test_correction_analytics_truncates_regra_field",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSyncJsonToSupabase::test_sync_json_to_supabase_db_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSyncJsonToSupabase::test_sync_json_to_supabase_empty_json",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_database_corrections.py::TestSyncJsonToSupabase::test_sync_json_to_supabase_calls_save_for_each",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_with_agent_generates_brief_from_agent",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_without_agent_uses_fallback_brief",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_saves_escalation_to_database",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_sets_session_status_to_escalated",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_notifies_supervisor_with_brief",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_injects_motivo_into_brief",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_syncs_to_hubspot_when_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_handles_hubspot_error_gracefully",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestHandleEscalation::test_handle_escalation_calls_wild_lifecycle_on_escalation",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestResolveEscalation::test_resolve_escalation_sets_session_status_to_active",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestResolveEscalation::test_resolve_escalation_updates_lead_status_in_database",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestResolveEscalation::test_resolve_escalation_resolves_escalation_record",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestResolveEscalation::test_resolve_escalation_accepts_optional_resolution_text",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestIsEscalated::test_is_escalated_returns_true_for_escalated_session",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestIsEscalated::test_is_escalated_returns_false_for_active_session",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestIsEscalated::test_is_escalated_returns_false_for_unknown_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestIsEscalated::test_is_escalated_returns_false_for_none_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestIsEscalated::test_is_escalated_calls_get_status_with_phone",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestNotifySupervisor::test_notify_supervisor_returns_false_when_no_phone_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestNotifySupervisor::test_notify_supervisor_sends_whatsapp_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestNotifySupervisor::test_notify_supervisor_includes_formatted_brief_in_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestTransferToBotmaker::test_transfer_to_botmaker_returns_false_when_not_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestTransferToBotmaker::test_transfer_to_botmaker_returns_false_when_not_implemented",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestEdgeCases::test_handle_escalation_with_empty_brief_data",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestEdgeCases::test_resolve_escalation_with_none_resolution",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_escalation_extended.py::TestEdgeCases::test_handle_escalation_with_missing_session_id",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
       {
         "nodeid": "tests/unit/test_escalation_logic.py::TestFormatBriefWhatsapp::test_full_data_brief",
         "outcome": "passed",
@@ -59,6 +1043,426 @@
       },
       {
         "nodeid": "tests/unit/test_escalation_logic.py::TestIsEscalated::test_calls_get_status_with_phone",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestHealthHubSpot::test_health_hubspot_when_enabled_and_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestHealthHubSpot::test_health_hubspot_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestHealthHubSpot::test_health_hubspot_when_enabled_but_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestHealthWildMemory::test_health_wild_memory_returns_all_components",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestHealthWildMemory::test_health_wild_memory_scheduler_import_error",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestWildMemoryCron::test_wild_memory_cron_with_valid_auth",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestWildMemoryCron::test_wild_memory_cron_without_auth_token",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestWildMemoryCron::test_wild_memory_cron_with_invalid_token",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestWildMemoryCron::test_wild_memory_cron_no_token_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdate::test_config_update_model",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdate::test_config_update_max_tokens",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdate::test_config_update_both",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdate::test_config_update_empty_payload",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdate::test_config_update_no_json",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_returns_recent_logs",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_with_since_parameter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_import_error",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_history_returns_filtered_logs",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_history_with_search",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_stats_returns_daily_stats",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_stats_default_days",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_sources_returns_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_cleanup_with_valid_auth",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_cleanup_without_auth",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_cleanup_no_token_configured",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_cleanup_database_unavailable",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestLogsEndpoints::test_api_logs_cleanup_exception_handling",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_history_returns_usage",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_history_with_date_range",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_daily_returns_stats",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_daily_default_days",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_totals_returns_accumulated",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestMetricsEndpoints::test_api_metrics_totals_with_since_parameter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdateActualModule::test_config_update_actually_changes_model",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_health_extended.py::TestConfigUpdateActualModule::test_config_update_actually_changes_max_tokens",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotEnabled::test_is_enabled_returns_false_when_token_empty",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotEnabled::test_is_enabled_returns_false_when_feature_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotEnabled::test_is_enabled_returns_true_when_both_set",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_returns_none_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_makes_get_call_with_correct_headers",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_makes_post_call_with_payload",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_handles_409_conflict_response",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_returns_none_on_error_status",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_handles_httpx_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestHubSpotRequest::test_request_rejects_unsupported_http_method",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestFindContactByPhone::test_find_contact_returns_contact_when_found",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestFindContactByPhone::test_find_contact_returns_none_when_not_found",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestFindContactByPhone::test_find_contact_returns_none_when_request_fails",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_returns_none_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_creates_new_contact",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_updates_existing_contact",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_splits_name_into_firstname_lastname",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_maps_lead_data_to_properties",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestUpsertContact::test_upsert_contact_skips_unknown_values",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncLead::test_sync_lead_returns_disabled_status_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncLead::test_sync_lead_returns_success_dict_when_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncLead::test_sync_lead_calls_upsert_contact_and_deal",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestGetStatus::test_get_status_returns_disabled_config",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestGetStatus::test_get_status_shows_configured_but_not_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestGetStatus::test_get_status_shows_fully_connected",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestGetStatus::test_get_status_includes_stage_mapping",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestStageMapping::test_get_stage_map_returns_default_mapping",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestStageMapping::test_set_stage_mapping_updates_custom_map",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestStageMapping::test_get_stage_map_merges_custom_with_default",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncEscalation::test_sync_escalation_returns_false_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncEscalation::test_sync_escalation_adds_note_when_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestSyncEscalation::test_sync_escalation_formats_escalation_message",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestAddNote::test_add_note_returns_none_when_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestAddNote::test_add_note_returns_none_when_contact_not_found",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_hubspot.py::TestAddNote::test_add_note_creates_note_when_contact_exists",
         "outcome": "passed",
         "duration": 0,
         "message": ""
@@ -155,6 +1559,366 @@
       },
       {
         "nodeid": "tests/unit/test_llm_retry.py::TestRetryConstants::test_retryable_does_not_contain_401",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_error_tag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_security_tag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_flush_tag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_debounce_tag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_system_tags",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestTagClassification::test_classify_debug_default",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_database",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_llm",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_chat",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_zapi",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_form",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_config",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_security",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_wild_memory",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_context",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_lifecycle",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_scheduler",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_flush",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_debounce",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSourceExtraction::test_extract_source_app_default",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_single_entry",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_increments_counter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_ignores_empty_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_strips_whitespace",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_sets_correct_tag",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_ring_buffer_maxlen_constraint",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_enqueues_persist",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestRingBuffer::test_add_log_time_format",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_empty_buffer",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_all_entries",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_filters_by_since",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_respects_limit",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_limit_larger_than_available",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_since_beyond_buffer",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestGetLogs::test_get_logs_thread_safe",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_enqueue_persist_adds_to_buffer",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_enqueue_persist_truncates_long_messages",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_flush_on_batch_size_reached",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_do_insert_calls_supabase",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_flush_to_supabase_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestPersistence::test_do_insert_handles_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_history_basic",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_history_with_filters",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_history_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_history_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_daily_stats",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_daily_stats_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_sources",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestSupabaseQueries::test_get_sources_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_log_capture_write_intercepting",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_log_capture_ignores_empty_writes",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_log_capture_flush",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_log_capture_fileno",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_log_capture_isatty",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_install_captures_stdout",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestLogCapture::test_install_idempotent",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestIntegration::test_full_logging_flow",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestIntegration::test_logging_multiple_sources_and_tags",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestIntegration::test_logging_with_persistence_flow",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_log_buffer.py::TestIntegration::test_get_logs_with_various_filters",
         "outcome": "passed",
         "duration": 0,
         "message": ""
@@ -305,6 +2069,228 @@
       },
       {
         "nodeid": "tests/unit/test_metadata_extraction.py::TestExtractMetadata::test_meta_pattern_regex_matches",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestCostCalculation::test_record_call_known_model_calculates_correct_cost",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestCostCalculation::test_record_call_known_model_sonnet_cost",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestCostCalculation::test_record_call_unknown_model_uses_default_prices",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestCostCalculation::test_record_call_zero_tokens_zero_cost",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestMetricsAccumulation::test_record_call_increments_total_calls",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestMetricsAccumulation::test_record_call_increments_token_counts",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestMetricsAccumulation::test_record_call_increments_cache_metrics",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestMetricsAccumulation::test_multiple_record_calls_accumulate_cost",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetMetrics::test_get_metrics_returns_snapshot_dict",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetMetrics::test_get_metrics_includes_model_and_max_tokens",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetMetrics::test_get_metrics_includes_recent_calls_list",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetMetrics::test_get_metrics_recent_calls_includes_cost",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetMetrics::test_get_metrics_total_cost_is_rounded",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestRecentCallsDeque::test_recent_calls_maxlen_50",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestRecentCallsDeque::test_recent_calls_preserves_order",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestThreadSafety::test_concurrent_record_calls_no_data_loss",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestThreadSafety::test_concurrent_get_metrics_consistent",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestPersistanceBuffer::test_enqueue_persist_adds_to_buffer",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestPersistanceBuffer::test_enqueue_persist_batch_size_triggers_flush",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestPersistanceBuffer::test_enqueue_persist_interval_triggers_flush",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestFlushToSupabase::test_flush_clears_buffer_when_persist_disabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestFlushToSupabase::test_flush_spawns_thread_when_persist_enabled",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestFlushToSupabase::test_flush_does_nothing_when_buffer_empty",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetHistory::test_get_history_returns_empty_when_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetHistory::test_get_history_returns_calls_with_model_filter",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetHistory::test_get_history_with_pagination",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetHistory::test_get_history_handles_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetDailyStats::test_get_daily_stats_returns_empty_when_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetDailyStats::test_get_daily_stats_calls_rpc_with_days_back",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetDailyStats::test_get_daily_stats_returns_data_when_available",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetDailyStats::test_get_daily_stats_handles_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetTotals::test_get_totals_returns_empty_when_no_db",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetTotals::test_get_totals_calls_rpc_without_since",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetTotals::test_get_totals_calls_rpc_with_since_date",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetTotals::test_get_totals_handles_empty_response",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestGetTotals::test_get_totals_handles_exception",
+        "outcome": "passed",
+        "duration": 0,
+        "message": ""
+      },
+      {
+        "nodeid": "tests/unit/test_metrics.py::TestIntegration::test_full_workflow_multiple_calls_persist_and_query",
         "outcome": "passed",
         "duration": 0,
         "message": ""
@@ -941,7 +2927,7 @@
     "BUG2_primary_waiter": "passed"
   },
   "coverage": {
-    "total_percent": 43.5,
+    "total_percent": 67.6,
     "files": {
       "src/__init__.py": {
         "statements": 0,
@@ -995,8 +2981,8 @@
       },
       "src/api/health.py": {
         "statements": 129,
-        "missing": 78,
-        "coverage": 39.53488372093023
+        "missing": 3,
+        "coverage": 97.67441860465117
       },
       "src/api/hubspot_api.py": {
         "statements": 26,
@@ -1030,18 +3016,18 @@
       },
       "src/core/database/analytics.py": {
         "statements": 128,
-        "missing": 120,
-        "coverage": 6.25
+        "missing": 16,
+        "coverage": 87.5
       },
       "src/core/database/backlog.py": {
         "statements": 215,
-        "missing": 194,
-        "coverage": 9.767441860465116
+        "missing": 53,
+        "coverage": 75.34883720930233
       },
       "src/core/database/client.py": {
         "statements": 56,
-        "missing": 47,
-        "coverage": 16.071428571428573
+        "missing": 0,
+        "coverage": 100.0
       },
       "src/core/database/conversations.py": {
         "statements": 51,
@@ -1050,8 +3036,8 @@
       },
       "src/core/database/corrections.py": {
         "statements": 128,
-        "missing": 115,
-        "coverage": 10.15625
+        "missing": 23,
+        "coverage": 82.03125
       },
       "src/core/database/escalations.py": {
         "statements": 38,
@@ -1065,13 +3051,13 @@
       },
       "src/core/escalation.py": {
         "statements": 67,
-        "missing": 37,
-        "coverage": 44.776119402985074
+        "missing": 1,
+        "coverage": 98.50746268656717
       },
       "src/core/hubspot.py": {
         "statements": 153,
-        "missing": 133,
-        "coverage": 13.071895424836601
+        "missing": 37,
+        "coverage": 75.81699346405229
       },
       "src/core/llm.py": {
         "statements": 58,
@@ -1080,8 +3066,8 @@
       },
       "src/core/log_buffer.py": {
         "statements": 141,
-        "missing": 100,
-        "coverage": 29.078014184397162
+        "missing": 9,
+        "coverage": 93.61702127659575
       },
       "src/core/logger.py": {
         "statements": 49,
@@ -1100,8 +3086,8 @@
       },
       "src/core/metrics.py": {
         "statements": 109,
-        "missing": 66,
-        "coverage": 39.44954128440367
+        "missing": 10,
+        "coverage": 90.8256880733945
       },
       "src/core/scheduler.py": {
         "statements": 45,

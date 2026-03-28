@@ -4,7 +4,8 @@ WORKDIR /app
 
 # Install dependencies first (Docker layer caching)
 COPY requirements.txt pyproject.toml ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir pytest pytest-cov pytest-flask pytest-mock responses pytest-json-report
 
 # Copy application code
 COPY . .

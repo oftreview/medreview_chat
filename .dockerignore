@@ -28,12 +28,9 @@ docs/
 *.md
 !README.md
 
-# Tests — exclude test files but keep dashboard + runner
-tests/unit/
-tests/critical/
-tests/integration/
-tests/e2e/
-tests/conftest.py
+# Tests — only exclude cached results and temp files
+tests/results/
+tests/__pycache__/
 
 # Local cache
 local_cache/
