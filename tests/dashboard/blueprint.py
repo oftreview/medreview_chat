@@ -53,7 +53,7 @@ def _read_json(filepath: Path) -> dict | list | None:
 @bp.route("/")
 def dashboard_page():
     """Render the test dashboard page."""
-    return render_template("test_dashboard.html")
+    return render_template("test_dashboard.html", active_page="tests")
 
 
 # ── API Routes ───────────────────────────────────────────────────────────────

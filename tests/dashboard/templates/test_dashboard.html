@@ -1,47 +1,49 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Closi AI — Test Suite</title>
-    <link rel="stylesheet" href="{{ url_for('test_dashboard.static', filename='test_dashboard.css') }}">
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <h1>Closi AI — Test Suite</h1>
-                <span id="last-run-time" class="subtitle">Nenhum run registrado</span>
-            </div>
-            <div class="header-right">
-                <button id="btn-run" class="btn btn-primary" onclick="runTests()">
-                    <span id="btn-run-text">Run Tests Now</span>
-                    <span id="btn-run-spinner" class="spinner hidden"></span>
-                </button>
-            </div>
-        </header>
+{% extends "base.html" %}
 
+{% block title %}Test Suite{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('test_dashboard.static', filename='test_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="test-dashboard">
+    <!-- Header -->
+    <header class="page-header">
+        <div class="page-title">
+            <h1>Test Suite</h1>
+            <span class="page-badge green">153 tests</span>
+            <span id="last-run-time" class="subtitle" style="margin-left:12px;font-size:12px;color:var(--text-dim);">Nenhum run registrado</span>
+        </div>
+        <div class="page-actions">
+            <button id="btn-run" class="btn-primary" onclick="runTests()">
+                <span id="btn-run-text">Run Tests Now</span>
+                <span id="btn-run-spinner" class="spinner hidden"></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="test-content">
         <!-- Summary Cards -->
         <section class="cards">
             <div class="card" id="card-total">
                 <div class="card-label">Total Tests</div>
-                <div class="card-value" id="total-tests">—</div>
+                <div class="card-value" id="total-tests">&mdash;</div>
                 <div class="card-trend" id="total-trend"></div>
             </div>
             <div class="card card-pass" id="card-pass">
                 <div class="card-label">Passing</div>
-                <div class="card-value" id="passing-tests">—</div>
+                <div class="card-value" id="passing-tests">&mdash;</div>
                 <div class="card-subtitle" id="passing-pct"></div>
             </div>
             <div class="card card-fail" id="card-fail">
                 <div class="card-label">Failing</div>
-                <div class="card-value" id="failing-tests">—</div>
+                <div class="card-value" id="failing-tests">&mdash;</div>
                 <div class="card-subtitle" id="failing-pct"></div>
             </div>
             <div class="card" id="card-coverage">
                 <div class="card-label">Coverage</div>
-                <div class="card-value" id="coverage-pct">—</div>
+                <div class="card-value" id="coverage-pct">&mdash;</div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="coverage-bar"></div>
                 </div>
@@ -132,7 +134,9 @@
             </table>
         </section>
     </div>
+</div>
+{% endblock %}
 
-    <script src="{{ url_for('test_dashboard.static', filename='test_dashboard.js') }}"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="{{ url_for('test_dashboard.static', filename='test_dashboard.js') }}"></script>
+{% endblock %}
