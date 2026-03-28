@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ── Modo de Teste ──────────────────────────────────────────────────────────────
+TEST_MODE = os.getenv("TEST_MODE", "false").lower() == "true"
+
 # ── Claude / LLM ─────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
