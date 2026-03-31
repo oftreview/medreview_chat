@@ -936,10 +936,11 @@ function renderKanban(items) {
 // ── View Toggle ──
 function setView(view, btn) {
   currentView = view;
+  // Close any special view first
+  hideAllSpecialViews();
   document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
-  document.getElementById('kanbanView').classList.toggle('active', view === 'kanban');
+  showMainView();
 }
 
 // ── Expand Row ──
@@ -1217,10 +1218,20 @@ function hideMainView() {
 
 // ── Done ──
 async function toggleDone() {
-  if (showingDone) { hideAllSpecialViews(); showMainView(); return; }
+  if (showingDone) {
+    hideAllSpecialViews();
+    showMainView();
+    // Re-highlight active view button
+    document.querySelectorAll('.view-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent.trim().toLowerCase() === (currentView==='kanban'?'kanban':'tabela'));
+    });
+    return;
+  }
   hideAllSpecialViews();
   hideMainView();
   showingDone = true;
+  // Deactivate view toggle buttons
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('doneView').style.display = 'block';
   document.getElementById('doneToggle').style.background = 'rgba(34,197,94,0.1)';
   document.getElementById('doneToggle').style.borderColor = 'rgba(34,197,94,0.3)';
@@ -1264,10 +1275,18 @@ async function reopenItem(id) {
 
 // ── Trash ──
 async function toggleTrash() {
-  if (showingTrash) { hideAllSpecialViews(); showMainView(); return; }
+  if (showingTrash) {
+    hideAllSpecialViews();
+    showMainView();
+    document.querySelectorAll('.view-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent.trim().toLowerCase() === (currentView==='kanban'?'kanban':'tabela'));
+    });
+    return;
+  }
   hideAllSpecialViews();
   hideMainView();
   showingTrash = true;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('trashView').style.display = 'block';
   document.getElementById('trashToggle').style.background = 'rgba(239,68,68,0.1)';
   document.getElementById('trashToggle').style.borderColor = 'rgba(239,68,68,0.3)';
