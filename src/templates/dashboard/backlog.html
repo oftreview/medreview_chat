@@ -899,7 +899,7 @@ function renderTable(items) {
 
 // ── Kanban Render ──
 function renderKanban(items) {
-  const cols = ['review','in-progress','next','backlog','blocked'];
+  const cols = ['backlog','next','in-progress','review','blocked'];
   const container = document.getElementById('kanbanView');
   container.innerHTML = cols.map(status => {
     const colItems = items.filter(i => i.status === status);
