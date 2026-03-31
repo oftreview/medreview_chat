@@ -556,15 +556,23 @@ def reset():
 
 @bp.route("/history", methods=["GET"])
 def history():
-    """Get conversation history for a session."""
+    """
+    Get conversation history for a session.
+    Tries multiple sources: DB conversations table, DB messages table (legacy), in-memory.
+    """
     session_id = request.args.get("session_id", "sandbox")
 
-    # Primeiro tenta carregar do banco de dados (persistente)
+    # 1. Tenta tabela conversations (fonte primária, persistente)
     db_history = database.load_conversation_history(session_id, limit=50)
     if db_history:
         return jsonify({"history": db_history})
 
-    # Fallback: memória in-memory (para sessões ativas que ainda não persistiram)
+    # 2. Tenta tabela messages legada
+    legacy_history = database.load_messages_legacy(session_id)
+    if legacy_history:
+        return jsonify({"history": legacy_history})
+
+    # 3. Fallback: memória in-memory (sessões ativas não persistidas)
     agent = _get_agent()
     return jsonify({"history": agent.memory.get(session_id)})
 
@@ -574,26 +582,37 @@ def sessions():
     """
     List all sessions — from database (persistent) + in-memory (active).
     Database is the primary source; in-memory adds any sessions not yet in DB.
+
+    Query params:
+        date_from: ISO date (e.g., "2026-03-01")
+        date_to: ISO date (e.g., "2026-03-31")
+        limit: max sessions (default 100)
     """
+    date_from = request.args.get("date_from", None)
+    date_to = request.args.get("date_to", None)
+    limit = int(request.args.get("limit", 100))
+
     # Fonte primária: banco de dados (sobrevive a deploys)
-    db_sessions = database.list_sessions_from_db(limit=100)
+    db_sessions = database.list_sessions_from_db(
+        limit=limit, date_from=date_from, date_to=date_to
+    )
 
     # Fonte secundária: memória (sessões ativas que podem não estar no DB ainda)
-    agent = _get_agent()
-    memory_sessions = set(agent.memory.list_sessions())
+    # Só adiciona se não tiver filtro de data (memória não tem timestamp)
+    if not date_from and not date_to:
+        agent = _get_agent()
+        memory_sessions = set(agent.memory.list_sessions())
+        db_ids = {s["session_id"] for s in db_sessions}
 
-    # IDs que já vieram do DB
-    db_ids = {s["session_id"] for s in db_sessions}
-
-    # Adiciona sessões in-memory que não estão no DB
-    for sid in memory_sessions:
-        if sid not in db_ids and sid != "sandbox":
-            db_sessions.append({
-                "session_id": sid,
-                "channel": "memory",
-                "last_message": "",
-                "last_activity": "",
-                "message_count": 0,
-            })
+        for sid in memory_sessions:
+            if sid not in db_ids and sid != "sandbox":
+                db_sessions.append({
+                    "session_id": sid,
+                    "channel": "memory",
+                    "last_message": "",
+                    "last_activity": "",
+                    "message_count": 0,
+                    "is_sandbox": False,
+                })
 
     return jsonify({"sessions": db_sessions})

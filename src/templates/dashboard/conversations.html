@@ -19,6 +19,29 @@
 }
 .session-search input::placeholder { color:var(--text-dim); }
 .session-search input:focus { border-color:var(--purple); }
+.date-filters {
+  padding:8px 16px; border-bottom:1px solid var(--border);
+  display:flex; gap:8px; align-items:center;
+}
+.date-filters input[type="date"] {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:5px 8px; font-size:11px;
+  font-family:'Space Grotesk',sans-serif; color:var(--text); outline:none;
+  flex:1;
+}
+.date-filters input[type="date"]:focus { border-color:var(--purple); }
+.date-filters .btn-filter {
+  background:var(--purple); color:#fff; border:none; border-radius:8px;
+  padding:5px 10px; font-size:11px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+  white-space:nowrap;
+}
+.date-filters .btn-filter:hover { opacity:0.85; }
+.date-filters .btn-clear {
+  background:transparent; color:var(--text-dim); border:1px solid var(--border);
+  border-radius:8px; padding:5px 8px; font-size:11px; cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;
+}
+.date-filters .btn-clear:hover { color:var(--text); border-color:var(--text-dim); }
 .session-items { flex:1; overflow-y:auto; }
 .session-items::-webkit-scrollbar { width:3px; }
 .session-items::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
@@ -81,6 +104,12 @@
     <div class="session-search">
       <input type="text" id="searchInput" placeholder="Buscar sessao..." oninput="filterSessions()">
     </div>
+    <div class="date-filters">
+      <input type="date" id="dateFrom" title="Data inicial">
+      <input type="date" id="dateTo" title="Data final">
+      <button class="btn-filter" onclick="loadSessions()">Filtrar</button>
+      <button class="btn-clear" onclick="clearDateFilters()">Limpar</button>
+    </div>
     <div class="session-items" id="sessionItems">
       <div class="msg-viewer-empty" style="padding:40px 0">
         <p>Carregando sessoes...</p>
@@ -105,7 +134,14 @@ let activeSessionId = null;
 
 async function loadSessions() {
   try {
-    const res = await fetch('/sessions');
+    const params = new URLSearchParams();
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+
+    const url = '/sessions' + (params.toString() ? '?' + params.toString() : '');
+    const res = await fetch(url);
     const data = await res.json();
     allSessions = data.sessions || [];
     document.getElementById('sessionCountBadge').textContent = allSessions.length + ' sessoes';
@@ -113,6 +149,12 @@ async function loadSessions() {
   } catch(e) {
     document.getElementById('sessionItems').innerHTML = '<div class="msg-viewer-empty" style="padding:40px 0"><p>Erro ao carregar sessoes</p></div>';
   }
+}
+
+function clearDateFilters() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  loadSessions();
 }
 
 function renderSessions(sessions) {

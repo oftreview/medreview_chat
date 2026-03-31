@@ -107,10 +107,15 @@ def save_message_legacy(phone: str, role: str, content: str) -> bool:
         return False
 
 
-def list_sessions_from_db(limit: int = 100) -> list:
+def list_sessions_from_db(limit: int = 100, date_from: str = None, date_to: str = None) -> list:
     """
     Lista sessões únicas do banco de dados com metadados.
     Retorna sessões ordenadas pela última atividade (mais recente primeiro).
+
+    Args:
+        limit: máximo de sessões a retornar
+        date_from: filtro de data início (ISO format, ex: "2026-03-01")
+        date_to: filtro de data fim (ISO format, ex: "2026-03-31")
 
     Cada item: {
         "session_id": user_id,
@@ -126,38 +131,54 @@ def list_sessions_from_db(limit: int = 100) -> list:
         return []
 
     try:
-        # Busca as conversas mais recentes agrupadas por user_id
-        # Supabase não suporta GROUP BY direto, então buscamos mensagens recentes
-        # e agrupamos no Python
-        result = (
+        # Busca mensagens recentes — NÃO filtra por message_type para não perder
+        # dados antigos que podem não ter esse campo preenchido
+        query = (
             db.table("conversations")
-            .select("user_id, channel, content, role, created_at")
-            .eq("message_type", "conversation")
+            .select("user_id, channel, content, role, created_at, message_type")
             .order("created_at", desc=True)
-            .limit(2000)  # últimas 2000 mensagens cobre muitas sessões
-            .execute()
+            .limit(5000)
         )
 
+        # Filtros de data
+        if date_from:
+            query = query.gte("created_at", f"{date_from}T00:00:00")
+        if date_to:
+            query = query.lte("created_at", f"{date_to}T23:59:59")
+
+        result = query.execute()
+
         if not result.data:
+            print(f"[DB] list_sessions_from_db: 0 mensagens encontradas", flush=True)
             return []
+
+        print(f"[DB] list_sessions_from_db: {len(result.data)} mensagens carregadas", flush=True)
 
         # Agrupa por user_id
         sessions_map = {}
         for row in result.data:
             uid = row.get("user_id", "")
-            if not uid or uid == "sandbox":
+            if not uid:
+                continue
+            # Ignora healthcheck probes
+            if uid.startswith("_healthcheck_"):
                 continue
 
             if uid not in sessions_map:
                 sessions_map[uid] = {
                     "session_id": uid,
-                    "channel": row.get("channel", "api"),
+                    "channel": row.get("channel") or "api",
                     "last_message": "",
                     "last_activity": row.get("created_at", ""),
                     "message_count": 0,
+                    "is_sandbox": uid == "sandbox",
                 }
-            sessions_map[uid]["message_count"] += 1
-            # A primeira ocorrência (mais recente) define last_message e last_activity
+            # Conta apenas mensagens de conversa (não incoming_raw que são duplicatas)
+            msg_type = row.get("message_type", "conversation")
+            if msg_type != "incoming_raw":
+                sessions_map[uid]["message_count"] += 1
+
+            # A primeira ocorrência de mensagem do lead (mais recente) = preview
             if not sessions_map[uid]["last_message"] and row.get("role") == "user":
                 content = row.get("content", "")
                 sessions_map[uid]["last_message"] = content[:80] if content else ""
@@ -169,10 +190,13 @@ def list_sessions_from_db(limit: int = 100) -> list:
             reverse=True,
         )
 
+        print(f"[DB] list_sessions_from_db: {len(sessions_list)} sessões únicas", flush=True)
         return sessions_list[:limit]
 
     except Exception as e:
         print(f"[DB ERROR] list_sessions_from_db: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
         return []
 
 
