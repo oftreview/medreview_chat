@@ -235,6 +235,11 @@ def api_metrics_daily():
 
     days = int(request.args.get("days", 30))
     stats = get_daily_stats(days_back=days)
+
+    # Se retornou erro (dict em vez de list), envia com campo error
+    if isinstance(stats, dict) and "error" in stats:
+        return jsonify({"stats": [], "error": stats.get("message", stats["error"])})
+
     return jsonify({"stats": stats})
 
 
@@ -245,4 +250,18 @@ def api_metrics_totals():
 
     since = request.args.get("since")
     totals = get_totals(since=since)
+
+    # Se retornou erro, envia com campo error para o frontend
+    if isinstance(totals, dict) and "error" in totals:
+        return jsonify({"totals": {}, "error": totals.get("message", totals["error"])})
+
     return jsonify({"totals": totals})
+
+
+@bp.route("/api/metrics/status", methods=["GET"])
+def api_metrics_status():
+    """Diagnostic endpoint: check if llm_usage table exists and is accessible."""
+    from src.core.metrics import check_table_status
+
+    status = check_table_status()
+    return jsonify(status)

@@ -26,9 +26,6 @@ CREATE INDEX IF NOT EXISTS idx_llm_usage_created
 CREATE INDEX IF NOT EXISTS idx_llm_usage_model
     ON llm_usage (model);
 
-CREATE INDEX IF NOT EXISTS idx_llm_usage_date
-    ON llm_usage (DATE(created_at));
-
 -- ── RPC: Resumo diário de custos (para gráficos) ────────────
 CREATE OR REPLACE FUNCTION llm_daily_stats(days_back INT DEFAULT 30)
 RETURNS TABLE (
@@ -42,7 +39,7 @@ RETURNS TABLE (
     models_used   TEXT[]
 ) LANGUAGE sql STABLE AS $$
     SELECT
-        DATE(created_at) AS day,
+        (created_at AT TIME ZONE 'UTC')::date AS day,
         COUNT(*)::BIGINT AS total_calls,
         COALESCE(SUM(input_tokens), 0)::BIGINT AS total_input,
         COALESCE(SUM(output_tokens), 0)::BIGINT AS total_output,
@@ -52,7 +49,7 @@ RETURNS TABLE (
         ARRAY_AGG(DISTINCT model) AS models_used
     FROM llm_usage
     WHERE created_at >= now() - (days_back || ' days')::INTERVAL
-    GROUP BY DATE(created_at)
+    GROUP BY (created_at AT TIME ZONE 'UTC')::date
     ORDER BY day DESC;
 $$;
 

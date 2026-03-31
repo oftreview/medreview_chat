@@ -321,12 +321,33 @@ async function loadTotals() {
     document.getElementById('totalCacheSub').textContent = `${formatNum(cr)} read / ${formatNum(cw)} write`;
 
     // Se nao tem dados no Supabase, mostrar hint
-    if (!calls) {
+    if (!calls && !data.error) {
       document.getElementById('totalCost').textContent = '$0.00';
       document.getElementById('totalCostSub').textContent = 'dados acumulam a partir de agora';
       document.getElementById('totalCalls').textContent = '0';
     }
+
+    // Se tem erro, mostrar diagnóstico
+    if (data.error) {
+      document.getElementById('totalCost').textContent = '⚠';
+      document.getElementById('totalCostSub').innerHTML = `<span style="color:var(--red)">${data.error}</span>`;
+      console.error('Metrics error:', data.error);
+      // Tenta carregar diagnóstico
+      loadDiagnostics();
+    }
   } catch(e) { console.error('loadTotals:', e); }
+}
+
+async function loadDiagnostics() {
+  try {
+    const res = await fetch('/api/metrics/status');
+    const status = await res.json();
+    console.log('[METRICS DIAG]', status);
+    if (status.error) {
+      document.getElementById('totalCostSub').innerHTML =
+        `<span style="color:var(--red);font-size:10px">${status.error}</span>`;
+    }
+  } catch(e) { console.error('loadDiagnostics:', e); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -339,6 +360,13 @@ async function loadDailyChart() {
     const stats = (data.stats || []).slice().reverse(); // cronologico
     const container = document.getElementById('dailyBars');
     const labelsEl = document.getElementById('chartLabels');
+
+    if (data.error) {
+      container.innerHTML = `<span style="color:var(--red);font-size:12px;padding:30px 0">${data.error}</span>`;
+      labelsEl.innerHTML = '';
+      document.getElementById('chart30dTotal').textContent = '$0.00';
+      return;
+    }
 
     if (!stats.length) {
       container.innerHTML = '<span style="color:var(--text-dim);font-size:12px;padding:30px 0">Os dados comecam a aparecer apos a primeira chamada ao LLM</span>';

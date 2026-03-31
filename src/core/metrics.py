@@ -147,6 +147,7 @@ def _flush_to_supabase():
 
 def _do_insert(batch: list):
     """Insere batch no Supabase (roda em thread)."""
+    global _persist_enabled
     try:
         from src.core.database.client import _get_client
         db = _get_client()
@@ -154,7 +155,63 @@ def _do_insert(batch: list):
             db.table("llm_usage").insert(batch).execute()
             print(f"[METRICS] Persistido {len(batch)} registro(s) na tabela llm_usage", flush=True)
     except Exception as e:
-        print(f"[METRICS WARN] Falha ao persistir llm_usage: {e}", flush=True)
+        err = str(e)
+        print(f"[METRICS WARN] Falha ao persistir llm_usage: {err}", flush=True)
+        # Se a tabela não existe, desabilita persistência para evitar spam de erros
+        if "llm_usage" in err and ("does not exist" in err or "relation" in err):
+            _persist_enabled = False
+            print("[METRICS] Tabela llm_usage não existe! Execute a migration 007 no Supabase SQL Editor.", flush=True)
+
+
+# ── Diagnóstico ────────────────────────────────────────────────
+
+def check_table_status() -> dict:
+    """Verifica se a tabela llm_usage existe e está acessível."""
+    result = {
+        "table_exists": False,
+        "row_count": 0,
+        "rpc_available": False,
+        "error": None,
+        "supabase_enabled": False,
+    }
+
+    try:
+        from src.core.database.client import is_enabled, _get_client
+        result["supabase_enabled"] = is_enabled()
+
+        if not is_enabled():
+            result["error"] = "SUPABASE_URL ou SUPABASE_KEY não configurados"
+            return result
+
+        db = _get_client()
+        if not db:
+            result["error"] = "Cliente Supabase não inicializado"
+            return result
+
+        # Testa se a tabela existe fazendo um SELECT simples
+        try:
+            test = db.table("llm_usage").select("id", count="exact").limit(1).execute()
+            result["table_exists"] = True
+            result["row_count"] = test.count if test.count is not None else len(test.data or [])
+        except Exception as e:
+            err = str(e)
+            if "does not exist" in err or "relation" in err:
+                result["error"] = "Tabela llm_usage não existe. Execute a migration 007_llm_usage.sql no Supabase SQL Editor."
+            else:
+                result["error"] = f"Erro ao acessar llm_usage: {err}"
+            return result
+
+        # Testa se as RPCs existem
+        try:
+            db.rpc("llm_totals", {"since": None}).execute()
+            result["rpc_available"] = True
+        except Exception:
+            result["rpc_available"] = False  # Funciona sem RPC (usa fallback)
+
+    except Exception as e:
+        result["error"] = f"Erro inesperado: {str(e)}"
+
+    return result
 
 
 # ── Consultas históricas (Supabase) ──────────────────────────
@@ -260,8 +317,11 @@ def get_daily_stats(days_back: int = 30) -> list:
         return sorted(daily.values(), key=lambda x: x["day"])
 
     except Exception as e:
-        print(f"[METRICS] get_daily_stats error: {e}", flush=True)
-        return []
+        err = str(e)
+        print(f"[METRICS] get_daily_stats error: {err}", flush=True)
+        if "does not exist" in err or "relation" in err:
+            return {"error": "table_missing", "message": "Tabela llm_usage não existe. Execute a migration 007."}
+        return {"error": "query_failed", "message": err}
 
 
 def get_totals(since: str = None) -> dict:
@@ -326,5 +386,8 @@ def get_totals(since: str = None) -> dict:
         return totals
 
     except Exception as e:
-        print(f"[METRICS] get_totals error: {e}", flush=True)
-        return {}
+        err = str(e)
+        print(f"[METRICS] get_totals error: {err}", flush=True)
+        if "does not exist" in err or "relation" in err:
+            return {"error": "table_missing", "message": "Tabela llm_usage não existe. Execute a migration 007."}
+        return {"error": "query_failed", "message": err}
