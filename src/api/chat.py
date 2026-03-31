@@ -21,9 +21,14 @@ from src.core import database, escalation
 from src.core.security import (
     sanitize_input,
     check_injection_patterns,
+    check_data_extraction,
+    check_media_attachment,
     rate_limiter,
     filter_output,
     hash_user_id,
+    record_injection_strike,
+    is_user_blocked,
+    INJECTION_BLOCK_RESPONSE,
 )
 from src.core.logger import log_security_event
 from src.core.message_splitter import split_response, DELAY_SECONDS as MSG_DELAY
@@ -279,6 +284,19 @@ def chat():
                 "status": "escalated_session",
             })
 
+        # ── Security: check if user is blocked (injection strikes) ──────────
+        if is_user_blocked(user_id):
+            uid_hash = hash_user_id(user_id)
+            log_security_event("USER_BLOCKED", uid_hash, {"reason": "injection_strikes"})
+            print(f"[SECURITY] Usuário BLOQUEADO por injection strikes uid={uid_hash}", flush=True)
+            return jsonify({
+                "session_id": session_id,
+                "response": INJECTION_BLOCK_RESPONSE,
+                "responses": [INJECTION_BLOCK_RESPONSE],
+                "user_id": user_id,
+                "status": "success",
+            })
+
         # ── Security: rate limit ─────────────────────────────────────────────
         allowed, count = rate_limiter(session_id)
         if not allowed:
@@ -292,15 +310,78 @@ def chat():
                 429,
             )
 
-        # ── Security: sanitization and injection detection ────────────────────
+        # ── Security: sanitization ───────────────────────────────────────────
         message, warnings = sanitize_input(message)
         if warnings:
             log_security_event("INPUT_SANITIZED", hash_user_id(user_id), {"warnings": warnings})
 
+        # Block dangerous HTML tags (script, iframe, etc.)
+        if "DANGEROUS_HTML_TAG" in warnings:
+            uid_hash = hash_user_id(user_id)
+            log_security_event("DANGEROUS_HTML_BLOCKED", uid_hash, {"warnings": warnings})
+            record_injection_strike(user_id)
+            print(f"[SECURITY] HTML perigoso BLOQUEADO uid={uid_hash}", flush=True)
+            return jsonify({
+                "session_id": session_id,
+                "response": INJECTION_BLOCK_RESPONSE,
+                "responses": [INJECTION_BLOCK_RESPONSE],
+                "user_id": user_id,
+                "status": "success",
+            })
+
+        # ── Security: injection detection (BLOCK, not just log) ──────────────
         is_suspicious, patterns = check_injection_patterns(message)
         if is_suspicious:
-            log_security_event("INJECTION_DETECTED", hash_user_id(user_id), {"patterns": patterns})
-            print(f"[SECURITY] Injection pattern detectado de {hash_user_id(user_id)}", flush=True)
+            uid_hash = hash_user_id(user_id)
+            log_security_event("INJECTION_DETECTED", uid_hash, {"patterns": patterns})
+            blocked, strikes = record_injection_strike(user_id)
+            print(
+                f"[SECURITY] Injection BLOQUEADO uid={uid_hash} "
+                f"patterns={patterns[:3]} strikes={strikes}",
+                flush=True,
+            )
+            return jsonify({
+                "session_id": session_id,
+                "response": INJECTION_BLOCK_RESPONSE,
+                "responses": [INJECTION_BLOCK_RESPONSE],
+                "user_id": user_id,
+                "status": "success",
+            })
+
+        # ── Security: data extraction detection ──────────────────────────────
+        is_extraction, extraction_patterns = check_data_extraction(message)
+        if is_extraction:
+            uid_hash = hash_user_id(user_id)
+            log_security_event("DATA_EXTRACTION_ATTEMPT", uid_hash, {"patterns": extraction_patterns})
+            record_injection_strike(user_id)
+            print(
+                f"[SECURITY] Tentativa de extração de dados BLOQUEADA uid={uid_hash} "
+                f"patterns={extraction_patterns[:3]}",
+                flush=True,
+            )
+            return jsonify({
+                "session_id": session_id,
+                "response": INJECTION_BLOCK_RESPONSE,
+                "responses": [INJECTION_BLOCK_RESPONSE],
+                "user_id": user_id,
+                "status": "success",
+            })
+
+        # ── Security: malicious media/file detection ─────────────────────────
+        is_blocked_media, block_reason, media_warnings = check_media_attachment(message)
+        if is_blocked_media:
+            uid_hash = hash_user_id(user_id)
+            log_security_event("MALICIOUS_MEDIA_BLOCKED", uid_hash, {"reason": block_reason, "warnings": media_warnings})
+            print(f"[SECURITY] Mídia maliciosa BLOQUEADA uid={uid_hash}: {block_reason}", flush=True)
+            return jsonify({
+                "session_id": session_id,
+                "response": INJECTION_BLOCK_RESPONSE,
+                "responses": [INJECTION_BLOCK_RESPONSE],
+                "user_id": user_id,
+                "status": "success",
+            })
+        if media_warnings:
+            log_security_event("MEDIA_WARNING", hash_user_id(user_id), {"warnings": media_warnings})
 
         # ── Save raw message before debounce ─────────────────────────────────
         database.save_raw_incoming(user_id, message, channel=channel)
@@ -397,7 +478,7 @@ def chat():
         cmd_result["message"] = cmd_result.pop("response", "")
         return jsonify(cmd_result)
 
-    # Sanitization and injection detection
+    # Sanitization and security checks (sandbox mode — log but don't block)
     user_message, warnings = sanitize_input(user_message)
     if warnings:
         log_security_event("INPUT_SANITIZED", session_id, {"warnings": warnings, "source": "sandbox"})
@@ -405,6 +486,7 @@ def chat():
     is_suspicious, patterns = check_injection_patterns(user_message)
     if is_suspicious:
         log_security_event("INJECTION_DETECTED", session_id, {"patterns": patterns, "source": "sandbox"})
+        print(f"[SECURITY SANDBOX] Injection detectado (não bloqueado em sandbox): {patterns[:3]}", flush=True)
 
     # Save raw message before debounce
     database.save_raw_incoming(session_id, user_message, channel="sandbox")
