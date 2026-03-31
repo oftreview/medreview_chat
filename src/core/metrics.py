@@ -39,8 +39,8 @@ _recent_calls = deque(maxlen=50)
 # ── Batch para Supabase ──
 _persist_buffer = []
 _persist_lock = threading.Lock()
-_BATCH_SIZE = 10
-_FLUSH_INTERVAL = 15  # segundos
+_BATCH_SIZE = 1   # Flush a cada chamada (garante persistência imediata)
+_FLUSH_INTERVAL = 5  # segundos
 _last_flush = time.time()
 _persist_enabled = None  # Lazy init
 
@@ -152,8 +152,9 @@ def _do_insert(batch: list):
         db = _get_client()
         if db and batch:
             db.table("llm_usage").insert(batch).execute()
-    except Exception:
-        pass  # Silenciar — não travar o sistema por falha de persistência
+            print(f"[METRICS] Persistido {len(batch)} registro(s) na tabela llm_usage", flush=True)
+    except Exception as e:
+        print(f"[METRICS WARN] Falha ao persistir llm_usage: {e}", flush=True)
 
 
 # ── Consultas históricas (Supabase) ──────────────────────────
@@ -198,29 +199,132 @@ def get_history(
 
 
 def get_daily_stats(days_back: int = 30) -> list:
-    """Retorna estatísticas diárias para gráficos."""
+    """
+    Retorna estatísticas diárias para gráficos.
+    Consulta diretamente a tabela llm_usage (sem depender de RPC).
+    """
     try:
         from src.core.database.client import _get_client
         db = _get_client()
         if not db:
             return []
-        result = db.rpc("llm_daily_stats", {"days_back": days_back}).execute()
-        return result.data or []
-    except Exception:
+
+        # Tenta RPC primeiro (mais eficiente se existir)
+        try:
+            result = db.rpc("llm_daily_stats", {"days_back": days_back}).execute()
+            if result.data:
+                return result.data
+        except Exception:
+            pass  # RPC não existe — fallback para query manual
+
+        # Fallback: busca registros e agrupa no Python
+        from datetime import datetime, timezone, timedelta
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=days_back)).isoformat()
+
+        result = (
+            db.table("llm_usage")
+            .select("created_at, input_tokens, output_tokens, cache_read, cache_write, cost")
+            .gte("created_at", cutoff)
+            .order("created_at", desc=False)
+            .limit(5000)
+            .execute()
+        )
+
+        if not result.data:
+            return []
+
+        # Agrupa por dia
+        daily = {}
+        for row in result.data:
+            ts = row.get("created_at", "")
+            day = ts[:10] if ts else "unknown"  # "2026-03-25"
+            if day not in daily:
+                daily[day] = {
+                    "day": day,
+                    "total_calls": 0,
+                    "total_input": 0,
+                    "total_output": 0,
+                    "total_cache_read": 0,
+                    "total_cache_write": 0,
+                    "total_cost": 0.0,
+                }
+            d = daily[day]
+            d["total_calls"] += 1
+            d["total_input"] += int(row.get("input_tokens", 0) or 0)
+            d["total_output"] += int(row.get("output_tokens", 0) or 0)
+            d["total_cache_read"] += int(row.get("cache_read", 0) or 0)
+            d["total_cache_write"] += int(row.get("cache_write", 0) or 0)
+            d["total_cost"] += float(row.get("cost", 0) or 0)
+
+        # Retorna ordenado cronologicamente (mais antigo primeiro)
+        return sorted(daily.values(), key=lambda x: x["day"])
+
+    except Exception as e:
+        print(f"[METRICS] get_daily_stats error: {e}", flush=True)
         return []
 
 
 def get_totals(since: str = None) -> dict:
-    """Retorna totais acumulados (all-time ou desde uma data)."""
+    """
+    Retorna totais acumulados (all-time ou desde uma data).
+    Consulta diretamente a tabela llm_usage (sem depender de RPC).
+    """
     try:
         from src.core.database.client import _get_client
         db = _get_client()
         if not db:
             return {}
-        params = {"since": since} if since else {"since": None}
-        result = db.rpc("llm_totals", params).execute()
-        if result.data and len(result.data) > 0:
-            return result.data[0]
-        return {}
-    except Exception:
+
+        # Tenta RPC primeiro
+        try:
+            params = {"since": since} if since else {"since": None}
+            result = db.rpc("llm_totals", params).execute()
+            if result.data and len(result.data) > 0:
+                return result.data[0]
+        except Exception:
+            pass  # RPC não existe — fallback
+
+        # Fallback: busca todos os registros e soma no Python
+        query = (
+            db.table("llm_usage")
+            .select("input_tokens, output_tokens, cache_read, cache_write, cost")
+        )
+        if since:
+            query = query.gte("created_at", since)
+
+        # Paginação para lidar com muitos registros
+        all_rows = []
+        page_size = 1000
+        offset = 0
+        while True:
+            result = query.range(offset, offset + page_size - 1).execute()
+            rows = result.data or []
+            all_rows.extend(rows)
+            if len(rows) < page_size:
+                break
+            offset += page_size
+
+        if not all_rows:
+            return {}
+
+        totals = {
+            "total_calls": len(all_rows),
+            "total_input": 0,
+            "total_output": 0,
+            "total_cache_read": 0,
+            "total_cache_write": 0,
+            "total_cost": 0.0,
+        }
+        for row in all_rows:
+            totals["total_input"] += int(row.get("input_tokens", 0) or 0)
+            totals["total_output"] += int(row.get("output_tokens", 0) or 0)
+            totals["total_cache_read"] += int(row.get("cache_read", 0) or 0)
+            totals["total_cache_write"] += int(row.get("cache_write", 0) or 0)
+            totals["total_cost"] += float(row.get("cost", 0) or 0)
+
+        totals["total_cost"] = round(totals["total_cost"], 6)
+        return totals
+
+    except Exception as e:
+        print(f"[METRICS] get_totals error: {e}", flush=True)
         return {}
