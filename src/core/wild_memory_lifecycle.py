@@ -195,7 +195,8 @@ class WildMemoryLifecycle:
                 results["status"] = "disabled"
                 return results
 
-            import asyncio
+            from src.core.async_bridge import run_async
+
             wm = self._wild_memory
 
             async def _maintenance():
@@ -234,19 +235,7 @@ class WildMemoryLifecycle:
 
                 return r
 
-            # Run in new loop (safe from gevent)
-            loop = asyncio.new_event_loop()
-            try:
-                r = loop.run_until_complete(_maintenance())
-            except RuntimeError:
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                    r = pool.submit(self._run_in_loop, _maintenance).result(timeout=60)
-            finally:
-                try:
-                    loop.close()
-                except Exception:
-                    pass
+            r = run_async(_maintenance(), timeout=60)
 
             results.update(r)
             results["status"] = "ok"
@@ -273,7 +262,8 @@ class WildMemoryLifecycle:
     ):
         """Processa escalação em background."""
         try:
-            import asyncio
+            from src.core.async_bridge import run_async
+
             wm = self._wild_memory
             if wm is None:
                 return
@@ -298,7 +288,7 @@ class WildMemoryLifecycle:
                     # end_session pode falhar se session não existe no WM
                     print(f"[WILD LIFECYCLE] end_session warning: {e}", flush=True)
 
-            self._run_in_new_loop(lambda: _record())
+            run_async(_record(), timeout=30)
 
             print(
                 f"[WILD LIFECYCLE] Escalação processada session={session_id[:8]}... "
@@ -316,7 +306,8 @@ class WildMemoryLifecycle:
     ):
         """Processa fim de sessão em background."""
         try:
-            import asyncio
+            from src.core.async_bridge import run_async
+
             wm = self._wild_memory
             if wm is None:
                 return
@@ -353,7 +344,7 @@ class WildMemoryLifecycle:
                     except Exception as e:
                         print(f"[WILD LIFECYCLE] Distillation warning: {e}", flush=True)
 
-            self._run_in_new_loop(lambda: _end())
+            run_async(_end(), timeout=30)
 
             print(
                 f"[WILD LIFECYCLE] Session end processado session={session_id[:8]}... "
@@ -383,26 +374,6 @@ class WildMemoryLifecycle:
             }).execute()
         except Exception as e:
             print(f"[WILD LIFECYCLE] Feedback signal error: {e}", flush=True)
-
-    @staticmethod
-    def _run_in_new_loop(fn):
-        """Run async function in a new event loop."""
-        import asyncio
-        loop = asyncio.new_event_loop()
-        try:
-            loop.run_until_complete(fn())
-        finally:
-            loop.close()
-
-    @staticmethod
-    def _run_in_loop(coro_fn):
-        """Run async coroutine in a brand new event loop (for ThreadPoolExecutor)."""
-        import asyncio
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(coro_fn())
-        finally:
-            loop.close()
 
     def get_status(self) -> dict:
         """Retorna status do lifecycle manager."""

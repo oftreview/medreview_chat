@@ -232,9 +232,9 @@ class WildMemoryContextInjector:
     ) -> Optional[str]:
         """
         Constrói briefing usando retrieval do Wild Memory.
-        Roda em thread separada (chamada por get_context).
+        Usa async_bridge para evitar conflitos de event loop com gevent.
         """
-        import asyncio
+        from src.core.async_bridge import run_async
 
         wm = self._wild_memory
         if wm is None:
@@ -278,31 +278,8 @@ class WildMemoryContextInjector:
                 f"nesta conversa, NÃO repita. Apenas referencie se o lead perguntar."
             )
 
-        # Run async in new loop (safe from gevent conflicts)
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(_async_retrieve())
-        except RuntimeError:
-            # Event loop conflict — try ThreadPoolExecutor
-            import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                future = pool.submit(self._run_in_loop, _async_retrieve)
-                return future.result(timeout=RETRIEVAL_TIMEOUT_SECONDS)
-        finally:
-            try:
-                loop.close()
-            except Exception:
-                pass
-
-    @staticmethod
-    def _run_in_loop(coro_fn):
-        """Run async coroutine in a brand new event loop."""
-        import asyncio
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(coro_fn())
-        finally:
-            loop.close()
+        # Submete para o event loop dedicado (thread-safe, sem conflito com gevent)
+        return run_async(_async_retrieve(), timeout=RETRIEVAL_TIMEOUT_SECONDS)
 
     def get_status(self) -> dict:
         """Retorna status completo do context injection para health check."""
