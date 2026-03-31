@@ -125,15 +125,40 @@ function renderSessions(sessions) {
     const id = typeof s === 'string' ? s : s.session_id || s;
     const isActive = id === activeSessionId ? 'active' : '';
     const isSandbox = id === 'sandbox';
-    const badgeClass = isSandbox ? 'sandbox' : 'whatsapp';
-    const badgeText = isSandbox ? 'Sandbox' : 'WhatsApp';
+    const channel = (typeof s === 'object' ? s.channel : '') || '';
+    const lastMsg = (typeof s === 'object' ? s.last_message : '') || '';
+    const lastActivity = (typeof s === 'object' ? s.last_activity : '') || '';
+    const msgCount = (typeof s === 'object' ? s.message_count : 0) || 0;
+
+    const badgeClass = isSandbox ? 'sandbox' : channel === 'botmaker' ? 'whatsapp' : 'whatsapp';
+    const badgeText = isSandbox ? 'Sandbox' : channel === 'botmaker' ? 'WhatsApp' : (channel || 'API');
     const displayId = isSandbox ? 'Sandbox' : id.length > 20 ? id.slice(0,8)+'...'+id.slice(-4) : id;
+
+    // Formata data da última atividade
+    let timeStr = '';
+    if (lastActivity) {
+      try {
+        const d = new Date(lastActivity);
+        const now = new Date();
+        const diff = now - d;
+        if (diff < 3600000) timeStr = Math.floor(diff/60000) + 'min';
+        else if (diff < 86400000) timeStr = Math.floor(diff/3600000) + 'h';
+        else timeStr = d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+      } catch(e) {}
+    }
+
+    const preview = lastMsg ? lastMsg.slice(0,50) + (lastMsg.length > 50 ? '...' : '') : '';
+    const countBadge = msgCount > 0 ? `<span style="font-size:9px;color:var(--text-dim)">${msgCount} msgs</span>` : '';
+
     return `<div class="session-item ${isActive}" onclick="selectSession('${id}')">
       <div class="session-item-header">
         <span class="session-item-id">${displayId}</span>
+        <span class="session-item-time">${timeStr}</span>
       </div>
+      ${preview ? `<div class="session-item-preview">${escapeHtml(preview)}</div>` : ''}
       <div class="session-item-badges">
         <span class="session-badge ${badgeClass}">${badgeText}</span>
+        ${countBadge}
       </div>
     </div>`;
   }).join('');
@@ -143,7 +168,8 @@ function filterSessions() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const filtered = allSessions.filter(s => {
     const id = typeof s === 'string' ? s : s.session_id || s;
-    return id.toLowerCase().includes(q);
+    const msg = (typeof s === 'object' ? s.last_message : '') || '';
+    return id.toLowerCase().includes(q) || msg.toLowerCase().includes(q);
   });
   renderSessions(filtered);
 }

@@ -107,6 +107,75 @@ def save_message_legacy(phone: str, role: str, content: str) -> bool:
         return False
 
 
+def list_sessions_from_db(limit: int = 100) -> list:
+    """
+    Lista sessões únicas do banco de dados com metadados.
+    Retorna sessões ordenadas pela última atividade (mais recente primeiro).
+
+    Cada item: {
+        "session_id": user_id,
+        "channel": str,
+        "last_message": str (preview),
+        "last_activity": str (ISO timestamp),
+        "message_count": int,
+    }
+    """
+    db = _get_client()
+    if db is None:
+        print("[DB ERROR] list_sessions_from_db — DB não conectado", flush=True)
+        return []
+
+    try:
+        # Busca as conversas mais recentes agrupadas por user_id
+        # Supabase não suporta GROUP BY direto, então buscamos mensagens recentes
+        # e agrupamos no Python
+        result = (
+            db.table("conversations")
+            .select("user_id, channel, content, role, created_at")
+            .eq("message_type", "conversation")
+            .order("created_at", desc=True)
+            .limit(2000)  # últimas 2000 mensagens cobre muitas sessões
+            .execute()
+        )
+
+        if not result.data:
+            return []
+
+        # Agrupa por user_id
+        sessions_map = {}
+        for row in result.data:
+            uid = row.get("user_id", "")
+            if not uid or uid == "sandbox":
+                continue
+
+            if uid not in sessions_map:
+                sessions_map[uid] = {
+                    "session_id": uid,
+                    "channel": row.get("channel", "api"),
+                    "last_message": "",
+                    "last_activity": row.get("created_at", ""),
+                    "message_count": 0,
+                }
+            sessions_map[uid]["message_count"] += 1
+            # A primeira ocorrência (mais recente) define last_message e last_activity
+            if not sessions_map[uid]["last_message"] and row.get("role") == "user":
+                content = row.get("content", "")
+                sessions_map[uid]["last_message"] = content[:80] if content else ""
+
+        # Ordena por última atividade (mais recente primeiro)
+        sessions_list = sorted(
+            sessions_map.values(),
+            key=lambda s: s.get("last_activity", ""),
+            reverse=True,
+        )
+
+        return sessions_list[:limit]
+
+    except Exception as e:
+        print(f"[DB ERROR] list_sessions_from_db: {e}", flush=True)
+        return []
+
+
 def load_messages_legacy(phone: str) -> list:
     """DEPRECADO: Carrega da tabela messages (legada). Use load_conversation_history()."""
     db = _get_client()

@@ -557,13 +557,43 @@ def reset():
 @bp.route("/history", methods=["GET"])
 def history():
     """Get conversation history for a session."""
-    agent = _get_agent()
     session_id = request.args.get("session_id", "sandbox")
+
+    # Primeiro tenta carregar do banco de dados (persistente)
+    db_history = database.load_conversation_history(session_id, limit=50)
+    if db_history:
+        return jsonify({"history": db_history})
+
+    # Fallback: memória in-memory (para sessões ativas que ainda não persistiram)
+    agent = _get_agent()
     return jsonify({"history": agent.memory.get(session_id)})
 
 
 @bp.route("/sessions", methods=["GET"])
 def sessions():
-    """List all active sessions."""
+    """
+    List all sessions — from database (persistent) + in-memory (active).
+    Database is the primary source; in-memory adds any sessions not yet in DB.
+    """
+    # Fonte primária: banco de dados (sobrevive a deploys)
+    db_sessions = database.list_sessions_from_db(limit=100)
+
+    # Fonte secundária: memória (sessões ativas que podem não estar no DB ainda)
     agent = _get_agent()
-    return jsonify({"sessions": agent.memory.list_sessions()})
+    memory_sessions = set(agent.memory.list_sessions())
+
+    # IDs que já vieram do DB
+    db_ids = {s["session_id"] for s in db_sessions}
+
+    # Adiciona sessões in-memory que não estão no DB
+    for sid in memory_sessions:
+        if sid not in db_ids and sid != "sandbox":
+            db_sessions.append({
+                "session_id": sid,
+                "channel": "memory",
+                "last_message": "",
+                "last_activity": "",
+                "message_count": 0,
+            })
+
+    return jsonify({"sessions": db_sessions})

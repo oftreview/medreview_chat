@@ -4,7 +4,7 @@ Re-exports para backward compatibility.
 """
 from .client import _get_client, get_connection_status, health_check, is_enabled
 from .conversations import save_message, save_raw_incoming, load_conversation_history
-from .conversations import save_message_legacy, load_messages_legacy
+from .conversations import save_message_legacy, load_messages_legacy, list_sessions_from_db
 from .leads import (upsert_lead, update_lead_status, save_lead_metadata, get_lead_metadata,
                     generate_session_id, create_session, update_session_status)
 from .escalations import save_escalation, resolve_escalation_record, list_escalations
@@ -30,6 +30,7 @@ __all__ = [
     "load_conversation_history",
     "save_message_legacy",
     "load_messages_legacy",
+    "list_sessions_from_db",
     # leads
     "upsert_lead",
     "update_lead_status",
