@@ -31,10 +31,10 @@
 .daily-bars { display:flex; align-items:flex-end; gap:4px; height:120px; min-width:fit-content; }
 .daily-bar {
   flex:1; min-width:16px; max-width:28px; border-radius:4px 4px 0 0;
-  background:var(--purple); position:relative; cursor:pointer;
-  min-height:2px; transition:all .2s;
+  position:relative; cursor:pointer;
+  min-height:6px; transition:all .2s; opacity:0.85;
 }
-.daily-bar:hover { background:var(--purple-light); }
+.daily-bar:hover { opacity:1; filter:brightness(1.3); }
 .daily-bar-tip {
   display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
   background:var(--surface); border:1px solid var(--border); border-radius:8px;
@@ -460,10 +460,10 @@ function renderDailyChart() {
 
   container.innerHTML = stats.map((s, i) => {
     const val = values[i];
-    const h = Math.max(2, (val / maxVal) * 100);
+    const h = Math.max(6, (val / maxVal) * 110);
     const tokens = (parseInt(s.total_input)||0) + (parseInt(s.total_output)||0);
     const cost = parseFloat(s.total_cost) || 0;
-    const barColor = isCost ? 'var(--purple)' : 'var(--green)';
+    const barColor = isCost ? 'var(--orange)' : 'var(--green)';
     return `<div class="daily-bar" style="height:${h}px;background:${barColor}" title="${s.day}">
       <div class="daily-bar-tip">
         <strong>${s.day||'?'}</strong><br>
