@@ -282,9 +282,22 @@ def get_daily_stats(days_back: int = 30) -> list:
         try:
             result = db.rpc("llm_daily_stats", {"days_back": days_back}).execute()
             if result.data:
-                return result.data
-        except Exception:
-            pass  # RPC não existe — fallback para query manual
+                # Normaliza tipos (NUMERIC vira string em alguns drivers)
+                normalized = []
+                for row in result.data:
+                    normalized.append({
+                        "day": str(row.get("day", "")),
+                        "total_calls": int(row.get("total_calls", 0) or 0),
+                        "total_input": int(row.get("total_input", 0) or 0),
+                        "total_output": int(row.get("total_output", 0) or 0),
+                        "total_cache_read": int(row.get("total_cache_read", 0) or 0),
+                        "total_cache_write": int(row.get("total_cache_write", 0) or 0),
+                        "total_cost": float(row.get("total_cost", 0) or 0),
+                    })
+                print(f"[METRICS] get_daily_stats via RPC: {len(normalized)} dias, cost_sum=${sum(r['total_cost'] for r in normalized):.4f}", flush=True)
+                return normalized
+        except Exception as e:
+            print(f"[METRICS] RPC llm_daily_stats falhou: {e}, usando fallback", flush=True)
 
         # Fallback: busca registros e agrupa no Python
         from datetime import datetime, timezone, timedelta
@@ -300,7 +313,12 @@ def get_daily_stats(days_back: int = 30) -> list:
         )
 
         if not result.data:
+            print("[METRICS] get_daily_stats fallback: 0 registros encontrados", flush=True)
             return []
+
+        # Debug: mostra primeiro registro para diagnosticar tipos
+        first = result.data[0]
+        print(f"[METRICS] Fallback sample row: cost={first.get('cost')!r} (type={type(first.get('cost')).__name__})", flush=True)
 
         # Agrupa por dia
         daily = {}
@@ -325,8 +343,9 @@ def get_daily_stats(days_back: int = 30) -> list:
             d["total_cache_write"] += int(row.get("cache_write", 0) or 0)
             d["total_cost"] += float(row.get("cost", 0) or 0)
 
-        # Retorna ordenado cronologicamente (mais antigo primeiro)
-        return sorted(daily.values(), key=lambda x: x["day"])
+        stats = sorted(daily.values(), key=lambda x: x["day"])
+        print(f"[METRICS] get_daily_stats fallback: {len(stats)} dias, cost_sum=${sum(r['total_cost'] for r in stats):.4f}", flush=True)
+        return stats
 
     except Exception as e:
         err = str(e)
@@ -352,9 +371,19 @@ def get_totals(since: str = None) -> dict:
             params = {"since": since} if since else {"since": None}
             result = db.rpc("llm_totals", params).execute()
             if result.data and len(result.data) > 0:
-                return result.data[0]
-        except Exception:
-            pass  # RPC não existe — fallback
+                row = result.data[0]
+                normalized = {
+                    "total_calls": int(row.get("total_calls", 0) or 0),
+                    "total_input": int(row.get("total_input", 0) or 0),
+                    "total_output": int(row.get("total_output", 0) or 0),
+                    "total_cache_read": int(row.get("total_cache_read", 0) or 0),
+                    "total_cache_write": int(row.get("total_cache_write", 0) or 0),
+                    "total_cost": float(row.get("total_cost", 0) or 0),
+                }
+                print(f"[METRICS] get_totals via RPC: {normalized['total_calls']} calls, ${normalized['total_cost']:.4f}", flush=True)
+                return normalized
+        except Exception as e:
+            print(f"[METRICS] RPC llm_totals falhou: {e}, usando fallback", flush=True)
 
         # Fallback: busca todos os registros e soma no Python
         query = (

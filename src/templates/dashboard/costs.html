@@ -417,6 +417,14 @@ async function loadDailyChart() {
       return;
     }
 
+    // Debug: mostra dados recebidos
+    if (_dailyStatsCache.length) {
+      const sample = _dailyStatsCache[0];
+      console.log('[CHART DEBUG] First day:', JSON.stringify(sample));
+      console.log('[CHART DEBUG] total_cost type:', typeof sample.total_cost, 'value:', sample.total_cost);
+      console.log('[CHART DEBUG] total_input type:', typeof sample.total_input, 'value:', sample.total_input);
+    }
+
     renderDailyChart();
   } catch(e) { console.error('loadDailyChart:', e); }
 }
