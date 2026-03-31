@@ -292,6 +292,20 @@ tr:hover .row-actions { opacity:1; }
 }
 .expanded-content textarea:focus { outline:none; border-color:var(--primary); }
 
+/* ── Done View ── */
+.done-reopen-btn {
+  background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3);
+  color:var(--primary-light); padding:4px 10px; border-radius:6px;
+  font-size:11px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.done-reopen-btn:hover { background:rgba(37,99,235,0.2); }
+.done-delete-btn {
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+  color:var(--red); padding:4px 10px; border-radius:6px;
+  font-size:11px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.done-delete-btn:hover { background:rgba(239,68,68,0.2); }
+
 /* ── Trash View ── */
 .trash-restore-btn {
   background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3);
@@ -410,6 +424,9 @@ tr:hover .row-actions { opacity:1; }
       <option value="data">Data</option><option value="devops">DevOps</option>
     </select>
     <div class="toolbar-spacer"></div>
+    <button class="btn-ghost" id="doneToggle" onclick="toggleDone()" style="font-size:11px">
+      ✓ Feitos <span id="doneCount" style="font-size:10px;opacity:0.7"></span>
+    </button>
     <button class="btn-ghost" id="trashToggle" onclick="toggleTrash()" style="font-size:11px">
       🗑 Lixeira <span id="trashCount" style="font-size:10px;opacity:0.7"></span>
     </button>
@@ -447,6 +464,23 @@ tr:hover .row-actions { opacity:1; }
 
   <!-- ── Kanban View ── -->
   <div class="kanban-container active" id="kanbanView"></div>
+
+  <!-- ── Done View ── -->
+  <div class="backlog-scroll" id="doneView" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 0 12px">
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;color:var(--green)">✓ Tarefas Feitas</h3>
+      <span style="font-size:11px;color:var(--text-dim)">Itens concluídos ficam aqui permanentemente</span>
+    </div>
+    <table class="backlog-table">
+      <thead><tr>
+        <th style="width:70px">ID</th><th>Título</th><th style="width:90px">Tipo</th>
+        <th style="width:100px">Módulo</th><th style="width:70px">RICE</th>
+        <th style="width:140px">Concluído em</th><th style="width:160px">Ações</th>
+      </tr></thead>
+      <tbody id="doneBody"></tbody>
+    </table>
+    <div id="doneEmpty" style="display:none;text-align:center;padding:40px;color:var(--text-dim);font-size:13px">Nenhuma tarefa concluída ainda</div>
+  </div>
 
   <!-- ── Trash View ── -->
   <div class="backlog-scroll" id="trashView" style="display:none">
@@ -654,6 +688,7 @@ function renderAll() {
   renderTable(filtered);
   renderKanban(filtered);
   updateBulkBar();
+  updateDoneCount();
 }
 
 // ── Stats ──
@@ -669,6 +704,8 @@ function updateStats() {
 }
 
 // ── Filter ──
+const STATUS_ORDER = { 'review':0, 'in-progress':1, 'next':2, 'backlog':3, 'blocked':4, 'done':5, 'cancelled':6 };
+
 function getFilteredItems() {
   const q = document.querySelector('.toolbar-search').value.toLowerCase();
   const st = document.getElementById('filterStatus').value;
@@ -676,12 +713,18 @@ function getFilteredItems() {
   const ph = document.getElementById('filterPhase').value;
   const md = document.getElementById('filterModule').value;
   let items = [...allItems];
+  // Hide done items from main views (they go to "Feitos" bucket)
+  if (st !== 'done') items = items.filter(i => i.status !== 'done');
   if (q) items = items.filter(i => (i.title||'').toLowerCase().includes(q) || (i.description||'').toLowerCase().includes(q) || (i.item_id||'').toLowerCase().includes(q));
   if (st) items = items.filter(i => i.status === st);
   if (tp) items = items.filter(i => i.item_type === tp);
   if (ph) items = items.filter(i => i.phase === ph);
   if (md) items = items.filter(i => i.module === md);
   items.sort((a, b) => {
+    // Primary sort: status order (review > in-progress > next > backlog > blocked)
+    const sa = STATUS_ORDER[a.status] ?? 99, sb = STATUS_ORDER[b.status] ?? 99;
+    if (sa !== sb) return sa - sb;
+    // Secondary sort: by current sort column
     let va = a[currentSort.key] ?? '', vb = b[currentSort.key] ?? '';
     if (typeof va === 'number' && typeof vb === 'number') return currentSort.desc ? vb - va : va - vb;
     va = String(va).toLowerCase(); vb = String(vb).toLowerCase();
@@ -856,7 +899,7 @@ function renderTable(items) {
 
 // ── Kanban Render ──
 function renderKanban(items) {
-  const cols = ['backlog','next','in-progress','review','done'];
+  const cols = ['review','in-progress','next','backlog','blocked'];
   const container = document.getElementById('kanbanView');
   container.innerHTML = cols.map(status => {
     const colItems = items.filter(i => i.status === status);
@@ -1145,18 +1188,91 @@ function exportBacklog() {
   a.href=URL.createObjectURL(blob); a.download='closi-ai-backlog.md'; a.click();
 }
 
-// ── Trash ──
+// ── Special Views (Done / Trash) ──
+let showingDone = false;
 let showingTrash = false;
 
+function hideAllSpecialViews() {
+  showingDone = false;
+  showingTrash = false;
+  document.getElementById('doneView').style.display = 'none';
+  document.getElementById('trashView').style.display = 'none';
+  document.getElementById('doneToggle').style.background = '';
+  document.getElementById('doneToggle').style.borderColor = '';
+  document.getElementById('doneToggle').style.color = '';
+  document.getElementById('trashToggle').style.background = '';
+  document.getElementById('trashToggle').style.borderColor = '';
+  document.getElementById('trashToggle').style.color = '';
+}
+
+function showMainView() {
+  document.getElementById('tableView').style.display = currentView==='table' ? 'block' : 'none';
+  document.getElementById('kanbanView').classList.toggle('active', currentView==='kanban');
+}
+
+function hideMainView() {
+  document.getElementById('tableView').style.display = 'none';
+  document.getElementById('kanbanView').classList.remove('active');
+}
+
+// ── Done ──
+async function toggleDone() {
+  if (showingDone) { hideAllSpecialViews(); showMainView(); return; }
+  hideAllSpecialViews();
+  hideMainView();
+  showingDone = true;
+  document.getElementById('doneView').style.display = 'block';
+  document.getElementById('doneToggle').style.background = 'rgba(34,197,94,0.1)';
+  document.getElementById('doneToggle').style.borderColor = 'rgba(34,197,94,0.3)';
+  document.getElementById('doneToggle').style.color = 'var(--green)';
+  renderDoneView();
+}
+
+function renderDoneView() {
+  const doneItems = allItems.filter(i => i.status === 'done');
+  document.getElementById('doneEmpty').style.display = doneItems.length ? 'none' : 'block';
+  document.getElementById('doneBody').innerHTML = doneItems.map(i => {
+    const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
+    return `
+      <tr>
+        <td style="font-size:10px;color:var(--text-dim);font-weight:600">${esc(i.item_id)}</td>
+        <td>${esc(i.title)}</td>
+        <td><span class="type-badge ${i.item_type}">${i.item_type}</span></td>
+        <td><span style="font-size:11px">${MODULE_LABELS[i.module]||i.module}</span></td>
+        <td><span class="rice-score ${riceClass(rice)}">${rice}</span></td>
+        <td style="font-size:11px;color:var(--text-dim)">${i.updated_at ? new Date(i.updated_at).toLocaleDateString('pt-BR') : ''}</td>
+        <td style="display:flex;gap:6px">
+          <button class="done-reopen-btn" onclick="reopenItem('${esc(i.item_id)}')">Reabrir</button>
+          <button class="done-delete-btn" onclick="deleteItem('${esc(i.item_id)}')">Excluir</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function updateDoneCount() {
+  const count = allItems.filter(i => i.status === 'done').length;
+  document.getElementById('doneCount').textContent = count ? `(${count})` : '';
+}
+
+async function reopenItem(id) {
+  await updateField(id, 'status', 'backlog');
+  const item = allItems.find(i => i.item_id === id);
+  if (item) item.status = 'backlog';
+  renderDoneView();
+  renderAll();
+}
+
+// ── Trash ──
 async function toggleTrash() {
-  showingTrash = !showingTrash;
-  document.getElementById('tableView').style.display = showingTrash ? 'none' : (currentView==='table'?'block':'none');
-  document.getElementById('kanbanView').classList.toggle('active', !showingTrash && currentView==='kanban');
-  document.getElementById('trashView').style.display = showingTrash ? 'block' : 'none';
-  document.getElementById('trashToggle').style.background = showingTrash ? 'rgba(239,68,68,0.1)' : '';
-  document.getElementById('trashToggle').style.borderColor = showingTrash ? 'rgba(239,68,68,0.3)' : '';
-  document.getElementById('trashToggle').style.color = showingTrash ? 'var(--red)' : '';
-  if (showingTrash) await loadTrash();
+  if (showingTrash) { hideAllSpecialViews(); showMainView(); return; }
+  hideAllSpecialViews();
+  hideMainView();
+  showingTrash = true;
+  document.getElementById('trashView').style.display = 'block';
+  document.getElementById('trashToggle').style.background = 'rgba(239,68,68,0.1)';
+  document.getElementById('trashToggle').style.borderColor = 'rgba(239,68,68,0.3)';
+  document.getElementById('trashToggle').style.color = 'var(--red)';
+  await loadTrash();
 }
 
 async function loadTrash() {
