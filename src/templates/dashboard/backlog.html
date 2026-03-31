@@ -414,13 +414,13 @@ tr:hover .row-actions { opacity:1; }
       🗑 Lixeira <span id="trashCount" style="font-size:10px;opacity:0.7"></span>
     </button>
     <div class="view-toggle">
-      <button class="view-btn active" onclick="setView('table',this)">Tabela</button>
-      <button class="view-btn" onclick="setView('kanban',this)">Kanban</button>
+      <button class="view-btn" onclick="setView('table',this)">Tabela</button>
+      <button class="view-btn active" onclick="setView('kanban',this)">Kanban</button>
     </div>
   </div>
 
   <!-- ── Table View ── -->
-  <div class="backlog-scroll" id="tableView">
+  <div class="backlog-scroll" id="tableView" style="display:none">
     <table class="backlog-table">
       <thead>
         <tr>
@@ -446,7 +446,7 @@ tr:hover .row-actions { opacity:1; }
   </div>
 
   <!-- ── Kanban View ── -->
-  <div class="kanban-container" id="kanbanView"></div>
+  <div class="kanban-container active" id="kanbanView"></div>
 
   <!-- ── Trash View ── -->
   <div class="backlog-scroll" id="trashView" style="display:none">
@@ -623,7 +623,7 @@ tr:hover .row-actions { opacity:1; }
 let allItems = [];
 let selectedIds = new Set();
 let currentSort = { key: 'rice_score', desc: true };
-let currentView = 'table';
+let currentView = 'kanban';
 let dragSrcRow = null;
 let ctxItemId = null;
 let screenshotFiles = [];
@@ -1080,10 +1080,10 @@ function showAddModal(editId) {
       document.getElementById('fModule').value = item.module||'core';
       document.getElementById('fStatus').value = item.status||'backlog';
       document.getElementById('fPhase').value = item.phase||'Phase 2';
-      document.getElementById('fReach').value = item.reach||100;
-      document.getElementById('fImpact').value = item.impact||1;
-      document.getElementById('fConfidence').value = item.confidence||0.8;
-      document.getElementById('fEffort').value = item.effort||2;
+      document.getElementById('fReach').value = item.reach??5;
+      document.getElementById('fImpact').value = item.impact??5;
+      document.getElementById('fConfidence').value = item.confidence??5;
+      document.getElementById('fEffort').value = item.effort??5;
       document.getElementById('fEstimate').value = item.estimate||'';
       document.getElementById('fDeps').value = item.dependencies||'';
       document.getElementById('fNotes').value = item.notes||'';
@@ -1092,8 +1092,8 @@ function showAddModal(editId) {
     ['fTitle','fDesc','fEstimate','fDeps','fNotes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fType').value='feat'; document.getElementById('fModule').value='core';
     document.getElementById('fStatus').value='backlog'; document.getElementById('fPhase').value='Phase 2';
-    document.getElementById('fReach').value=100; document.getElementById('fImpact').value='1';
-    document.getElementById('fConfidence').value='0.8'; document.getElementById('fEffort').value='2';
+    document.getElementById('fReach').value='5'; document.getElementById('fImpact').value='5';
+    document.getElementById('fConfidence').value='5'; document.getElementById('fEffort').value='5';
   }
   updateRicePreview();
 }
@@ -1101,8 +1101,8 @@ function hideAddModal() { document.getElementById('addModal').classList.remove('
 function editItem(id) { showAddModal(id); }
 
 function updateRicePreview() {
-  const r=parseInt(document.getElementById('fReach').value)||100, i=parseFloat(document.getElementById('fImpact').value)||1;
-  const c=parseFloat(document.getElementById('fConfidence').value)||0.8, e=parseFloat(document.getElementById('fEffort').value)||2;
+  const r=parseInt(document.getElementById('fReach').value)||5, i=parseFloat(document.getElementById('fImpact').value)||5;
+  const c=parseFloat(document.getElementById('fConfidence').value)||5, e=parseFloat(document.getElementById('fEffort').value)||5;
   const score=calcRice(r,i,c,e); const el=document.getElementById('ricePreview');
   el.textContent=score; el.className=`rice-preview-score ${riceClass(score)}`;
 }
@@ -1117,8 +1117,8 @@ async function saveItem() {
     title:document.getElementById('fTitle').value.trim(), description:document.getElementById('fDesc').value,
     item_type:document.getElementById('fType').value, module:document.getElementById('fModule').value,
     status:document.getElementById('fStatus').value, phase:document.getElementById('fPhase').value,
-    reach:parseInt(document.getElementById('fReach').value)||100, impact:parseFloat(document.getElementById('fImpact').value)||1,
-    confidence:parseFloat(document.getElementById('fConfidence').value)||0.8, effort:parseFloat(document.getElementById('fEffort').value)||2,
+    reach:parseInt(document.getElementById('fReach').value)||5, impact:parseFloat(document.getElementById('fImpact').value)||5,
+    confidence:parseFloat(document.getElementById('fConfidence').value)||5, effort:parseFloat(document.getElementById('fEffort').value)||5,
     estimate:document.getElementById('fEstimate').value, dependencies:document.getElementById('fDeps').value,
     notes:document.getElementById('fNotes').value,
   };

@@ -17,6 +17,7 @@ from src.core.database.backlog import (
     reorder_backlog,
     backlog_analytics,
     seed_backlog_if_empty,
+    recalculate_all_rice,
 )
 
 bp = Blueprint("backlog_api", __name__)
@@ -61,10 +62,10 @@ def api_backlog_save():
         "module": data.get("module", "core"),
         "status": data.get("status", "backlog"),
         "phase": data.get("phase", "Phase 2"),
-        "reach": int(data.get("reach", 100)),
-        "impact": float(data.get("impact", 1.0)),
-        "confidence": float(data.get("confidence", 0.8)),
-        "effort": float(data.get("effort", 2.0)),
+        "reach": int(data.get("reach", 5)),
+        "impact": float(data.get("impact", 5)),
+        "confidence": float(data.get("confidence", 5)),
+        "effort": float(data.get("effort", 5)),
         "estimate": data.get("estimate", ""),
         "dependencies": data.get("dependencies", ""),
         "notes": data.get("notes", ""),
@@ -163,3 +164,10 @@ def api_backlog_analytics():
 def api_backlog_next_id():
     """Retorna próximo ID disponível."""
     return jsonify({"next_id": get_next_item_id()})
+
+
+@bp.route("/api/backlog/recalculate-rice", methods=["POST"])
+def api_backlog_recalculate_rice():
+    """Recalcula RICE score de todos os itens."""
+    result = recalculate_all_rice()
+    return jsonify(result)

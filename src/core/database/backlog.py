@@ -148,10 +148,10 @@ def save_backlog_item(item: dict) -> bool:
                 "module": item.get("module", "core"),
                 "status": item.get("status", "backlog"),
                 "phase": item.get("phase", "Phase 2"),
-                "reach": item.get("reach", 100),
-                "impact": item.get("impact", 1.0),
-                "confidence": item.get("confidence", 0.8),
-                "effort": item.get("effort", 2.0),
+                "reach": item.get("reach", 5),
+                "impact": item.get("impact", 5),
+                "confidence": item.get("confidence", 5),
+                "effort": item.get("effort", 5),
                 "estimate": item.get("estimate", ""),
                 "dependencies": item.get("dependencies", ""),
                 "notes": item.get("notes", ""),
@@ -478,6 +478,34 @@ def _get_seed_data() -> list:
     for item in seed:
         item["rice_score"] = _calc_rice(item)
     return seed
+
+
+def recalculate_all_rice() -> dict:
+    """
+    Recalcula RICE score de todos os itens do backlog.
+    Retorna resumo com itens atualizados.
+    """
+    items = load_backlog(include_deleted=True)
+    updated = []
+    for item in items:
+        old_score = item.get("rice_score", 0)
+        new_score = _calc_rice(item)
+        if abs(old_score - new_score) > 0.01:
+            updated.append({
+                "item_id": item.get("item_id"),
+                "title": item.get("title", ""),
+                "old_score": old_score,
+                "new_score": new_score,
+                "reach": item.get("reach"),
+                "impact": item.get("impact"),
+                "confidence": item.get("confidence"),
+                "effort": item.get("effort"),
+            })
+        item["rice_score"] = new_score
+        save_backlog_item(item)
+
+    print(f"[DB] Recalculated RICE for {len(items)} items, {len(updated)} changed", flush=True)
+    return {"total": len(items), "updated": len(updated), "changes": updated}
 
 
 def seed_backlog_if_empty() -> bool:
