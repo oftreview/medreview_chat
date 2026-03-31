@@ -154,12 +154,39 @@
   <div class="daily-chart-wrap">
     <div class="chart-header">
       <div class="section-title" style="margin:0"><div class="dot"></div>Custo Diario — Ultimos 30 dias</div>
-      <div class="chart-total">Total 30d: <strong id="chart30dTotal">$0.00</strong></div>
+      <div style="display:flex;gap:18px;align-items:center">
+        <div class="mode-toggle" style="font-size:10px">
+          <button class="mode-btn active" id="chartModeCost" onclick="setChartMode('cost')" style="padding:4px 10px;font-size:10px">Custo</button>
+          <button class="mode-btn" id="chartModeTokens" onclick="setChartMode('tokens')" style="padding:4px 10px;font-size:10px">Tokens</button>
+        </div>
+        <div class="chart-total">Total 30d: <strong id="chart30dTotal">$0.00</strong></div>
+      </div>
     </div>
     <div class="daily-bars" id="dailyBars">
       <span style="color:var(--text-dim);font-size:12px;padding:30px">Carregando...</span>
     </div>
     <div class="chart-x-labels" id="chartLabels"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       METRICAS CALCULADAS (custo/token, custo/chamada)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="costs-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+    <div class="cost-card">
+      <div class="card-label">Custo / 1K Tokens</div>
+      <div class="card-value" style="font-size:20px;color:var(--purple-light)" id="costPerKToken">-</div>
+      <div class="card-sub" id="costPerKTokenSub">media ponderada</div>
+    </div>
+    <div class="cost-card">
+      <div class="card-label">Custo / Chamada</div>
+      <div class="card-value" style="font-size:20px;color:var(--orange)" id="costPerCall">-</div>
+      <div class="card-sub">media por request</div>
+    </div>
+    <div class="cost-card">
+      <div class="card-label">Tokens / Chamada</div>
+      <div class="card-value" style="font-size:20px;color:var(--green)" id="tokensPerCall">-</div>
+      <div class="card-sub">media input+output</div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
@@ -277,6 +304,8 @@ const MODEL_PRICES = {
 
 let currentTab = 0;
 let histPage = 1;
+let chartMode = 'cost';
+let _dailyStatsCache = [];
 
 function switchTab(idx) {
   currentTab = idx;
@@ -287,11 +316,12 @@ function switchTab(idx) {
   if (idx === 1) loadHistory();
 }
 
-function refreshAll() {
-  loadTotals();
-  loadDailyChart();
-  loadSessionMetrics();
-  if (currentTab === 1) loadHistory();
+async function refreshAll() {
+  const btn = document.querySelector('.page-actions .btn-ghost');
+  if (btn) { btn.textContent = '⟳ Atualizando...'; btn.disabled = true; }
+  await Promise.all([loadTotals(), loadDailyChart(), loadSessionMetrics()]);
+  if (currentTab === 1) await loadHistory();
+  if (btn) { btn.textContent = '✓ Atualizado!'; setTimeout(() => { btn.textContent = '↻ Atualizar'; btn.disabled = false; }, 1500); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -320,19 +350,31 @@ async function loadTotals() {
     document.getElementById('totalCache').textContent = cacheRate.toFixed(0) + '%';
     document.getElementById('totalCacheSub').textContent = `${formatNum(cr)} read / ${formatNum(cw)} write`;
 
+    // Métricas derivadas
+    const totalTokens = inp + out;
+    if (calls > 0) {
+      const costPerKToken = totalTokens > 0 ? (cost / totalTokens * 1000) : 0;
+      document.getElementById('costPerKToken').textContent = '$' + costPerKToken.toFixed(4);
+      document.getElementById('costPerCall').textContent = '$' + (cost / calls).toFixed(4);
+      document.getElementById('tokensPerCall').textContent = formatNum(Math.round(totalTokens / calls));
+    } else {
+      document.getElementById('costPerKToken').textContent = '-';
+      document.getElementById('costPerCall').textContent = '-';
+      document.getElementById('tokensPerCall').textContent = '-';
+    }
+
     // Se nao tem dados no Supabase, mostrar hint
     if (!calls && !data.error) {
       document.getElementById('totalCost').textContent = '$0.00';
-      document.getElementById('totalCostSub').textContent = 'dados acumulam a partir de agora';
+      document.getElementById('totalCostSub').textContent = 'dados acumulam a partir da proxima conversa';
       document.getElementById('totalCalls').textContent = '0';
     }
 
     // Se tem erro, mostrar diagnóstico
     if (data.error) {
       document.getElementById('totalCost').textContent = '⚠';
-      document.getElementById('totalCostSub').innerHTML = `<span style="color:var(--red)">${data.error}</span>`;
+      document.getElementById('totalCostSub').innerHTML = `<span style="color:#e74c3c;font-size:10px">${data.error}</span>`;
       console.error('Metrics error:', data.error);
-      // Tenta carregar diagnóstico
       loadDiagnostics();
     }
   } catch(e) { console.error('loadTotals:', e); }
@@ -345,7 +387,7 @@ async function loadDiagnostics() {
     console.log('[METRICS DIAG]', status);
     if (status.error) {
       document.getElementById('totalCostSub').innerHTML =
-        `<span style="color:var(--red);font-size:10px">${status.error}</span>`;
+        `<span style="color:#e74c3c;font-size:10px">${status.error}</span>`;
     }
   } catch(e) { console.error('loadDiagnostics:', e); }
 }
@@ -357,49 +399,78 @@ async function loadDailyChart() {
   try {
     const res = await fetch('/api/metrics/daily?days=30');
     const data = await res.json();
-    const stats = (data.stats || []).slice().reverse(); // cronologico
+    _dailyStatsCache = (data.stats || []).slice().reverse(); // cronologico
     const container = document.getElementById('dailyBars');
     const labelsEl = document.getElementById('chartLabels');
 
     if (data.error) {
-      container.innerHTML = `<span style="color:var(--red);font-size:12px;padding:30px 0">${data.error}</span>`;
+      container.innerHTML = `<span style="color:#e74c3c;font-size:12px;padding:30px 0">${data.error}</span>`;
       labelsEl.innerHTML = '';
       document.getElementById('chart30dTotal').textContent = '$0.00';
       return;
     }
 
-    if (!stats.length) {
-      container.innerHTML = '<span style="color:var(--text-dim);font-size:12px;padding:30px 0">Os dados comecam a aparecer apos a primeira chamada ao LLM</span>';
+    if (!_dailyStatsCache.length) {
+      container.innerHTML = '<span style="color:var(--text-dim);font-size:12px;padding:30px 0">Os dados comecam a aparecer apos a primeira conversa com o agente</span>';
       labelsEl.innerHTML = '';
       document.getElementById('chart30dTotal').textContent = '$0.00';
       return;
     }
 
-    const costs = stats.map(s => parseFloat(s.total_cost) || 0);
-    const maxCost = Math.max(...costs, 0.001);
-    const sum30d = costs.reduce((a, b) => a + b, 0);
-    document.getElementById('chart30dTotal').textContent = '$' + sum30d.toFixed(4);
-
-    container.innerHTML = stats.map((s, i) => {
-      const cost = costs[i];
-      const h = Math.max(2, (cost / maxCost) * 100);
-      return `<div class="daily-bar" style="height:${h}px" title="${s.day}">
-        <div class="daily-bar-tip">
-          <strong>${s.day||'?'}</strong><br>
-          ${s.total_calls || 0} chamadas<br>
-          ${formatNum((parseInt(s.total_input)||0) + (parseInt(s.total_output)||0))} tokens<br>
-          <span style="color:var(--orange)">$${cost.toFixed(4)}</span>
-        </div>
-      </div>`;
-    }).join('');
-
-    // X-axis labels (show every ~5 days)
-    labelsEl.innerHTML = stats.map((s, i) => {
-      const show = (i % 5 === 0) || i === stats.length - 1;
-      const label = show && s.day ? s.day.slice(5) : '';
-      return `<div class="chart-x-label">${label}</div>`;
-    }).join('');
+    renderDailyChart();
   } catch(e) { console.error('loadDailyChart:', e); }
+}
+
+function setChartMode(mode) {
+  chartMode = mode;
+  document.getElementById('chartModeCost').classList.toggle('active', mode === 'cost');
+  document.getElementById('chartModeTokens').classList.toggle('active', mode === 'tokens');
+  renderDailyChart();
+}
+
+function renderDailyChart() {
+  const stats = _dailyStatsCache;
+  const container = document.getElementById('dailyBars');
+  const labelsEl = document.getElementById('chartLabels');
+
+  if (!stats.length) return;
+
+  const isCost = chartMode === 'cost';
+
+  const values = stats.map(s => {
+    if (isCost) return parseFloat(s.total_cost) || 0;
+    return (parseInt(s.total_input)||0) + (parseInt(s.total_output)||0);
+  });
+  const maxVal = Math.max(...values, isCost ? 0.001 : 1);
+  const sum30d = values.reduce((a, b) => a + b, 0);
+
+  if (isCost) {
+    document.getElementById('chart30dTotal').textContent = '$' + sum30d.toFixed(4);
+  } else {
+    document.getElementById('chart30dTotal').textContent = formatNum(sum30d) + ' tokens';
+  }
+
+  container.innerHTML = stats.map((s, i) => {
+    const val = values[i];
+    const h = Math.max(2, (val / maxVal) * 100);
+    const tokens = (parseInt(s.total_input)||0) + (parseInt(s.total_output)||0);
+    const cost = parseFloat(s.total_cost) || 0;
+    const barColor = isCost ? 'var(--purple)' : 'var(--green)';
+    return `<div class="daily-bar" style="height:${h}px;background:${barColor}" title="${s.day}">
+      <div class="daily-bar-tip">
+        <strong>${s.day||'?'}</strong><br>
+        ${s.total_calls || 0} chamadas<br>
+        ${formatNum(tokens)} tokens (${formatNum(parseInt(s.total_input)||0)} in / ${formatNum(parseInt(s.total_output)||0)} out)<br>
+        <span style="color:var(--orange)">$${cost.toFixed(4)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  labelsEl.innerHTML = stats.map((s, i) => {
+    const show = (i % 5 === 0) || i === stats.length - 1;
+    const label = show && s.day ? s.day.slice(5) : '';
+    return `<div class="chart-x-label">${label}</div>`;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════════

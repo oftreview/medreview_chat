@@ -43,6 +43,9 @@ _BATCH_SIZE = 1   # Flush a cada chamada (garante persistência imediata)
 _FLUSH_INTERVAL = 5  # segundos
 _last_flush = time.time()
 _persist_enabled = None  # Lazy init
+_persist_failures = 0     # Contador de falhas consecutivas
+_MAX_PERSIST_FAILURES = 5  # Depois de N falhas, pausa temporariamente
+_persist_retry_after = 0   # Timestamp para tentar novamente
 
 
 def record_call(model: str, input_tokens: int, output_tokens: int,
@@ -119,7 +122,7 @@ def _enqueue_persist(model, inp, out, cr, cw, cost, ts):
 
 def _flush_to_supabase():
     """Envia batch para Supabase (non-blocking)."""
-    global _last_flush, _persist_enabled
+    global _last_flush, _persist_enabled, _persist_failures, _persist_retry_after
 
     if _persist_enabled is None:
         try:
@@ -134,6 +137,14 @@ def _flush_to_supabase():
             _last_flush = time.time()
         return
 
+    # Se muitas falhas consecutivas, pausa temporariamente (retry a cada 60s)
+    if _persist_failures >= _MAX_PERSIST_FAILURES:
+        if time.time() < _persist_retry_after:
+            return  # Mantém buffer — não descarta
+        # Tempo de retry chegou — reseta contador e tenta de novo
+        _persist_failures = 0
+        print("[METRICS] Retentando persistência após pausa...", flush=True)
+
     with _persist_lock:
         if not _persist_buffer:
             return
@@ -147,20 +158,21 @@ def _flush_to_supabase():
 
 def _do_insert(batch: list):
     """Insere batch no Supabase (roda em thread)."""
-    global _persist_enabled
+    global _persist_failures, _persist_retry_after
     try:
         from src.core.database.client import _get_client
         db = _get_client()
         if db and batch:
             db.table("llm_usage").insert(batch).execute()
+            _persist_failures = 0  # Reset no sucesso
             print(f"[METRICS] Persistido {len(batch)} registro(s) na tabela llm_usage", flush=True)
     except Exception as e:
         err = str(e)
-        print(f"[METRICS WARN] Falha ao persistir llm_usage: {err}", flush=True)
-        # Se a tabela não existe, desabilita persistência para evitar spam de erros
-        if "llm_usage" in err and ("does not exist" in err or "relation" in err):
-            _persist_enabled = False
-            print("[METRICS] Tabela llm_usage não existe! Execute a migration 007 no Supabase SQL Editor.", flush=True)
+        _persist_failures += 1
+        _persist_retry_after = time.time() + 60  # Retry em 60s após muitas falhas
+        print(f"[METRICS WARN] Falha ao persistir llm_usage ({_persist_failures}x): {err}", flush=True)
+        if "does not exist" in err or "relation" in err:
+            print("[METRICS] Tabela llm_usage não encontrada! Execute a migration 007 no Supabase SQL Editor.", flush=True)
 
 
 # ── Diagnóstico ────────────────────────────────────────────────
