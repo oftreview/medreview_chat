@@ -225,7 +225,7 @@ tr:hover .row-actions { opacity:1; }
 .kanban-card-id { font-size:9px; color:var(--text-dim); font-weight:600; letter-spacing:0.5px; }
 .kanban-card-title { font-size:12.5px; font-weight:500; margin:4px 0; }
 .kanban-card-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
-.kanban-card-rice { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; }
+/* kanban-card-rice removed — replaced by priority-badge and agent-badge */
 .kanban-cards.drag-over-col { background:rgba(37,99,235,0.06); border-radius:8px; }
 .kanban-drop-indicator {
   height:3px; background:var(--primary-light); border-radius:3px; margin:2px 0;
@@ -761,7 +761,7 @@ async function duplicateItem(id) {
   const orig = allItems.find(i => i.item_id === id);
   if (!orig) return;
   const payload = {...orig, title: orig.title + ' (cópia)'};
-  delete payload.item_id; delete payload.id; delete payload.rice_score; delete payload.created_at; delete payload.updated_at;
+  delete payload.item_id; delete payload.id; delete payload.created_at; delete payload.updated_at;
   await fetch('/api/backlog', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
 }
 
@@ -769,7 +769,6 @@ async function duplicateItem(id) {
 function renderTable(items) {
   const tbody = document.getElementById('backlogBody');
   tbody.innerHTML = items.map(i => {
-    const rice = i.rice_score ?? calcRice(i.reach, i.impact, i.confidence, i.effort);
     const checked = selectedIds.has(i.item_id) ? 'checked' : '';
     const imgs = (i.screenshots||[]).map(s=>`<img class="screenshot-thumb" src="${esc(s)}" onclick="showLightbox('${esc(s)}')">`).join('');
     return `
