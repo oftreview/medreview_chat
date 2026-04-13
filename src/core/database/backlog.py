@@ -1,6 +1,6 @@
 """
 Backlog items — CRUD + analytics + JSON fallback + trash (soft delete).
-Gerencia itens de backlog de produto com priorização RICE.
+Gerencia itens de backlog de produto com priorização por prioridade (baixa/media/alta/critica).
 """
 import os
 import json
@@ -48,17 +48,6 @@ def _save_backlog_json(items: list, path: str = None) -> bool:
         return False
 
 
-def _calc_rice(item: dict) -> float:
-    """
-    Calcula RICE score: R + I + C + E = 0 a 40.
-    Todos os fatores na mesma escala 0-10.
-    E (Effort) é invertido: 10 = fácil/rápido = prioridade alta.
-    """
-    r = max(0, min(10, item.get("reach", 5)))
-    i = max(0, min(10, item.get("impact", 5)))
-    c = max(0, min(10, item.get("confidence", 5)))
-    e = max(0, min(10, item.get("effort", 5)))
-    return round(r + i + c + e, 1)
 
 
 # ── CRUD Operations ───────────────────────────────────────────────────────────
@@ -88,9 +77,6 @@ def load_backlog(status: str = None, phase: str = None, include_deleted: bool = 
 
     # Fallback: JSON
     items = _load_backlog_json()
-    for item in items:
-        if "rice_score" not in item:
-            item["rice_score"] = _calc_rice(item)
     if not include_deleted:
         items = [i for i in items if not i.get("deleted_at")]
     if status:
@@ -132,7 +118,6 @@ def save_backlog_item(item: dict) -> bool:
     if not item_id:
         return False
 
-    item["rice_score"] = _calc_rice(item)
     item["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     # Supabase
@@ -148,10 +133,8 @@ def save_backlog_item(item: dict) -> bool:
                 "module": item.get("module", "core"),
                 "status": item.get("status", "backlog"),
                 "phase": item.get("phase", "Phase 2"),
-                "reach": item.get("reach", 5),
-                "impact": item.get("impact", 5),
-                "confidence": item.get("confidence", 5),
-                "effort": item.get("effort", 5),
+                "priority": item.get("priority", "media"),
+                "assigned_agent": item.get("assigned_agent", "humano"),
                 "estimate": item.get("estimate", ""),
                 "dependencies": item.get("dependencies", ""),
                 "notes": item.get("notes", ""),
@@ -301,31 +284,25 @@ def backlog_analytics() -> dict:
     by_status = {}
     by_phase = {}
     by_type = {}
-    total_effort = 0
+    by_priority = {}
+    by_agent = {}
 
     for item in items:
         st = item.get("status", "backlog")
         ph = item.get("phase", "Phase 2")
         tp = item.get("item_type", "feat")
+        pr = item.get("priority", "media")
+        ag = item.get("assigned_agent", "humano")
         by_status[st] = by_status.get(st, 0) + 1
         by_phase[ph] = by_phase.get(ph, 0) + 1
         by_type[tp] = by_type.get(tp, 0) + 1
-        if st not in ("done", "cancelled"):
-            total_effort += item.get("effort", 0)
-
-    scores = [i.get("rice_score", 0) for i in items if i.get("status") not in ("done", "cancelled")]
-    avg_rice = round(sum(scores) / len(scores), 1) if scores else 0
+        by_priority[pr] = by_priority.get(pr, 0) + 1
+        by_agent[ag] = by_agent.get(ag, 0) + 1
 
     blocked = [
         {"item_id": i["item_id"], "title": i.get("title", "")}
         for i in items if i.get("status") == "blocked"
     ]
-
-    top5 = sorted(
-        [i for i in items if i.get("status") not in ("done", "cancelled")],
-        key=lambda x: x.get("rice_score", 0),
-        reverse=True
-    )[:5]
 
     trash_count = len(load_trash())
 
@@ -334,13 +311,9 @@ def backlog_analytics() -> dict:
         "by_status": by_status,
         "by_phase": by_phase,
         "by_type": by_type,
-        "total_effort_weeks": round(total_effort, 1),
-        "avg_rice_score": avg_rice,
+        "by_priority": by_priority,
+        "by_agent": by_agent,
         "blocked_items": blocked,
-        "top5_rice": [
-            {"item_id": i["item_id"], "title": i.get("title", ""), "rice_score": i.get("rice_score", 0)}
-            for i in top5
-        ],
         "trash_count": trash_count,
     }
 
@@ -350,162 +323,131 @@ def backlog_analytics() -> dict:
 
 def _get_seed_data() -> list:
     """
-    Dados iniciais do backlog — escala unificada 0-10 para todos os fatores RICE.
-    R + I + C + E = score máximo 40.
-    Effort é invertido: 10 = fácil/rápido, 0 = muito difícil.
+    Dados iniciais do backlog — priorização simples (baixa/media/alta/critica)
+    com atribuição de agente (humano/claude-code).
     """
     seed = [
         {
             "item_id": "CLO-001", "title": "Follow-up Scheduler",
             "description": "Sistema de follow-up automático: 24h após primeiro contato, 3-5 dias sem resposta, 7-10 dias último contato. Precisa de background job (APScheduler ou Celery).",
             "item_type": "feat", "module": "core", "status": "backlog", "phase": "Phase 2",
-            "reach": 8, "impact": 10, "confidence": 7, "effort": 3,
+            "priority": "critica", "assigned_agent": "claude-code",
             "estimate": "2w", "dependencies": "", "notes": "Prompt já define regras de timing", "sort_order": 0,
         },
         {
             "item_id": "CLO-002", "title": "Webhook Hotmart (Pagamento)",
             "description": "Receber webhook de confirmação de pagamento da Hotmart. Ativar Stage 6 (pós-venda) automaticamente.",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 2",
-            "reach": 6, "impact": 10, "confidence": 7, "effort": 5,
+            "priority": "alta", "assigned_agent": "claude-code",
             "estimate": "1w", "dependencies": "", "notes": "Sem isso não detectamos conversão real", "sort_order": 1,
         },
         {
             "item_id": "CLO-003", "title": "Persistir Estágio do Funil",
             "description": "Garantir que stage extraído via [META] seja persistido na tabela leads em toda transição.",
             "item_type": "fix", "module": "database", "status": "backlog", "phase": "Phase 2",
-            "reach": 10, "impact": 7, "confidence": 10, "effort": 7,
+            "priority": "alta", "assigned_agent": "claude-code",
             "estimate": "3d", "dependencies": "", "notes": "Hoje extrai mas nem sempre salva", "sort_order": 2,
         },
         {
             "item_id": "CLO-004", "title": "Unificar Tabelas messages/conversations",
             "description": "Eliminar redundância entre tabelas. Migrar dados, atualizar queries.",
             "item_type": "refactor", "module": "database", "status": "backlog", "phase": "Phase 2",
-            "reach": 4, "impact": 5, "confidence": 7, "effort": 7,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "3d", "dependencies": "", "notes": "Criar migration SQL", "sort_order": 3,
         },
         {
             "item_id": "CLO-005", "title": "Dashboard Métricas de Conversão",
             "description": "Dashboard real-time: taxa de conversão por estágio, tempo médio, leads ativos vs perdidos.",
             "item_type": "feat", "module": "dashboard", "status": "backlog", "phase": "Phase 2",
-            "reach": 4, "impact": 7, "confidence": 7, "effort": 5,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "1w", "dependencies": "CLO-003", "notes": "Depende de CLO-003", "sort_order": 4,
         },
         {
             "item_id": "CLO-006", "title": "HubSpot Events Completos",
             "description": "Enviar eventos para HubSpot em todas as transições de estágio.",
             "item_type": "perf", "module": "integrations", "status": "backlog", "phase": "Phase 2",
-            "reach": 3, "impact": 5, "confidence": 7, "effort": 7,
+            "priority": "baixa", "assigned_agent": "claude-code",
             "estimate": "2d", "dependencies": "", "notes": "", "sort_order": 5,
         },
         {
             "item_id": "CLO-007", "title": "Monitorar Memory Leak (Cache TTL)",
             "description": "TTL cleanup implementado mas precisa de monitoramento em produção.",
             "item_type": "fix", "module": "core", "status": "next", "phase": "Phase 2",
-            "reach": 10, "impact": 7, "confidence": 4, "effort": 9,
+            "priority": "alta", "assigned_agent": "claude-code",
             "estimate": "1d", "dependencies": "", "notes": "Adicionar métricas de tamanho do cache", "sort_order": 6,
         },
         {
             "item_id": "CLO-008", "title": "Few-shot Examples no Prompt",
             "description": "Adicionar 3-5 exemplos de conversas reais bem-sucedidas ao system prompt.",
             "item_type": "perf", "module": "agent", "status": "backlog", "phase": "Phase 2",
-            "reach": 8, "impact": 7, "confidence": 4, "effort": 7,
+            "priority": "media", "assigned_agent": "humano",
             "estimate": "3d", "dependencies": "", "notes": "Medir impacto na qualidade", "sort_order": 7,
         },
         {
             "item_id": "CLO-009", "title": "A/B Testing de Prompts",
             "description": "Framework para testar variações de prompt. Medir conversão por variante.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 8, "impact": 7, "confidence": 4, "effort": 3,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "2w", "dependencies": "CLO-003", "notes": "", "sort_order": 8,
         },
         {
             "item_id": "CLO-010", "title": "Seleção Dinâmica de Oferta",
             "description": "Agente escolhe oferta baseado no perfil do lead.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 8, "impact": 7, "confidence": 4, "effort": 5,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "1w", "dependencies": "", "notes": "", "sort_order": 9,
         },
         {
             "item_id": "CLO-011", "title": "Desconto Dinâmico (até 10%)",
             "description": "Agente pode oferecer desconto progressivo: 5% após 2ª objeção.",
             "item_type": "feat", "module": "agent", "status": "backlog", "phase": "Phase 3",
-            "reach": 6, "impact": 7, "confidence": 4, "effort": 7,
+            "priority": "baixa", "assigned_agent": "claude-code",
             "estimate": "3d", "dependencies": "", "notes": "Precisa de regras claras e logging", "sort_order": 10,
         },
         {
             "item_id": "CLO-012", "title": "Integração Botmaker (Transfer Direto)",
             "description": "Transferir conversa para atendente humano via Botmaker API.",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 3",
-            "reach": 4, "impact": 5, "confidence": 4, "effort": 5,
+            "priority": "baixa", "assigned_agent": "claude-code",
             "estimate": "1w", "dependencies": "", "notes": "Config vars já existem", "sort_order": 11,
         },
         {
             "item_id": "CLO-013", "title": "Testes de Integração E2E",
             "description": "Testes end-to-end: simular lead completo.",
             "item_type": "test", "module": "devops", "status": "backlog", "phase": "Phase 3",
-            "reach": 3, "impact": 7, "confidence": 7, "effort": 5,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "1w", "dependencies": "", "notes": "Rodar no CI", "sort_order": 12,
         },
         {
             "item_id": "CLO-014", "title": "Rate Limiting por Sessão",
             "description": "Adicionar rate limiting por sessão para evitar abuse.",
             "item_type": "perf", "module": "core", "status": "backlog", "phase": "Phase 3",
-            "reach": 6, "impact": 5, "confidence": 7, "effort": 9,
+            "priority": "alta", "assigned_agent": "claude-code",
             "estimate": "1d", "dependencies": "", "notes": "", "sort_order": 13,
         },
         {
             "item_id": "CLO-015", "title": "Multi-tenant (Outros Produtos)",
             "description": "Abstrair Closi AI para suportar múltiplos clientes.",
             "item_type": "feat", "module": "core", "status": "backlog", "phase": "Phase 4",
-            "reach": 3, "impact": 10, "confidence": 4, "effort": 1,
+            "priority": "baixa", "assigned_agent": "humano",
             "estimate": "6w", "dependencies": "", "notes": "Visão de longo prazo", "sort_order": 14,
         },
         {
             "item_id": "CLO-016", "title": "Voice Messages (Áudio WhatsApp)",
             "description": "Receber e transcrever áudios de WhatsApp (Whisper API).",
             "item_type": "feat", "module": "integrations", "status": "backlog", "phase": "Phase 4",
-            "reach": 6, "impact": 7, "confidence": 4, "effort": 2,
+            "priority": "media", "assigned_agent": "claude-code",
             "estimate": "3w", "dependencies": "", "notes": "Whisper API", "sort_order": 15,
         },
         {
             "item_id": "CLO-017", "title": "Agente Autônomo de Desenvolvimento",
             "description": "V2: agentes de IA consultam backlog e constroem features 24/7.",
             "item_type": "research", "module": "devops", "status": "backlog", "phase": "Phase 4",
-            "reach": 1, "impact": 10, "confidence": 4, "effort": 2,
+            "priority": "alta", "assigned_agent": "humano",
             "estimate": "4w", "dependencies": "", "notes": "Requer guardrails", "sort_order": 16,
         },
     ]
-    for item in seed:
-        item["rice_score"] = _calc_rice(item)
     return seed
-
-
-def recalculate_all_rice() -> dict:
-    """
-    Recalcula RICE score de todos os itens do backlog.
-    Retorna resumo com itens atualizados.
-    """
-    items = load_backlog(include_deleted=True)
-    updated = []
-    for item in items:
-        old_score = item.get("rice_score", 0)
-        new_score = _calc_rice(item)
-        if abs(old_score - new_score) > 0.01:
-            updated.append({
-                "item_id": item.get("item_id"),
-                "title": item.get("title", ""),
-                "old_score": old_score,
-                "new_score": new_score,
-                "reach": item.get("reach"),
-                "impact": item.get("impact"),
-                "confidence": item.get("confidence"),
-                "effort": item.get("effort"),
-            })
-        item["rice_score"] = new_score
-        save_backlog_item(item)
-
-    print(f"[DB] Recalculated RICE for {len(items)} items, {len(updated)} changed", flush=True)
-    return {"total": len(items), "updated": len(updated), "changes": updated}
 
 
 def seed_backlog_if_empty() -> bool:

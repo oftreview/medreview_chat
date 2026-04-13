@@ -1,6 +1,6 @@
 """
 src/api/backlog_api.py — Product backlog management endpoints.
-CRUD + analytics + reorder + trash for backlog items with RICE prioritization.
+CRUD + analytics + reorder + trash for backlog items with priority levels.
 """
 from flask import Blueprint, request, jsonify
 
@@ -17,7 +17,6 @@ from src.core.database.backlog import (
     reorder_backlog,
     backlog_analytics,
     seed_backlog_if_empty,
-    recalculate_all_rice,
 )
 
 bp = Blueprint("backlog_api", __name__)
@@ -62,10 +61,8 @@ def api_backlog_save():
         "module": data.get("module", "core"),
         "status": data.get("status", "backlog"),
         "phase": data.get("phase", "Phase 2"),
-        "reach": int(data.get("reach", 5)),
-        "impact": float(data.get("impact", 5)),
-        "confidence": float(data.get("confidence", 5)),
-        "effort": float(data.get("effort", 5)),
+        "priority": data.get("priority", "media"),
+        "assigned_agent": data.get("assigned_agent", "humano"),
         "estimate": data.get("estimate", ""),
         "dependencies": data.get("dependencies", ""),
         "notes": data.get("notes", ""),
@@ -87,17 +84,13 @@ def api_backlog_update(item_id):
         return jsonify({"error": "Item não encontrado"}), 404
 
     for key in ["title", "description", "item_type", "module", "status",
-                "phase", "estimate", "dependencies", "notes"]:
+                "phase", "priority", "assigned_agent", "estimate", "dependencies", "notes"]:
         if key in data:
             current[key] = data[key]
 
-    for key in ["reach", "sort_order"]:
+    for key in ["sort_order"]:
         if key in data:
             current[key] = int(data[key])
-
-    for key in ["impact", "confidence", "effort"]:
-        if key in data:
-            current[key] = float(data[key])
 
     current["item_id"] = item_id
     ok = save_backlog_item(current)
@@ -166,8 +159,3 @@ def api_backlog_next_id():
     return jsonify({"next_id": get_next_item_id()})
 
 
-@bp.route("/api/backlog/recalculate-rice", methods=["POST"])
-def api_backlog_recalculate_rice():
-    """Recalcula RICE score de todos os itens."""
-    result = recalculate_all_rice()
-    return jsonify(result)
