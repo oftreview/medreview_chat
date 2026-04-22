@@ -45,7 +45,8 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
     Args:
         system_prompt: Contexto completo do agente (product_info, objections, etc.)
         messages: Histórico da conversa [{"role": "user/assistant", "content": "..."}]
-        memory_context: (Fase 3) Briefing do Wild Memory — concatenado ao system prompt.
+        memory_context: (Fase 3) Briefing do Wild Memory — enviado como bloco
+            de system separado, fora do cache (muda a cada turno).
 
     Returns:
         Texto da resposta do modelo.
@@ -55,12 +56,26 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
     """
     last_error = None
 
-    full_system = system_prompt
+    # System como content list multi-part para ativar prompt caching da Anthropic
+    # via OpenRouter. O bloco estático (system_prompt) recebe cache_control ephemeral
+    # e vira cache read (~10% do custo) a partir da 2ª chamada dentro da janela de 5min.
+    # memory_context vai em bloco separado SEM cache — muda a cada turno e quebraria
+    # o prefix match se estivesse antes ou dentro do bloco cacheado.
+    system_content = [
+        {
+            "type": "text",
+            "text": system_prompt,
+            "cache_control": {"type": "ephemeral"},
+        }
+    ]
     if memory_context:
-        full_system = f"{system_prompt}\n\n{memory_context}"
+        system_content.append({
+            "type": "text",
+            "text": memory_context,
+        })
 
-    full_messages = [{"role": "system", "content": full_system}, *messages]
-    sys_len = len(full_system)
+    full_messages = [{"role": "system", "content": system_content}, *messages]
+    sys_len = len(system_prompt) + (len(memory_context) if memory_context else 0)
     hist_len = len(messages)
 
     for attempt in range(1, MAX_RETRIES + 1):
@@ -85,12 +100,26 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
             input_tokens = getattr(usage, "prompt_tokens", 0) or 0
             output_tokens = getattr(usage, "completion_tokens", 0) or 0
 
+            # Cache hits do prompt caching da Anthropic, propagados pelo OpenRouter.
+            # Caminhos observados em ordem de preferência: prompt_tokens_details.cached_tokens
+            # (OpenAI schema) e cache_read_input_tokens / cache_creation_input_tokens
+            # (passthrough Anthropic).
+            cache_read = 0
+            details = getattr(usage, "prompt_tokens_details", None)
+            if details is not None:
+                cache_read = getattr(details, "cached_tokens", 0) or 0
+            if not cache_read:
+                cache_read = getattr(usage, "cache_read_input_tokens", 0) or 0
+            cache_write = getattr(usage, "cache_creation_input_tokens", 0) or 0
+
             log_chat(
                 "LLM_OK",
                 "Resposta recebida",
                 model=OPENROUTER_MODEL,
                 input=input_tokens,
                 output=output_tokens,
+                cache_read=cache_read,
+                cache_write=cache_write,
                 dur=f"{_dt:.2f}s",
                 attempt=f"{attempt}/{MAX_RETRIES}",
             )
@@ -101,6 +130,8 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
                     model=OPENROUTER_MODEL,
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
+                    cache_read=cache_read,
+                    cache_write=cache_write,
                 )
             except Exception:
                 pass  # Não bloqueia se métricas falharem

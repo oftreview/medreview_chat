@@ -14,7 +14,8 @@
       "Bash(python -c ' *)",
       "Bash(python -m pytest tests/unit/test_llm_retry.py -v)",
       "Bash(python -m pytest tests/ -x --ignore=tests/e2e --ignore=tests/load --ignore=tests/dashboard -q)",
-      "Bash(python -c \"import ast; ast.parse\\(open\\('run_local.py', encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")"
+      "Bash(python -c \"import ast; ast.parse\\(open\\('run_local.py', encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(python -m py_compile src/core/llm.py src/core/metrics.py)"
     ]
   }
 }

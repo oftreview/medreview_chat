@@ -4,9 +4,6 @@ Coletor de métricas de uso da API LLM (via OpenRouter).
 Singleton thread-safe que acumula tokens e custos.
 Dual-write: memória (live) + Supabase (persistente).
 Alimentado por core/llm.py após cada chamada à API.
-
-Nota: campos cache_read/cache_write permanecem na estrutura (compat com schema
-e dashboards legados) mas serão sempre 0 — OpenRouter é chamado sem caching.
 """
 import threading
 import time
@@ -54,9 +51,20 @@ _persist_retry_after = 0   # Timestamp para tentar novamente
 
 def record_call(model: str, input_tokens: int, output_tokens: int,
                 cache_read: int = 0, cache_write: int = 0):
-    """Registra uma chamada à API com seus tokens e cache."""
+    """Registra uma chamada à API com seus tokens e cache.
+
+    input_tokens é o total reportado pelo provedor (inclui cache_read e cache_write).
+    Cobrança Anthropic: cache_read custa 10% do preço de input; cache_write custa 125%.
+    """
     prices = MODEL_PRICES.get(model, {"input": 3.0, "output": 15.0})
-    cost = (input_tokens * prices["input"] + output_tokens * prices["output"]) / 1_000_000
+
+    regular_input = max(0, input_tokens - cache_read - cache_write)
+    cost = (
+        regular_input * prices["input"]
+        + cache_read * prices["input"] * 0.10
+        + cache_write * prices["input"] * 1.25
+        + output_tokens * prices["output"]
+    ) / 1_000_000
 
     now_brt = datetime.now(_BRT)
     time_str = now_brt.strftime("%H:%M:%S")
