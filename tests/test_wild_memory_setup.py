@@ -6,14 +6,12 @@ Verifica que:
 2. Config YAML carrega corretamente
 3. NER MedReview reconhece entidades do domínio
 4. Imprint YAML é válido
-5. Nenhum arquivo do agente original foi modificado
 
 Rodar com: python -m pytest tests/test_wild_memory_setup.py -v
 """
 
 import os
 import sys
-import hashlib
 
 # Adiciona raiz do projeto ao path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -274,48 +272,7 @@ def test_migration_has_rpc_functions():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 7. Integridade — Nada do agente original foi alterado
-# ══════════════════════════════════════════════════════════════════════════════
-
-def test_original_memory_unchanged():
-    """core/memory.py (sistema antigo) NÃO deve ter sido modificado."""
-    with open("core/memory.py", "rb") as f:
-        content = f.read()
-    # Deve conter a classe ConversationMemory intacta
-    assert b"class ConversationMemory:" in content
-    assert b"SESSION_TTL_SECONDS" in content
-    assert b"_cleanup_expired" in content
-
-
-def test_original_database_unchanged():
-    """core/database.py NÃO deve ter sido modificado."""
-    with open("core/database.py", "rb") as f:
-        content = f.read()
-    assert b"def save_message(" in content
-    assert b"def load_conversation_history(" in content
-    assert b"def upsert_lead(" in content
-
-
-def test_original_agent_unchanged():
-    """agents/sales/agent.py NÃO deve ter sido modificado."""
-    with open("agents/sales/agent.py", "rb") as f:
-        content = f.read()
-    assert b"class SalesAgent:" in content
-    assert b"from core.memory import ConversationMemory" in content
-    assert b"self.memory = ConversationMemory()" in content
-
-
-def test_original_system_prompt_unchanged():
-    """System prompt NÃO deve ter sido modificado."""
-    assert os.path.isfile("agents/sales/prompts/system_prompt.md")
-    with open("agents/sales/prompts/system_prompt.md") as f:
-        content = f.read()
-    assert "MedReview" in content
-    assert "IDENTIDADE" in content
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# 8. Distillation Gate
+# 7. Distillation Gate
 # ══════════════════════════════════════════════════════════════════════════════
 
 def test_gate_rejects_trivial():

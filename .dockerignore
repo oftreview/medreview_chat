@@ -8,6 +8,10 @@ venv/
 __pycache__/
 *.pyc
 *.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
 
 # Environment & Secrets
 .env
@@ -27,6 +31,10 @@ Thumbs.db
 docs/
 *.md
 !README.md
+*.docx
+*.pdf
+*.skill
+*.zip
 
 # Tests — only exclude cached results and temp files
 tests/results/
@@ -35,7 +43,3 @@ tests/__pycache__/
 # Local cache
 local_cache/
 
-# Legacy code (will be removed after migration)
-sandbox/
-core/
-agents/

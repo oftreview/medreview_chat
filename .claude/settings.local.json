@@ -15,7 +15,11 @@
       "Bash(python -m pytest tests/unit/test_llm_retry.py -v)",
       "Bash(python -m pytest tests/ -x --ignore=tests/e2e --ignore=tests/load --ignore=tests/dashboard -q)",
       "Bash(python -c \"import ast; ast.parse\\(open\\('run_local.py', encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
-      "Bash(python -m py_compile src/core/llm.py src/core/metrics.py)"
+      "Bash(python -m py_compile src/core/llm.py src/core/metrics.py)",
+      "Bash(grep -iE \"^\\(core|agents|sandbox\\)$\")",
+      "Bash(python -c \"import src.app; print\\('APP IMPORT OK'\\)\")",
+      "Bash(python -m pytest tests/test_wild_memory_setup.py -v --no-header)",
+      "Bash(python -m pytest tests/ --ignore=tests/results --co -q)"
     ]
   }
 }

@@ -48,7 +48,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 addopts = "-v --tb=short --strict-markers"
 
 [tool.coverage.run]
-source = ["src", "core", "wild_memory"]
+source = ["src", "wild_memory"]
 omit = ["*/tests/*", "*/__pycache__/*", "*/migrations/*"]
 
 [tool.coverage.report]
