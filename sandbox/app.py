@@ -1121,4 +1121,7 @@ def health_memory():
 
 if __name__ == "__main__":
     print(f"\n🟣 Closi AI rodando em http://{HOST}:{PORT}\n")
-    app.run(host=HOST, debug=DEBUG, port=PORT)
+    # use_reloader=False: o reloader do werkzeug monitora a stdlib inteira no
+    # Windows e reinicia o processo no meio do debounce do /chat, fazendo o
+    # fetch do cliente cair com "Failed to fetch". Debugger continua ativo.
+    app.run(host=HOST, debug=DEBUG, use_reloader=False, port=PORT)

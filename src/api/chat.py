@@ -5,6 +5,7 @@ Uses gevent for non-blocking timers with debounce accumulation.
 """
 import os
 import threading
+import time
 import gevent
 from flask import Blueprint, request, jsonify
 
@@ -30,7 +31,7 @@ from src.core.security import (
     is_user_blocked,
     INJECTION_BLOCK_RESPONSE,
 )
-from src.core.logger import log_security_event
+from src.core.logger import log_security_event, log_chat
 from src.core.message_splitter import split_response, DELAY_SECONDS as MSG_DELAY
 
 bp = Blueprint("chat", __name__)
@@ -43,8 +44,10 @@ def _get_agent():
     """Get or create the SalesAgent singleton."""
     global _agent
     if _agent is None:
+        _t0 = time.monotonic()
         from src.agent.sales_agent import SalesAgent
         _agent = SalesAgent()
+        log_chat("AGENT_INIT", "SalesAgent criado", dur=f"{time.monotonic() - _t0:.2f}s")
     return _agent
 
 
@@ -125,18 +128,24 @@ def _flush_and_respond(session_id: str):
     # Combine all accumulated messages
     combined = "\n".join(messages)
     uid_hash = hash_user_id(user_id)
-    print(
-        f"[FLUSH] Timer disparou! session={hash_user_id(session_id)} uid={uid_hash} msgs_acumuladas={len(messages)} canal={channel}",
-        flush=True,
+    sess_hash = hash_user_id(session_id)
+    log_chat(
+        "FLUSH",
+        "Timer disparou",
+        session=sess_hash,
+        uid=uid_hash,
+        msgs=len(messages),
+        canal=channel,
     )
-    print(
-        f"[FLUSH] Mensagens combinadas: {combined[:200]}{'...' if len(combined) > 200 else ''}",
-        flush=True,
-    )
+    preview = combined[:200] + ("..." if len(combined) > 200 else "")
+    log_chat("FLUSH", f"Combined: {preview!r}", session=sess_hash)
 
+    import time as _time
+    _t0 = _time.monotonic()
     try:
         # Use user_id as agent session_id for Supabase history continuity
         result = agent.reply(combined, session_id=user_id)
+        _dt = _time.monotonic() - _t0
         response_text = result["message"]
 
         # Filter output before sending to external channel
@@ -146,18 +155,26 @@ def _flush_and_respond(session_id: str):
 
         # Split into multiple short messages (1-3 parts)
         response_parts = split_response(response_text)
-        print(
-            f"[CHAT API] Resposta dividida em {len(response_parts)} parte(s) uid={uid_hash}",
-            flush=True,
+        log_chat(
+            "FLUSH",
+            "Resposta pronta",
+            session=sess_hash,
+            uid=uid_hash,
+            parts=len(response_parts),
+            dur=f"{_dt:.2f}s",
         )
 
         status = "success"
     except Exception as e:
         import traceback
+        _dt = _time.monotonic() - _t0
         error_detail = f"{type(e).__name__}: {e}"
-        print(
-            f"[CHAT API] Erro ao processar session={hash_user_id(session_id)} uid={uid_hash}: {error_detail}",
-            flush=True,
+        log_chat(
+            "FLUSH_ERR",
+            error_detail,
+            session=sess_hash,
+            uid=uid_hash,
+            dur=f"{_dt:.2f}s",
         )
         traceback.print_exc()
         # In sandbox, show real error. In production, show fallback.
@@ -417,9 +434,12 @@ def chat():
             state["event"].clear()
             state["result"] = None
 
-            print(
-                f"[DEBOUNCE] Msg acumulada session={hash_user_id(session_id)} total={len(state['messages'])} delay={RESPONSE_DELAY_SECONDS}s",
-                flush=True,
+            log_chat(
+                "DEBOUNCE",
+                "Msg acumulada",
+                session=hash_user_id(session_id),
+                total=len(state['messages']),
+                delay=f"{RESPONSE_DELAY_SECONDS}s",
             )
 
             timer = gevent.spawn_later(RESPONSE_DELAY_SECONDS, _flush_and_respond, session_id)
@@ -427,8 +447,11 @@ def chat():
 
             event = state["event"]
 
-        # Block until timer fires and processing completes
-        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 60)
+        # Block until timer fires and processing completes.
+        # +120s dá folga pros retries da LLM (llm.py: até 3 tentativas × 30s).
+        _wait_t0 = time.monotonic()
+        triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 120)
+        _wait_dt = time.monotonic() - _wait_t0
 
         with _chat_lock:
             state = _chat_state.get(session_id, {})
@@ -458,6 +481,15 @@ def chat():
         if triggered and result:
             return jsonify(result)
         else:
+            log_chat(
+                "FALLBACK",
+                "event.wait expirou ou result vazio — devolvendo FALLBACK_MESSAGE",
+                session=hash_user_id(session_id),
+                uid=hash_user_id(user_id),
+                triggered=triggered,
+                has_result=bool(result),
+                wait=f"{_wait_dt:.2f}s",
+            )
             return jsonify({
                 "session_id": session_id,
                 "response": FALLBACK_MESSAGE,
@@ -514,9 +546,12 @@ def chat():
         state["event"].clear()
         state["result"] = None
 
-        print(
-            f"[DEBOUNCE SANDBOX] Msg acumulada total={len(state['messages'])} delay={RESPONSE_DELAY_SECONDS}s",
-            flush=True,
+        log_chat(
+            "DEBOUNCE_SANDBOX",
+            "Msg acumulada",
+            session=session_id,
+            total=len(state['messages']),
+            delay=f"{RESPONSE_DELAY_SECONDS}s",
         )
 
         timer = gevent.spawn_later(RESPONSE_DELAY_SECONDS, _flush_and_respond, session_id)
@@ -524,7 +559,9 @@ def chat():
 
         event = state["event"]
 
-    triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 60)
+    _wait_t0 = time.monotonic()
+    triggered = event.wait(timeout=RESPONSE_DELAY_SECONDS + 120)
+    _wait_dt = time.monotonic() - _wait_t0
 
     with _chat_lock:
         state = _chat_state.get(session_id, {})
@@ -537,6 +574,14 @@ def chat():
     if triggered and result:
         return jsonify(result)
     else:
+        log_chat(
+            "FALLBACK_SANDBOX",
+            "event.wait expirou ou result vazio — devolvendo FALLBACK_MESSAGE",
+            session=session_id,
+            triggered=triggered,
+            has_result=bool(result),
+            wait=f"{_wait_dt:.2f}s",
+        )
         return jsonify({
             "session_id": session_id,
             "response": FALLBACK_MESSAGE,

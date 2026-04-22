@@ -12,7 +12,7 @@ Funções:
 import os
 import json
 import logging
-import hashlib
+from logging.handlers import RotatingFileHandler
 from datetime import datetime, timezone
 
 # ── Configuração do diretório de logs ─────────────────────────────────────────
@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 SECURITY_LOG_PATH = os.path.join(LOGS_DIR, "security.log")
 CONVERSATION_LOG_PATH = os.path.join(LOGS_DIR, "conversation.log")
+CHAT_LOG_PATH = os.path.join(LOGS_DIR, "chat.log")
 
 # Garante que o diretório de logs existe
 os.makedirs(LOGS_DIR, exist_ok=True)
@@ -47,8 +48,44 @@ if not _conv_logger.handlers:
     _conv_logger.addHandler(_conv_handler)
     _conv_logger.propagate = False
 
+# ── Logger do pipeline de chat (texto legível, rotação de arquivo) ────────────
+# Captura cada etapa do /chat: recv, debounce, flush, llm call/retry, response.
+# Usado para depurar timeouts e travamentos sem depender do stdout do processo.
+
+_chat_logger = logging.getLogger("closi-ai.chat")
+_chat_logger.setLevel(logging.INFO)
+
+if not _chat_logger.handlers:
+    # 10MB × 5 backups = ~50MB max. Suficiente pra debugar semanas de tráfego dev.
+    _chat_handler = RotatingFileHandler(
+        CHAT_LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    _chat_handler.setFormatter(logging.Formatter("%(message)s"))
+    _chat_logger.addHandler(_chat_handler)
+    _chat_logger.propagate = False
+
 
 # ── Funções públicas ──────────────────────────────────────────────────────────
+
+
+def log_chat(tag: str, msg: str, **context) -> None:
+    """
+    Registra um evento do pipeline de chat no stdout E em logs/chat.log.
+
+    Args:
+        tag: rótulo curto tipo "DEBOUNCE", "FLUSH", "LLM", "LLM_RETRY".
+        msg: descrição do evento.
+        **context: pares chave=valor anexados ao final da linha.
+
+    O log em arquivo tem timestamp ISO8601 UTC para cruzamento com traces.
+    O print stdout mantém compatibilidade com os logs legados.
+    """
+    ts = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    ctx = " ".join(f"{k}={v}" for k, v in context.items())
+    suffix = f" {ctx}" if ctx else ""
+    line = f"[{tag}] {msg}{suffix}"
+    _chat_logger.info(f"{ts} {line}")
+    print(line, flush=True)
 
 def log_security_event(
     event_type: str,

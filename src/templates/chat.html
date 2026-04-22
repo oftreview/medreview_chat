@@ -222,7 +222,12 @@ async function sendMessage(){
       if(data.escalate){statusDot.className='dot escalated';statusText.textContent='Escalando para humano'}
     }
   }catch(e){
-    if(!_responded){_responded=true;hideTyping();appendMessage('agent','Erro: '+(e.message||'conexão falhou'));}
+    if(!_responded){
+      _responded=true;hideTyping();
+      const isNetwork = e.name==='TypeError' || /fetch/i.test(e.message||'');
+      const msg = isNetwork ? 'Conexão interrompida. Tenta mandar de novo?' : 'Erro: '+(e.message||'conexão falhou');
+      appendMessage('agent', msg);
+    }
   }
 
   _activeSends--;

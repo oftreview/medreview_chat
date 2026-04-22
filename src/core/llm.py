@@ -19,6 +19,7 @@ from src.config import (
     OPENROUTER_APP_NAME,
     MAX_TOKENS,
 )
+from src.core.logger import log_chat
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -59,23 +60,39 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
         full_system = f"{system_prompt}\n\n{memory_context}"
 
     full_messages = [{"role": "system", "content": full_system}, *messages]
+    sys_len = len(full_system)
+    hist_len = len(messages)
 
     for attempt in range(1, MAX_RETRIES + 1):
+        log_chat(
+            "LLM_CALL",
+            "Enviando request",
+            model=OPENROUTER_MODEL,
+            attempt=f"{attempt}/{MAX_RETRIES}",
+            sys_chars=sys_len,
+            hist_msgs=hist_len,
+        )
+        _t0 = time.monotonic()
         try:
             response = client.chat.completions.create(
                 model=OPENROUTER_MODEL,
                 max_tokens=MAX_TOKENS,
                 messages=full_messages,
             )
+            _dt = time.monotonic() - _t0
 
             usage = response.usage
             input_tokens = getattr(usage, "prompt_tokens", 0) or 0
             output_tokens = getattr(usage, "completion_tokens", 0) or 0
 
-            print(
-                f"[LLM] OpenRouter | model={OPENROUTER_MODEL} "
-                f"input={input_tokens} output={output_tokens}",
-                flush=True,
+            log_chat(
+                "LLM_OK",
+                "Resposta recebida",
+                model=OPENROUTER_MODEL,
+                input=input_tokens,
+                output=output_tokens,
+                dur=f"{_dt:.2f}s",
+                attempt=f"{attempt}/{MAX_RETRIES}",
             )
 
             try:
@@ -91,47 +108,60 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
             return response.choices[0].message.content
 
         except RateLimitError as e:
+            _dt = time.monotonic() - _t0
             last_error = e
             delay = _get_retry_delay(attempt, e)
-            print(
-                f"[LLM] Rate limit (429) — tentativa {attempt}/{MAX_RETRIES}, "
-                f"retry em {delay:.1f}s",
-                flush=True,
+            log_chat(
+                "LLM_RETRY",
+                "Rate limit (429)",
+                attempt=f"{attempt}/{MAX_RETRIES}",
+                dur=f"{_dt:.2f}s",
+                backoff=f"{delay:.1f}s",
             )
             time.sleep(delay)
 
         except APITimeoutError as e:
+            _dt = time.monotonic() - _t0
             last_error = e
             delay = _get_retry_delay(attempt)
-            print(
-                f"[LLM] Timeout — tentativa {attempt}/{MAX_RETRIES}, "
-                f"retry em {delay:.1f}s",
-                flush=True,
+            log_chat(
+                "LLM_RETRY",
+                "Timeout",
+                attempt=f"{attempt}/{MAX_RETRIES}",
+                dur=f"{_dt:.2f}s",
+                backoff=f"{delay:.1f}s",
             )
             time.sleep(delay)
 
         except APIError as e:
+            _dt = time.monotonic() - _t0
             last_error = e
             status = getattr(e, "status_code", None)
 
             if status in RETRYABLE_STATUS_CODES:
                 delay = _get_retry_delay(attempt, e)
-                print(
-                    f"[LLM] Erro {status} — tentativa {attempt}/{MAX_RETRIES}, "
-                    f"retry em {delay:.1f}s",
-                    flush=True,
+                log_chat(
+                    "LLM_RETRY",
+                    f"APIError status={status}",
+                    attempt=f"{attempt}/{MAX_RETRIES}",
+                    dur=f"{_dt:.2f}s",
+                    backoff=f"{delay:.1f}s",
+                    err=str(e)[:150],
                 )
                 time.sleep(delay)
             else:
-                print(
-                    f"[LLM] Erro não-retryable {status}: {e}",
-                    flush=True,
+                log_chat(
+                    "LLM_FAIL",
+                    f"Erro não-retryable status={status}",
+                    dur=f"{_dt:.2f}s",
+                    err=str(e)[:200],
                 )
                 raise
 
-    print(
-        f"[LLM] Todas as {MAX_RETRIES} tentativas falharam. Último erro: {last_error}",
-        flush=True,
+    log_chat(
+        "LLM_FAIL",
+        f"Todas as {MAX_RETRIES} tentativas falharam",
+        last_err=str(last_error)[:200],
     )
     raise last_error
 
