@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc --version)",
+      "Bash(python -c \"import markdown; print\\('markdown:', markdown.__version__\\)\")",
+      "Bash(python -c \"import xhtml2pdf; print\\('xhtml2pdf:', xhtml2pdf.__version__\\)\")",
+      "Bash(python -c \"import reportlab; print\\('reportlab:', reportlab.Version\\)\")",
+      "Bash(python -c \"import weasyprint; print\\('weasyprint: ok'\\)\")",
+      "Bash(python _build_pdf.py)",
+      "Bash(python -m py_compile src/api/auth.py src/app.py src/config.py src/api/__init__.py)",
+      "Bash(SECRET_KEY=test_secret_for_import_check python -c \"from src.app import app; print\\('App imported OK, url_map has', len\\(list\\(app.url_map.iter_rules\\(\\)\\)\\), 'rules'\\); print\\('Auth routes:'\\); [print\\(' ', r\\) for r in app.url_map.iter_rules\\(\\) if 'auth' in r.endpoint]\")",
+      "Bash(python -m py_compile src/app.py src/config.py)",
+      "Bash(AUTH_DISABLED=true python -c \"import os; os.environ.pop\\('SECRET_KEY', None\\); from src.app import app; c = app.test_client\\(\\); r = c.get\\('/dashboard/sandbox', follow_redirects=False\\); print\\('AUTH_DISABLED: GET /dashboard/sandbox →', r.status_code\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python -m pytest tests/unit/test_llm_retry.py -v)",
+      "Bash(python -m pytest tests/ -x --ignore=tests/e2e --ignore=tests/load --ignore=tests/dashboard -q)"
+    ]
+  }
+}

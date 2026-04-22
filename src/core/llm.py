@@ -1,18 +1,34 @@
 """
-core/llm.py — Interface com a API Claude (Anthropic).
+core/llm.py — Interface com a API de LLM via OpenRouter.
+
+Usa o SDK `openai` apontando para o endpoint OpenAI-compatible do OpenRouter,
+permitindo roteamento para múltiplos modelos (Anthropic, OpenAI, Google, etc.)
+através de uma única API key.
 
 Implementa:
-  - Prompt Caching: o system prompt (~30K tokens) é cacheado globalmente
-    entre todas as sessões. Tokens cacheados NÃO contam no rate limit de
-    input e custam 90% menos. Cache TTL: 5 minutos (renovado a cada chamada).
   - Retry com backoff exponencial para resiliência contra erros transitórios.
+  - Registro de métricas (input/output tokens) por chamada.
 """
 
 import time
-from anthropic import Anthropic, APIError, APITimeoutError, RateLimitError
-from src.config import ANTHROPIC_API_KEY, CLAUDE_MODEL, MAX_TOKENS
+from openai import OpenAI, APIError, APITimeoutError, RateLimitError
+from src.config import (
+    OPENROUTER_API_KEY,
+    OPENROUTER_MODEL,
+    OPENROUTER_SITE_URL,
+    OPENROUTER_APP_NAME,
+    MAX_TOKENS,
+)
 
-client = Anthropic(api_key=ANTHROPIC_API_KEY, timeout=30.0)
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY,
+    timeout=30.0,
+    default_headers={
+        "HTTP-Referer": OPENROUTER_SITE_URL,
+        "X-Title": OPENROUTER_APP_NAME,
+    },
+)
 
 # ── Configuração de retry ────────────────────────────────────────────────────
 
@@ -23,92 +39,56 @@ RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 529}
 
 def call_claude(system_prompt: str, messages: list, memory_context: str = None) -> str:
     """
-    Chama a Claude API com Prompt Caching habilitado.
-
-    O system_prompt é enviado como bloco com cache_control, permitindo que
-    a Anthropic o cachie entre chamadas. Na primeira chamada, o cache é
-    criado (cache_creation_input_tokens). Nas chamadas seguintes (dentro de
-    5 minutos), o cache é reutilizado (cache_read_input_tokens) — esses
-    tokens NÃO contam no rate limit de ITPM.
-
-    Requisitos mínimos de tokens para cache:
-      - Claude Sonnet 4.x: 1.024 tokens
-      - Claude Haiku 4.5:  4.096 tokens
-      - Claude Opus 4.x:   4.096 tokens
-    Nosso system prompt (~30K tokens) excede todos esses limites.
+    Chama o LLM via OpenRouter usando a API OpenAI-compatible.
 
     Args:
         system_prompt: Contexto completo do agente (product_info, objections, etc.)
         messages: Histórico da conversa [{"role": "user/assistant", "content": "..."}]
-        memory_context: (Fase 3) Briefing do Wild Memory — injetado como bloco
-            dinâmico DEPOIS do system prompt cacheado. Não afeta o cache.
-            Se None, comportamento é idêntico ao original.
+        memory_context: (Fase 3) Briefing do Wild Memory — concatenado ao system prompt.
 
     Returns:
-        Texto da resposta do Claude.
+        Texto da resposta do modelo.
 
     Raises:
         Exception: se todas as tentativas falharem.
     """
     last_error = None
 
-    # System prompt formatado para Prompt Caching:
-    # Bloco 1: prompt principal (cacheado — ~30K tokens, reusado entre sessões)
-    # Bloco 2: memory_context (dinâmico por sessão, NÃO cacheado)
-    # O cache da Anthropic funciona por prefix matching, então o bloco 1
-    # continua tendo cache HIT mesmo com o bloco 2 variando.
-    system_with_cache = [
-        {
-            "type": "text",
-            "text": system_prompt,
-            "cache_control": {"type": "ephemeral"},
-        }
-    ]
-
+    full_system = system_prompt
     if memory_context:
-        system_with_cache.append({
-            "type": "text",
-            "text": memory_context,
-        })
+        full_system = f"{system_prompt}\n\n{memory_context}"
+
+    full_messages = [{"role": "system", "content": full_system}, *messages]
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            response = client.messages.create(
-                model=CLAUDE_MODEL,
+            response = client.chat.completions.create(
+                model=OPENROUTER_MODEL,
                 max_tokens=MAX_TOKENS,
-                system=system_with_cache,
-                messages=messages,
+                messages=full_messages,
             )
 
-            # Log de métricas de cache para monitoramento
             usage = response.usage
-            cache_created = getattr(usage, "cache_creation_input_tokens", 0) or 0
-            cache_read = getattr(usage, "cache_read_input_tokens", 0) or 0
-            input_tokens = getattr(usage, "input_tokens", 0) or 0
-            output_tokens = getattr(usage, "output_tokens", 0) or 0
+            input_tokens = getattr(usage, "prompt_tokens", 0) or 0
+            output_tokens = getattr(usage, "completion_tokens", 0) or 0
 
-            cache_status = "HIT" if cache_read > 0 else "MISS (created)" if cache_created > 0 else "NONE"
             print(
-                f"[LLM] Cache: {cache_status} | "
-                f"cached_read={cache_read} cached_write={cache_created} "
+                f"[LLM] OpenRouter | model={OPENROUTER_MODEL} "
                 f"input={input_tokens} output={output_tokens}",
                 flush=True,
             )
 
-            # Registra métricas para o dashboard
             try:
                 from src.core.metrics import record_call
                 record_call(
-                    model=CLAUDE_MODEL,
+                    model=OPENROUTER_MODEL,
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
-                    cache_read=cache_read,
-                    cache_write=cache_created,
                 )
             except Exception:
                 pass  # Não bloqueia se métricas falharem
 
-            return response.content[0].text
+            return response.choices[0].message.content
 
         except RateLimitError as e:
             last_error = e
@@ -143,14 +123,12 @@ def call_claude(system_prompt: str, messages: list, memory_context: str = None) 
                 )
                 time.sleep(delay)
             else:
-                # Erro não-retryable (400, 401, 403, etc.) — falha imediata
                 print(
                     f"[LLM] Erro não-retryable {status}: {e}",
                     flush=True,
                 )
                 raise
 
-    # Todas as tentativas falharam
     print(
         f"[LLM] Todas as {MAX_RETRIES} tentativas falharam. Último erro: {last_error}",
         flush=True,
@@ -165,7 +143,6 @@ def _get_retry_delay(attempt: int, error=None) -> float:
     Respeita o header Retry-After da API quando disponível (comum em 429).
     Caso contrário: 1s, 2s, 4s (base * 2^(attempt-1)).
     """
-    # Verifica se a API sugeriu um tempo de espera
     if error is not None:
         retry_after = getattr(error, "headers", {})
         if hasattr(retry_after, "get"):

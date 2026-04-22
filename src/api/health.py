@@ -103,9 +103,9 @@ def api_metrics():
         from src.core.metrics import get_metrics
         metrics = get_metrics()
     except ImportError:
-        from src.config import CLAUDE_MODEL, MAX_TOKENS
+        from src.config import OPENROUTER_MODEL, MAX_TOKENS
         metrics = {
-            "model": CLAUDE_MODEL,
+            "model": OPENROUTER_MODEL,
             "max_tokens": MAX_TOKENS,
             "total_calls": 0,
             "total_input_tokens": 0,
@@ -126,8 +126,8 @@ def api_config_update():
     data = request.get_json(silent=True) or {}
 
     if "model" in data:
-        cfg.CLAUDE_MODEL = data["model"]
-        print(f"[CONFIG] Modelo alterado para: {cfg.CLAUDE_MODEL}", flush=True)
+        cfg.OPENROUTER_MODEL = data["model"]
+        print(f"[CONFIG] Modelo alterado para: {cfg.OPENROUTER_MODEL}", flush=True)
 
     if "max_tokens" in data:
         cfg.MAX_TOKENS = int(data["max_tokens"])
@@ -135,7 +135,7 @@ def api_config_update():
 
     return jsonify({
         "status": "ok",
-        "model": cfg.CLAUDE_MODEL,
+        "model": cfg.OPENROUTER_MODEL,
         "max_tokens": cfg.MAX_TOKENS,
     })
 

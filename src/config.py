@@ -13,9 +13,11 @@ load_dotenv()
 # ── Modo de Teste ──────────────────────────────────────────────────────────────
 TEST_MODE = os.getenv("TEST_MODE", "false").lower() == "true"
 
-# ── Claude / LLM ─────────────────────────────────────────────────────────────
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
+# ── OpenRouter / LLM ─────────────────────────────────────────────────────────
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "anthropic/claude-haiku-4-5")
+OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL", "https://closi.ai")
+OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME", "Closi AI")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4000"))
 
 # ── Servidor ──────────────────────────────────────────────────────────────────
@@ -31,6 +33,15 @@ FALLBACK_MESSAGE = os.getenv(
     "Estou com uma instabilidade agora, em breve um consultor vai te atender.",
 )
 FORM_RATE_LIMIT = int(os.getenv("FORM_RATE_LIMIT", "5"))
+
+# ── Login do Dashboard (Supabase Auth) ───────────────────────────────────────
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+SESSION_LIFETIME_HOURS = int(os.getenv("SESSION_LIFETIME_HOURS", "2"))
+LOGIN_RATE_LIMIT_ATTEMPTS = int(os.getenv("LOGIN_RATE_LIMIT_ATTEMPTS", "5"))
+LOGIN_RATE_LIMIT_WINDOW_MINUTES = int(os.getenv("LOGIN_RATE_LIMIT_WINDOW_MINUTES", "5"))
+# ⚠️ APENAS PARA DESENVOLVIMENTO LOCAL. Se "true", pula o login e libera o dashboard.
+# NUNCA ativar em produção — qualquer pessoa acessaria o dashboard sem autenticação.
+AUTH_DISABLED = os.getenv("AUTH_DISABLED", "false").lower() in ("true", "1", "yes")
 
 # ── Comandos de escalação ────────────────────────────────────────────────────
 ESCALATE_COMMAND = "#transferindo-para-atendimento-dedicado"

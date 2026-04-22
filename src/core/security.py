@@ -211,6 +211,7 @@ OUTPUT_REDACTION_PATTERNS = [
     (re.compile(r'/data/[^\s]+\.json'), "[PATH_REDACTED]"),
     (re.compile(r'src/[^\s]+\.py'), "[PATH_REDACTED]"),
     (re.compile(r'ANTHROPIC_API_KEY\s*=?\s*[^\s]+'), "[KEY_REDACTED]"),
+    (re.compile(r'OPENROUTER_API_KEY\s*=?\s*[^\s]+'), "[KEY_REDACTED]"),
     (re.compile(r'SUPABASE_KEY\s*=?\s*[^\s]+'), "[KEY_REDACTED]"),
     (re.compile(r'SUPABASE_URL\s*=?\s*[^\s]+'), "[KEY_REDACTED]"),
     (re.compile(r'API_SECRET_TOKEN\s*=?\s*[^\s]+'), "[KEY_REDACTED]"),

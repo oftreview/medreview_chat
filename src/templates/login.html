@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Closi AI · Entrar</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --surface2: #1a2332;
+  --primary: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-glow: rgba(37,99,235,0.25);
+  --accent: #10b981;
+  --text: #f1f5f9;
+  --text-dim: #64748b;
+  --border: rgba(37,99,235,0.15);
+  --red: #ef4444;
+  --red-glow: rgba(239,68,68,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background:radial-gradient(ellipse at 30% 20%, rgba(37,99,235,0.12) 0%, transparent 60%),
+             radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.08) 0%, transparent 60%);
+  pointer-events:none; z-index:0;
+}
+
+.login-card {
+  position:relative; z-index:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:36px 32px;
+  width:380px; max-width:calc(100vw - 32px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+.login-logo {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom:28px;
+}
+.login-logo svg {
+  width:40px; height:40px;
+  filter:drop-shadow(0 0 10px var(--primary));
+}
+.login-logo .logo-text {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:22px;
+  letter-spacing:-0.5px;
+}
+.login-logo .logo-ai { color:var(--primary-light); font-weight:400; margin-left:4px; }
+
+.login-title {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:18px;
+  text-align:center; margin-bottom:4px;
+}
+.login-sub {
+  text-align:center; font-size:12px; color:var(--text-dim);
+  margin-bottom:24px;
+}
+
+.error-box {
+  background:var(--red-glow);
+  border:1px solid rgba(239,68,68,0.3);
+  color:#fca5a5;
+  padding:10px 12px; border-radius:8px;
+  font-size:12.5px;
+  margin-bottom:16px;
+}
+
+.form-group { margin-bottom:14px; }
+.form-label {
+  display:block; font-size:11px; font-weight:500;
+  color:var(--text-dim); letter-spacing:0.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+.form-input {
+  width:100%;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13.5px;
+  transition:border-color 0.15s, background 0.15s;
+}
+.form-input:focus {
+  outline:none;
+  border-color:var(--primary);
+  background:#0f172a;
+}
+
+.btn-submit {
+  width:100%;
+  background:var(--primary);
+  border:none;
+  color:#fff;
+  padding:11px 16px;
+  border-radius:8px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13.5px; font-weight:500;
+  cursor:pointer;
+  margin-top:8px;
+  transition:background 0.15s;
+}
+.btn-submit:hover { background:var(--primary-light); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; }
+
+.login-footer {
+  margin-top:24px; text-align:center;
+  font-size:10.5px; color:var(--text-dim); opacity:0.5;
+  letter-spacing:1px;
+}
+</style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="10" fill="#111827"/>
+        <path d="M26 10.5a12 12 0 1 0 0 19" stroke="#2563eb" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <circle cx="28" cy="10.5" r="3" fill="#10b981"/>
+      </svg>
+      <div class="logo-text">Closi<span class="logo-ai">AI</span></div>
+    </div>
+
+    <div class="login-title">Acessar o dashboard</div>
+    <div class="login-sub">Entre com seu email e senha</div>
+
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('auth.login_post') }}" autocomplete="on">
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email"
+               required autofocus autocomplete="email" spellcheck="false">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Senha</label>
+        <input class="form-input" type="password" id="password" name="password"
+               required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn-submit">Entrar</button>
+    </form>
+
+    <div class="login-footer">CLOSI AI · DASHBOARD</div>
+  </div>
+</body>
+</html>

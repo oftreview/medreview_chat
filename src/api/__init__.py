@@ -6,6 +6,7 @@ Imports all blueprints and provides register_blueprints() function.
 
 def register_blueprints(app):
     """Register all API blueprints with the Flask app."""
+    from .auth import bp as auth_bp
     from .dashboard import bp as dashboard_bp
     from .chat import bp as chat_bp
     from .webhooks import bp as webhooks_bp
@@ -17,6 +18,7 @@ def register_blueprints(app):
     from .backlog_api import bp as backlog_bp
 
     for bp in [
+        auth_bp,
         dashboard_bp,
         chat_bp,
         webhooks_bp,

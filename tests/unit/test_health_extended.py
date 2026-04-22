@@ -177,10 +177,10 @@ class TestConfigUpdate:
     """Test /api/config endpoint (POST)."""
 
     def test_config_update_model(self, client):
-        """POST /api/config updates CLAUDE_MODEL."""
+        """POST /api/config updates OPENROUTER_MODEL."""
         resp = client.post(
             "/api/config",
-            json={"model": "claude-3-opus-20240229"}
+            json={"model": "anthropic/claude-opus-4"}
         )
 
         assert resp.status_code == 200
@@ -508,20 +508,20 @@ class TestConfigUpdateActualModule:
     """Test /api/config updates actual src.config module values."""
 
     def test_config_update_actually_changes_model(self, client):
-        """POST /api/config actually updates src.config.CLAUDE_MODEL."""
+        """POST /api/config actually updates src.config.OPENROUTER_MODEL."""
         import src.config
-        original_model = src.config.CLAUDE_MODEL
+        original_model = src.config.OPENROUTER_MODEL
 
         try:
             resp = client.post(
                 "/api/config",
-                json={"model": "claude-3-opus-20240229"}
+                json={"model": "anthropic/claude-opus-4"}
             )
 
             assert resp.status_code == 200
-            assert src.config.CLAUDE_MODEL == "claude-3-opus-20240229"
+            assert src.config.OPENROUTER_MODEL == "anthropic/claude-opus-4"
         finally:
-            src.config.CLAUDE_MODEL = original_model
+            src.config.OPENROUTER_MODEL = original_model
 
     def test_config_update_actually_changes_max_tokens(self, client):
         """POST /api/config actually updates src.config.MAX_TOKENS."""

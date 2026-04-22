@@ -1,9 +1,12 @@
 """
-Coletor de métricas de uso da API Anthropic.
+Coletor de métricas de uso da API LLM (via OpenRouter).
 
-Singleton thread-safe que acumula tokens, custos e cache hits.
+Singleton thread-safe que acumula tokens e custos.
 Dual-write: memória (live) + Supabase (persistente).
 Alimentado por core/llm.py após cada chamada à API.
+
+Nota: campos cache_read/cache_write permanecem na estrutura (compat com schema
+e dashboards legados) mas serão sempre 0 — OpenRouter é chamado sem caching.
 """
 import threading
 import time
@@ -13,12 +16,13 @@ from datetime import datetime, timezone, timedelta
 # Fuso horário de Brasília (UTC-3)
 _BRT = timezone(timedelta(hours=-3))
 
-# Preços por milhão de tokens (input, output)
+# Preços por milhão de tokens (input, output) — slugs do OpenRouter
 MODEL_PRICES = {
-    "claude-haiku-4-5-20251001":  {"input": 1.0, "output": 5.0},
-    "claude-sonnet-4-20250514":   {"input": 3.0, "output": 15.0},
-    "claude-sonnet-4-6":          {"input": 3.0, "output": 15.0},
-    "claude-opus-4-6":            {"input": 5.0, "output": 25.0},
+    "anthropic/claude-haiku-4-5":  {"input": 1.0, "output": 5.0},
+    "anthropic/claude-sonnet-4-5": {"input": 3.0, "output": 15.0},
+    "anthropic/claude-opus-4":     {"input": 15.0, "output": 75.0},
+    "openai/gpt-4o-mini":          {"input": 0.15, "output": 0.6},
+    "openai/gpt-4o":               {"input": 2.5, "output": 10.0},
 }
 
 _lock = threading.Lock()
@@ -82,11 +86,11 @@ def record_call(model: str, input_tokens: int, output_tokens: int,
 
 def get_metrics() -> dict:
     """Retorna snapshot das métricas da sessão atual (memória)."""
-    from src.config import CLAUDE_MODEL, MAX_TOKENS
+    from src.config import OPENROUTER_MODEL, MAX_TOKENS
 
     with _lock:
         return {
-            "model": CLAUDE_MODEL,
+            "model": OPENROUTER_MODEL,
             "max_tokens": MAX_TOKENS,
             **dict(_totals),
             "total_cost": round(_totals["total_cost"], 6),

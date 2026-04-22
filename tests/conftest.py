@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ["TEST_MODE"] = "true"
 os.environ["SUPABASE_URL"] = "http://localhost:54321"
 os.environ["SUPABASE_KEY"] = "test-key-not-real"
-os.environ["ANTHROPIC_API_KEY"] = "test-key-not-real"
+os.environ["OPENROUTER_API_KEY"] = "test-key-not-real"
 os.environ["ZAPI_INSTANCE_ID"] = ""
 os.environ["ZAPI_TOKEN"] = ""
 os.environ["ZAPI_CLIENT_TOKEN"] = ""
@@ -72,18 +72,17 @@ def client(app):
 
 @pytest.fixture
 def mock_claude(mocker):
-    """Mock da API Claude com respostas deterministicas."""
-    mock = mocker.patch("src.core.llm.client.messages.create")
+    """Mock da API LLM (via OpenRouter) com respostas deterministicas."""
+    mock = mocker.patch("src.core.llm.client.chat.completions.create")
 
-    # Cria objetos com atributos reais (nao MagicMock)
-    text_block = type("TextBlock", (), {"text": "Resposta padrao do agente para testes."})()
+    # Shape OpenAI-compatible: response.choices[0].message.content + response.usage
+    message = type("Message", (), {"content": "Resposta padrao do agente para testes."})()
+    choice = type("Choice", (), {"message": message})()
     usage = type("Usage", (), {
-        "input_tokens": 100,
-        "output_tokens": 50,
-        "cache_creation_input_tokens": 0,
-        "cache_read_input_tokens": 100,
+        "prompt_tokens": 100,
+        "completion_tokens": 50,
     })()
-    response = type("Response", (), {"content": [text_block], "usage": usage})()
+    response = type("Response", (), {"choices": [choice], "usage": usage})()
     mock.return_value = response
     return mock
 
