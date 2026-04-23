@@ -16,7 +16,7 @@ from src import config
 _SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Endpoints que NÃO exigem login. Novos blueprints ficam protegidos por padrão.
-_PUBLIC_ENDPOINT_PREFIXES = ("auth.", "health.", "webhooks.")
+_PUBLIC_ENDPOINT_PREFIXES = ("auth.", "health.", "webhooks.", "chat.")
 
 
 def create_app():

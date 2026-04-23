@@ -1,0 +1,117 @@
+{
+  "info": {
+    "name": "Closi-AI Chat API",
+    "description": "Endpoints do chat em produção (Railway).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://web-production-f15f8.up.railway.app" },
+    { "key": "apiToken", "value": "COLE_SEU_API_SECRET_TOKEN_AQUI" },
+    { "key": "userId", "value": "teste-postman-001" },
+    { "key": "sessionId", "value": "teste-postman-001" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{apiToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Chat - Enviar mensagem (API mode)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{apiToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"session_id\": \"{{sessionId}}\",\n  \"channel\": \"api\",\n  \"message\": \"Oi, quero saber sobre o produto\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/chat", "host": ["{{baseUrl}}"], "path": ["chat"] },
+        "description": "Retorna `response`, `responses[]`, `status`. Bloqueia alguns segundos por conta do debounce."
+      }
+    },
+    {
+      "name": "Chat - Sandbox (sem auth)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"session_id\": \"sandbox\",\n  \"message\": \"teste sandbox\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/chat", "host": ["{{baseUrl}}"], "path": ["chat"] },
+        "description": "Modo sandbox — não exige Bearer. Use só para debug local."
+      }
+    },
+    {
+      "name": "Chat - Escalar (comando secreto)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{apiToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"channel\": \"api\",\n  \"message\": \"<<comando_escalar>>\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/chat", "host": ["{{baseUrl}}"], "path": ["chat"] },
+        "description": "Substitua a string pelo ESCALATE_COMMAND real configurado no backend."
+      }
+    },
+    {
+      "name": "Reset - Zerar histórico",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{apiToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"session_id\": \"{{sessionId}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/reset", "host": ["{{baseUrl}}"], "path": ["reset"] }
+      }
+    },
+    {
+      "name": "History - Obter histórico",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{apiToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/history?session_id={{sessionId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["history"],
+          "query": [{ "key": "session_id", "value": "{{sessionId}}" }]
+        }
+      }
+    },
+    {
+      "name": "Sessions - Listar sessões",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{apiToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/sessions?limit=50",
+          "host": ["{{baseUrl}}"],
+          "path": ["sessions"],
+          "query": [
+            { "key": "limit", "value": "50" },
+            { "key": "date_from", "value": "", "disabled": true },
+            { "key": "date_to", "value": "", "disabled": true }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Health - Ping",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+        "description": "Público — não exige auth."
+      }
+    }
+  ]
+}
